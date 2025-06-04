@@ -1,11 +1,19 @@
 const express = require('express')
-const dotenv = require('dotenv')
-const app = express()
-const port = 3000
+require('dotenv').config();
+const userRouter = require('./Filters.js');
+
+const app = express();
+app.use('/', userRouter);
+
+const port = process.env.STATUS == "production" ? 3000 : 3001;
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/about', (req, res) => {
   res.json({
-    
+    "ProdName": "EhBMatch",
+    "Version": `v${process.env.VERSION} (Build: ${process.env.BUILD})`
   })
 })
 
