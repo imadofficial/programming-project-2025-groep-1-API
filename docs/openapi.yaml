@@ -1,4 +1,15 @@
 openapi: '3.1.1'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+security:
+  - bearerAuth: []
+
+
 info:
   title: API Title
   version: '1.0'
