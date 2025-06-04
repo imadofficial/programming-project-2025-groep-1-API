@@ -1,6 +1,7 @@
 const express = require('express')
 require('dotenv').config();
 const userRouter = require('./Filters.js');
+const swaggerDocs = require('./docs/swagger.js');
 
 const app = express();
 app.use('/', userRouter);
@@ -20,3 +21,5 @@ app.get('/about', (req, res) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
+swaggerDocs(app);
