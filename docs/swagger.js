@@ -8,7 +8,7 @@ const swaggerDefinition = {
     version: '1.0.0',
     description: 'Demo Express API documented with OpenAPI 3.1 & Swagger UI',
   },
-  servers: [{ url: 'http://localhost:3000', description: 'Dev server' }],
+  servers: [{ url: 'http://localhost:3001', description: 'Dev server' }],
 };
 
 const options = {
