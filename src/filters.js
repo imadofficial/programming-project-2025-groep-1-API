@@ -4,7 +4,7 @@ const path = require('path');
 
 const router = express.Router()
 
-const bedrijvenData = JSON.parse(fs.readFileSync(path.join('bedrijvenlijst.json'), 'utf8'));
+const bedrijvenData = JSON.parse(fs.readFileSync(path.join('data/bedrijvenlijst.json'), 'utf8'));
 
 router.get('/bedrijven', (req, res) => {
     res.json(bedrijvenData);
