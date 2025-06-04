@@ -2,6 +2,7 @@ const mysql = require('mysql2');
 require('dotenv').config();
 
 const allowedDatabases = process.env.ALLOWED_DB;
+
 const pools = {};
 
 function getPool(dbName = 'Accounts') {
@@ -12,9 +13,9 @@ function getPool(dbName = 'Accounts') {
     if (!pools[dbName]) {
         pools[dbName] = mysql.createPool({
             host: 'localhost',
-            user: srvConfig["MySQL"]["Username"],
-            password: srvConfig["MySQL"]["Password"],
-            port: srvConfig["MySQL"]["Port"],
+            user: process.env.USER || 'root',
+            password: process.env.PASS || '',
+            port: process.env.PORT || 3306,
             database: dbName,
             waitForConnections: true,
             connectionLimit: 20,
