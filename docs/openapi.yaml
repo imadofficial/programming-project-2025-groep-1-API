@@ -13,12 +13,37 @@ security:
 info:
   title: API Title
   version: '1.0'
+
 servers:
   - url: http://localhost:3001
     description: Dev Server
+
 paths:
   /bedrijven:
     get:
+      responses:
+        '200':
+          description: OK
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+
+  /bedrijven/{id}:
+    get:
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: OK
