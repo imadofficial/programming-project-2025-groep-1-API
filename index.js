@@ -1,6 +1,6 @@
 const express = require('express')
 require('dotenv').config();
-const userRouter = require('./Filters.js');
+const userRouter = require('./filters.js');
 const swaggerDocs = require('./docs/swagger.js');
 
 const app = express();
