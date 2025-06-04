@@ -2,9 +2,10 @@ const express = require('express')
 require('dotenv').config();
 const userRouter = require('./filters.js');
 const swaggerDocs = require('../docs/swagger.js');
+const auth = require('./authentication.js');
 
 const app = express();
-app.use('/', userRouter);
+app.use('/', auth.authenticate, userRouter);
 
 const port = process.env.STATUS == "production" ? 3000 : 3001;
 
