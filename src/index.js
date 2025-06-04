@@ -5,7 +5,7 @@ const swaggerDocs = require('../docs/swagger.js');
 const auth = require('./authentication.js');
 
 const app = express();
-app.use('/', auth.authenticate, userRouter);
+app.use('/', userRouter);
 
 const port = process.env.STATUS == "production" ? 3000 : 3001;
 
