@@ -21,7 +21,7 @@ router.post('/', (req, res, next) => {
             httpOnly: true,
             secure: process.env.STATUS === 'production', // Use secure cookies in production
             sameSite: 'Strict', // Adjust as necessary
-            path: '/refresh', // Ensure the cookie is only sent to the refresh endpoint
+            path: "/auth/refresh", // Ensure the cookie is only sent to the refresh endpoint
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
