@@ -49,8 +49,10 @@ paths:
               properties:
                 username:
                   type: string
+                  example: 'janjansen'
                 password:
                   type: string
+                  example: 'password123'
       responses:
         '200':
           description: Successful login
