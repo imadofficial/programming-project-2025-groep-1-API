@@ -105,6 +105,8 @@ paths:
       tags:
         - Auth
       summary: Logout from the API
+      description: >
+        This endpoint logs the user out and removes the refresh token.
       responses:
         '200':
           description: Successful logout
@@ -122,7 +124,8 @@ paths:
     post:
       tags:
         - Bedrijven
-      description: Create a new company
+      summary: Create a new company [NOTE: This endpoint is not implemented yet]
+      description: Create a new company [NOTE: This endpoint is not implemented yet]
       requestBody:
         required: true
         content:
@@ -182,7 +185,8 @@ paths:
     post:
       tags:
         - Studenten
-      description: Create a new student
+      summary: Create a new student [NOTE: This endpoint is not implemented yet]
+      description: Create a new student [NOTE: This endpoint is not implemented yet]
       requestBody:
         required: true
         content:
