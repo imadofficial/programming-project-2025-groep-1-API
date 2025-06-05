@@ -1,21 +1,26 @@
 const express = require('express')
 require('dotenv').config();
 const swaggerDocs = require('../docs/swagger.js');
-const auth = require('./authentication.js');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 app.use(express.json());
-//app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
-require('./auth/authentication.js'); // Initialize authentication strategies
+require('./auth/passportJWT.js');
 
 const bedrijven = require('./routes/bedrijven.js');
 const studenten = require('./routes/studenten.js');
 const login = require('./auth/login.js');
+const refresh = require('./auth/refresh.js');
+const logout = require('./auth/logout.js');
 
 app.use('/bedrijven', bedrijven);
 app.use('/studenten', studenten);
-app.use('/login', login);
+app.use('/auth/login', login);
+app.use('/auth/refresh', refresh);
+app.use('/auth/logout', logout);
 
 const port = process.env.STATUS == "production" ? 3000 : 3001;
 
