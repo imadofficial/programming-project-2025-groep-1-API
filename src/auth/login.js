@@ -25,7 +25,7 @@ router.post('/', (req, res, next) => {
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
-        return res.status(200).json({ message: 'Login successful', token: accessToken });
+        return res.status(200).json({ message: 'Login successful', accessToken: accessToken });
     })(req, res, next);
 });
 
