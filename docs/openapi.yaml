@@ -5,6 +5,11 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Use a JWT access token in the Authorization header:
+        `Authorization: Bearer <access_token>`.
+
 
 security:
   - bearerAuth: []
@@ -15,14 +20,101 @@ info:
   version: '1.0'
 
 tags:
+  - name: Auth
+    description: >
+      Authentication endpoints for the API.
   - name: Bedrijven
+    description: >
+      Endpoints for managing companies.
   - name: Studenten
+    description: >
+      Endpoints for managing students.
 
 servers:
-  - url: http://localhost:3001
+  - url: https://api.ehb-match.me
     description: Dev Server
 
 paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login to the API
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Login successful'
+                  accessToken:
+                    type: string
+                    example: 'your_access_token_here'
+                  accessTokenExpiresAt:
+                    type: string
+                    format: date-time
+                    example: '2023-10-01T00:15:00Z'
+                  refreshTokenExpiresAt:
+                    type: string
+                    format: date-time
+                    example: '2023-10-08T00:00:00Z'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Auth
+      summary: Refresh the access token
+      responses:
+        '200':
+          description: Successful token refresh
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Token refreshed successfully'
+                  accessToken:
+                    type: string
+                    example: 'new_access_token_here'
+                  accessTokenExpiresAt:
+                    type: string
+                    format: date-time
+                    example: '2023-10-01T12:00:00Z'
+
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Logout from the API
+      responses:
+        '200':
+          description: Successful logout
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Logout successful'
+
   /bedrijven:
     description: List of companies
     post:
