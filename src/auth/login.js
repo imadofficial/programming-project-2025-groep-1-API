@@ -25,7 +25,10 @@ router.post('/', (req, res, next) => {
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
-        return res.status(200).json({ message: 'Login successful', accessToken: accessToken });
+        const accessTokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+        const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+        return res.status(200).json({ message: 'Login successful', accessToken: accessToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt });
     })(req, res, next);
 });
 
