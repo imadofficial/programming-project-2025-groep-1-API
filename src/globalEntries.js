@@ -12,10 +12,10 @@ function getPool(dbName = 'Accounts') {
 
     if (!pools[dbName]) {
         pools[dbName] = mysql.createPool({
-            host: 'localhost',
-            user: process.env.SQLUSER || 'root',
-            password: process.env.SQLPASS || '',
-            port: process.env.SQLPORT || 3306,
+            host: process.env.SQL_HOST || 'localhost',
+            user: process.env.SQL_USER || 'root',
+            password: process.env.SQL_PASS || '',
+            port: process.env.SQL_PORT || 3306,
             database: dbName,
             waitForConnections: true,
             connectionLimit: 20,
