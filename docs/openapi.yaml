@@ -98,7 +98,11 @@ paths:
                   accessTokenExpiresAt:
                     type: string
                     format: date-time
-                    example: '2023-10-01T12:00:00Z'
+                    example: '2023-10-01T12:15:00Z'
+                  refreshTokenExpiresAt:
+                    type: string
+                    format: date-time
+                    example: '2023-10-08T12:00:00Z'
 
   /auth/logout:
     post:
