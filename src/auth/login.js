@@ -8,6 +8,7 @@ const router = express.Router();
 
 router.post('/', async (req, res, next) => {
     await passport.authenticate('local', { session: false }, (err, user, info) => {
+        console.log(user);
         if (err) {
             return res.status(500).json({ message: 'Internal server error: ' + err.message });
         }
