@@ -10,14 +10,20 @@ app.use(cookieParser());
 
 require('./auth/passportJWT.js');
 
+const skills = require('./routes/skills.js');
+
 const bedrijven = require('./routes/bedrijven.js');
 const studenten = require('./routes/studenten.js');
+
 const login = require('./auth/login.js');
 const refresh = require('./auth/refresh.js');
 const logout = require('./auth/logout.js');
 
+app.use('/skills', skills);
+
 app.use('/bedrijven', bedrijven);
 app.use('/studenten', studenten);
+
 app.use('/auth/login', login);
 app.use('/auth/refresh', refresh);
 app.use('/auth/logout', logout);
