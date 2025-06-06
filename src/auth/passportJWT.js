@@ -9,6 +9,7 @@ passport.use(new JwtStrategy({
     secretOrKey: process.env.JWT_ACCESS_SECRET
 }, async (jwtPayload, done) => {
     // Find the user in the database based on the JWT payload
+    console.log("JWT Payload:", jwtPayload);
     const user = await getUserById(jwtPayload.id);
     if (user) {
         done(null, user);
