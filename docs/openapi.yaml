@@ -16,8 +16,8 @@ security:
 
 
 info:
-  title: API Title
-  version: '1.0'
+  title: EHB Match API
+  version: '0.1'
 
 tags:
   - name: Auth
@@ -124,8 +124,8 @@ paths:
     post:
       tags:
         - Bedrijven
-      summary: Create a new company [NOTE: This endpoint is not implemented yet]
-      description: Create a new company [NOTE: This endpoint is not implemented yet]
+      summary: 'Create a new company [NOTE: This endpoint is not implemented yet]'
+      description: 'Create a new company [NOTE: This endpoint is not implemented yet]'
       requestBody:
         required: true
         content:
@@ -185,8 +185,8 @@ paths:
     post:
       tags:
         - Studenten
-      summary: Create a new student [NOTE: This endpoint is not implemented yet]
-      description: Create a new student [NOTE: This endpoint is not implemented yet]
+      summary: 'Create a new student [NOTE: This endpoint is not implemented yet]'
+      description: 'Create a new student [NOTE: This endpoint is not implemented yet]'
       requestBody:
         required: true
         content:
