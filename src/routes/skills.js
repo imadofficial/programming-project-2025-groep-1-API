@@ -2,6 +2,8 @@ const express = require('express');
 const passport = require('passport');
 const { getAllSkills } = require('../sql/skills.js');
 
+require('../auth/passportJWT.js');
+
 const router = express.Router();
 
 router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {

@@ -4,6 +4,8 @@ const path = require('path');
 const passport = require('passport');
 const { getPool } = require('../globalEntries.js');
 
+require('../auth/passportJWT.js');
+
 const router = express.Router()
 
 const bedrijvenData = JSON.parse(fs.readFileSync(path.join('data/bedrijvenlijst.json'), 'utf8'));
