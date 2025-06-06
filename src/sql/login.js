@@ -48,6 +48,7 @@ async function login(email, wachtwoord) {
         const match = await bcrypt.compare(wachtwoord, rows[0].wachtwoord);
 
         if (rows.length > 0 && match) {
+            console.log('Login successful for email:', email); // Log successful login
             return rows[0].id;
         } else {
             return null;
