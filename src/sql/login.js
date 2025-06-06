@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 
 const { getPool } = require('../globalEntries.js');
 
+const bcrypt = require('bcrypt');
+
 
 dotenv.config();
 
