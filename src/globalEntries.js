@@ -1,7 +1,7 @@
 const mysql = require('mysql2');
 require('dotenv').config();
 
-const allowedDatabases = process.env.ALLOWED_DB;
+const allowedDatabases = JSON.parse(process.env.ALLOWED_DB);
 
 const pools = {};
 
