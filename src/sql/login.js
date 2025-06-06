@@ -47,8 +47,8 @@ async function login(email, wachtwoord) {
 
         const match = await bcrypt.compare(wachtwoord, rows[0].wachtwoord);
 
+        return rows[0].id;
         if (rows.length > 0) {
-            return rows[0].id;
         } else {
             return null;
         }
