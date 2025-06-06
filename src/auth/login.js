@@ -6,8 +6,8 @@ require('./passportLocal.js');
 
 const router = express.Router();
 
-router.post('/', (req, res, next) => {
-    passport.authenticate('local', { session: false }, (err, user, info) => {
+router.post('/', async (req, res, next) => {
+    await passport.authenticate('local', { session: false }, (err, user, info) => {
         if (err) {
             return res.status(500).json({ message: 'Internal server error: ' + err.message });
         }
