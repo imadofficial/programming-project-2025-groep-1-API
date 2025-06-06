@@ -11,7 +11,7 @@ passport.use(new LocalStrategy(
     },
     async function(email, password, done) {
         const userId = await login(email, password); 
-        if (!userId) {
+        if (userId === null) {
             return done(null, false, { message: 'Incorrect email or password.' });
         }
         const isAdminUser = await isAdmin(userId);
