@@ -15,6 +15,8 @@ const bedrijven = require('./routes/bedrijven.js');
 const studenten = require('./routes/studenten.js');
 const login = require('./routes/login.js');
 const skills = require('./routes/skills.js');
+const register = require('./routes/register.js');
+const opleidingen = require('./routes/opleiding.js');
 
 // Enable CORS for all origins
 app.use(cors());
@@ -26,6 +28,8 @@ app.use('/bedrijven', bedrijven);
 app.use('/studenten', studenten);
 app.use('/login', login);
 app.use('/skills', skills);
+app.use('/register', register);
+app.use('/opleiding', opleidingen);
 
 const port = process.env.STATUS == "production" ? 3000 : 3001;
 
