@@ -43,7 +43,7 @@ async function login(email, wachtwoord) {
         const [rows] = await pool.query(query, [email]);
         console.log('Query result:', rows); // Log the query result
 
-        const match = await bcrypt.compare(wachtwoord, rows[0]?.wachtwoord || ''); // Use optional chaining to avoid errors if rows is empty
+        const match = await bcrypt.compare(wachtwoord, rows[0].wachtwoord);
 
         if (rows.length > 0 && match) {
             return rows[0].id;

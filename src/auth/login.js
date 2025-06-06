@@ -9,10 +9,10 @@ const router = express.Router();
 router.post('/', (req, res, next) => {
     passport.authenticate('local', { session: false }, (err, user, info) => {
         if (err) {
-            return res.status(500).json({ message: 'Internal server error: ' });
+            return res.status(500).json({ message: 'Internal server error: ' + err.message });
         }
         if (!user) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            return res.status(401).json({ message: 'Invalid credentials', info: info });
         }
         const accessToken = jwt.sign({ id: user.id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
         const refreshToken = jwt.sign({ id: user.id }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
