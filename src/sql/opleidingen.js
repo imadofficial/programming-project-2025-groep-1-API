@@ -8,7 +8,7 @@ const { getPool } = require('../globalEntries.js');
 dotenv.config();
 
 async function getAllOpleidingen() {
-    const pool = getPool('ehbmatch');
+    const pool = getPool('ehbmatchdev');
     const query = 'SELECT * FROM opleiding'; // Corrected table name
 
     try {

@@ -7,7 +7,7 @@ const { getPool } = require('../globalEntries.js');
 
 dotenv.config();
 async function register(email, wachtwoord) {
-    const pool = getPool('ehbmatch');
+    const pool = getPool('ehbmatchdev');
     const query = 'INSERT INTO gebruiker (email, wachtwoord) VALUES (?,?)';
 
     try {
