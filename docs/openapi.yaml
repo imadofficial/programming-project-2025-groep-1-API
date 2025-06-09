@@ -26,6 +26,9 @@ tags:
   - name: Registration
     description: >
       Endpoints for user registration and management.
+  - name: Information
+    description: >
+      Endpoints for retrieving available informations like skills.
   - name: Bedrijven
     description: >
       Endpoints for managing companies.
@@ -165,6 +168,52 @@ paths:
                   type: string
                   example: 'password123'
 
+  /skills:
+    description: List of available skills
+    get:
+      tags:
+        - Information
+      summary: Get all available skills
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    skill:
+                      type: string
+                      example: 'JavaScript'
+
+  /opleidingen:
+    description: List of available opleidingen
+    get:
+      tags:
+        - Information
+      summary: Get all available opleidingen
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    naam:
+                      type: string
+                      example: 'Informatica'
+                    type:
+                      type: string
+
   /bedrijven:
     description: List of companies
     post:
@@ -206,10 +255,18 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
+                    gebruiker_id:
                       type: integer
-                    name:
+                    naam:
                       type: string
+                    plaats:
+                      type: string
+                    contact_email:
+                      type: string
+                      format: email
+                    linkedin:
+                      type: string
+                      format: uri
 
   /bedrijven/{id}:
     description: Get a specific company by ID
@@ -225,6 +282,26 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  gebruiker_id:
+                    type: integer
+                  naam:
+                    type: string 
+                    example: 'Tech Solutions'
+                  plaats:
+                    type: string
+                  contact_email:
+                    type: string
+                    format: email
+                    example: 'info@techsolutions.com'
+                  linkedin:
+                    type: string
+                    format: uri
+                    example: 'https://www.linkedin.com/company/techsolutions'
 
   /studenten:
     description: List of students
@@ -267,10 +344,25 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
+                    gebruiker_id:
                       type: integer
-                    name:
+                    voornaam:
                       type: string
+                      example: 'Jan'
+                    achternaam:
+                      type: string
+                      example: 'Jansen'
+                    linkedin:
+                      type: string
+                      format: uri
+                    profiel_foto:
+                      type: string
+                      format: uri
+                    studiejaar:
+                      type: integer
+                    opleiding_id:
+                      type: integer
+
 
 
   /studenten/{id}:
@@ -292,7 +384,21 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
+                  gebruiker_id:
                     type: integer
-                  name:
+                  voornaam:
                     type: string
+                    example: 'Jan'
+                  achternaam:
+                    type: string
+                    example: 'Jansen'
+                  linkedin:
+                    type: string
+                    format: uri
+                  profiel_foto:
+                    type: string
+                    format: uri
+                  studiejaar:
+                    type: integer
+                  opleiding_id:
+                    type: integer
