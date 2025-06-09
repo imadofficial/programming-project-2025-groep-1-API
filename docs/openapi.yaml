@@ -23,6 +23,9 @@ tags:
   - name: Auth
     description: >
       Authentication endpoints for the API.
+  - name: Registration
+    description: >
+      Endpoints for user registration and management.
   - name: Bedrijven
     description: >
       Endpoints for managing companies.
@@ -122,6 +125,45 @@ paths:
                   message:
                     type: string
                     example: 'Logout successful'
+
+  /auth/register/user:
+    post:
+      tags:
+        - Registration
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'janjansen@example.com'
+                password:
+                  type: string
+                  example: 'password123'
+  /auth/register/admin:
+    post:
+      tags:
+        - Registration
+      summary: Register a new admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'admin@example.com'
+                password:
+                  type: string
+                  example: 'password123'
 
   /bedrijven:
     description: List of companies
