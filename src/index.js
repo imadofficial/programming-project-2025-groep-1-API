@@ -27,6 +27,7 @@ app.use('/studenten', studenten);
 app.use('/auth/login', login);
 app.use('/auth/refresh', refresh);
 app.use('/auth/logout', logout);
+app.use('/auth/register', register);
 
 const port = process.env.STATUS == "production" ? 3000 : 3001;
 
