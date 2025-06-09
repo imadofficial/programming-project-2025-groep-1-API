@@ -10,27 +10,33 @@ app.use(cookieParser());
 
 require('./auth/passportJWT.js');
 
-const skills = require('./routes/skills.js');
 
 const bedrijven = require('./routes/bedrijven.js');
 const studenten = require('./routes/studenten.js');
+
+const skills = require('./routes/skills.js');
+const opleidingen = require('./routes/opleidingen.js');
 
 const login = require('./auth/login.js');
 const refresh = require('./auth/refresh.js');
 const logout = require('./auth/logout.js');
 
-app.use('/skills', skills);
+const register = require('./auth/register.js');
+
 
 app.use('/bedrijven', bedrijven);
 app.use('/studenten', studenten);
 
+app.use('/skills', skills);
+app.use('/opleidingen', opleidingen);
+
+// Authentication routes
 app.use('/auth/login', login);
 app.use('/auth/refresh', refresh);
 app.use('/auth/logout', logout);
 app.use('/auth/register', register);
 
 const port = process.env.STATUS == "production" ? 3000 : 3001;
-
 
 app.get('/about', (req, res) => {
   res.json({
