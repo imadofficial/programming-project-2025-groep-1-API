@@ -83,5 +83,6 @@ async function getUserInfo(id) {
 }
 
 module.exports = {
-    getUserById
+    getUserById,
+    getUserInfo
 };
