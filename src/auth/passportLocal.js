@@ -8,7 +8,7 @@ console.log("Loading passport local strategy...");
 
 passport.use(new LocalStrategy(
     {
-        emailField: 'email',
+        usernameField: 'email',
         passwordField: 'password',
     },
     async function(email, password, done) {
