@@ -48,6 +48,8 @@ const login = require('./auth/login.js');
 const refresh = require('./auth/refresh.js');
 const logout = require('./auth/logout.js');
 
+const info = require('./auth/info.js');
+
 const register = require('./auth/register.js');
 
 
@@ -58,6 +60,8 @@ app.use('/skills', skills);
 app.use('/opleidingen', opleidingen);
 
 // Authentication routes
+app.use('/auth/info', info);
+
 app.use('/auth/login', login);
 app.use('/auth/refresh', refresh);
 app.use('/auth/logout', logout);
