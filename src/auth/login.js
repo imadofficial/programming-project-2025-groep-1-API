@@ -12,7 +12,7 @@ router.post('/', async (req, res, next) => {
         if (err) {
             return res.status(500).json({ message: 'Internal server error: ' + err.message });
         }
-        if (user === null) {
+        if (!user) {
             return res.status(401).json({ message: 'Invalid credentials', info: info });
         }
         const accessToken = jwt.sign({ id: user.id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
