@@ -21,6 +21,7 @@ async function getUserById(id) {
 
 async function getUserInfo(id) {
     const pool = getPool('ehbmatchdev');
+    console.log('Fetching user info for ID:', id); // Log the ID being fetched
     const query = `
         SELECT 
             g.id, g.email, g.is_admin,
