@@ -6,7 +6,8 @@ const authAdmin = require('./authAdmin.js');
 const router = express.Router();
 
 router.post('/user', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const { email, wachtwoord } = req.body;
+    const email = req.body.email ? req.body.email.toLowerCase() : res.status(400).json({ error: 'Email is required' });
+    const wachtwoord = req.body.wachtwoord ? req.body.wachtwoord.toLowerCase() : res.status(400).json({ error: 'Password is required' });
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
     try {
         const userId = await register(email, hashedPassword);

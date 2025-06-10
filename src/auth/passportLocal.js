@@ -12,6 +12,8 @@ passport.use(new LocalStrategy(
         passwordField: 'password',
     },
     async function(email, password, done) {
+        email = email.toLowerCase();
+        password = password.toLowerCase();
         console.log("LocalStrategy called with email:", email);
         console.log("LocalStrategy called with password:", password);
         const userId = await login(email, password); 
