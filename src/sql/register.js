@@ -49,15 +49,18 @@ async function registerStudent(email, wachtwoord, voornaam, achternaam, linkedin
     }
 }
 
-async function registerBedrijf(email, wachtwoord, naam, plaats, contact_email) {
+async function registerBedrijf(email, wachtwoord, naam, plaats, contact_email, linkedin) {
     const pool = getPool('ehbmatchdev');
     const query1 = 'INSERT INTO gebruiker (email, wachtwoord, is_admin) VALUES (?,?,0)';
-    const query2 = 'INSERT INTO bedrijf (gebruiker_id,naam, plaats, contact_email) VALUES (?, ?, ?, ?, ?)';
+    const query2 = 'INSERT INTO bedrijf (gebruiker_id, naam, plaats, contact_email, linkedin) VALUES (?, ?, ?, ?, ?)';
 
     try {
         const [result] = await pool.query(query1, [email, wachtwoord]);
         const gebruikerId = result.insertId;
-        const [result2] = await pool.query(query2, [gebruikerId, naam, plaats, contact_email]);
+        const [result2] = await pool.query(query2, [gebruikerId, naam, plaats, contact_email, linkedin]);
+        if (result2.affectedRows === 0) {
+            throw new Error('Bedrijf registration failed');
+        }
         return result2.insertId; // Return the ID of the newly inserted user
     } catch (error) {
         console.error('Database query error in registerStudent:', error.message, error.stack);
