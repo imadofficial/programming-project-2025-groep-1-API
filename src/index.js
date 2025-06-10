@@ -10,12 +10,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 const allowedOrigins = [
-  'http://127.0.0.1:5500', // Local test
-  'https://localhost:3000',
-  'https://localhost:3001',
-  'http://localhost:3001', // Local test
   'https://www.ehb-match.me',
   'https://ehb-match.me',
+  'https://dev.ehb-match.me',
 ];
 
 app.use(cors({
