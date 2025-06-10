@@ -54,8 +54,53 @@ async function removeOpleidingBijBedrijf(opleidingId, bedrijfId) {
     }
 }
 
+async function addOpleiding(naam, type) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'INSERT INTO opleiding (naam, type) VALUES (?, ?)';
+
+    try {
+        const [result] = await pool.query(query, [naam, type]);
+        return result.insertId; // Return the ID of the newly inserted opleiding
+    } catch (error) {
+        console.error('Database query error in addOpleiding:', error.message, error.stack);
+        throw new Error('Adding opleiding failed');
+    }
+}
+
+async function deleteOpleiding(id) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'DELETE FROM opleiding WHERE id = ?';
+
+    try {
+        const [result] = await pool.query(query, [id]);
+        return result.affectedRows > 0; // Return true if a row was deleted
+    } catch (error) {
+        console.error('Database query error in deleteOpleiding:', error.message, error.stack);
+        throw new Error('Deleting opleiding failed');
+    }   
+}
+
+async function modifyOpleiding(id, naam, type) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'UPDATE opleiding SET naam = ?, type = ? WHERE id = ?';
+
+    try {
+        const [result] = await pool.query(query, [naam, type, id]);
+        return result.affectedRows > 0; // Return true if a row was updated
+    } catch (error) {
+        console.error('Database query error in modifyOpleiding:', error.message, error.stack);
+        throw new Error('Modifying opleiding failed');
+    }
+
+}
+
+
+
 module.exports = {
     getAllOpleidingen,
     addOpleidingBijBedrijf,
-    removeOpleidingBijBedrijf
+    removeOpleidingBijBedrijf,
+    addOpleiding,
+    deleteOpleiding,
+    modifyOpleiding
 };
