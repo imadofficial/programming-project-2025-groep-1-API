@@ -15,10 +15,11 @@ router.post('/', async (req, res, next) => {
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials'});
         }
-        const accessToken = jwt.sign({ id: user.id, is_admin: user.is_admin }, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
+        const accessToken = jwt.sign({ id: user.id, is_admin: user.is_admin }, process.env.JWT_ACCESS_SECRET, { expiresIn: '30s' });
         const refreshToken = jwt.sign({ id: user.id, is_admin: user.is_admin }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
-        const refreshMaxAge = 60 * 1000; // 1 minute for testing, adjust as necessary
+        const accessMaxAge = 30 * 1000;
+        const refreshMaxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
@@ -29,7 +30,7 @@ router.post('/', async (req, res, next) => {
             maxAge: refreshMaxAge,
         });
 
-        const accessTokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+        const accessTokenExpiresAt = new Date(Date.now() + accessMaxAge).toISOString();
         const refreshTokenExpiresAt = new Date(Date.now() + refreshMaxAge).toISOString();
 
         if (res.locals.ua == 'EhBMatch/Mobile') return res.json({ message: 'Login successful', accessToken: accessToken, refreshToken: refreshToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt });
