@@ -18,16 +18,18 @@ router.post('/', async (req, res, next) => {
         const accessToken = jwt.sign({ id: user.id, is_admin: user.is_admin }, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
         const refreshToken = jwt.sign({ id: user.id, is_admin: user.is_admin }, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
+        const refreshMaxAge = 60 * 1000; // 1 minute for testing, adjust as necessary
+
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: process.env.STATUS === 'production', // Use secure cookies in production
             sameSite: 'Strict', // Adjust as necessary
             path: "/auth/refresh", // Ensure the cookie is only sent to the refresh endpoint
-            maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+            maxAge: refreshMaxAge,
         });
 
         const accessTokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-        const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+        const refreshTokenExpiresAt = new Date(Date.now() + refreshMaxAge).toISOString();
 
         if (res.locals.ua == 'EhBMatch/Mobile') return res.json({ message: 'Login successful', accessToken: accessToken, refreshToken: refreshToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt });
         return res.json({ message: 'Login successful', accessToken: accessToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt });
