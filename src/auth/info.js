@@ -7,6 +7,8 @@ require('./passportJWT.js');
 const router = express.Router();
 
 router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    console.log('User ID:', req.user.id);
+    console.log('User Info:', req.user);
     const user = await getUserInfo(req.user.id);
 
     if (!user) {
