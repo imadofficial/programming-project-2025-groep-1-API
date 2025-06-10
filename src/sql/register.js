@@ -49,15 +49,15 @@ async function registerStudent(email, wachtwoord, voornaam, achternaam, linkedin
     }
 }
 
-async function registerBedrijf(email, wachtwoord, naam, plaats, contact_email, linkedin) {
+async function registerBedrijf(email, wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto) {
     const pool = getPool('ehbmatchdev');
     const query1 = 'INSERT INTO gebruiker (email, wachtwoord, is_admin) VALUES (?,?,0)';
-    const query2 = 'INSERT INTO bedrijf (gebruiker_id, naam, plaats, contact_email, linkedin) VALUES (?, ?, ?, ?, ?)';
+    const query2 = 'INSERT INTO bedrijf (gebruiker_id, naam, plaats, contact_email, linkedin, profiel_foto) VALUES (?, ?, ?, ?, ?, ?)';
 
     try {
         const [result] = await pool.query(query1, [email, wachtwoord]);
         const gebruikerId = result.insertId;
-        const [result2] = await pool.query(query2, [gebruikerId, naam, plaats, contact_email, linkedin]);
+        const [result2] = await pool.query(query2, [gebruikerId, naam, plaats, contact_email, linkedin, profiel_foto]);
         if (result2.affectedRows === 0) {
             throw new Error('Bedrijf registration failed');
         }

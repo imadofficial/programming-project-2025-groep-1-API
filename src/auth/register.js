@@ -47,10 +47,10 @@ router.post('/student', passport.authenticate('jwt', { session: false }), async 
 });
 
 router.post('/bedrijf', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const { email, wachtwoord, naam, plaats, contact_email, linkedin } = req.body;
+    const { email, wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto } = req.body;
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
     try {
-        const bedrijfId = await registerBedrijf(email, hashedPassword, naam, plaats, contact_email, linkedin);
+        const bedrijfId = await registerBedrijf(email, hashedPassword, naam, plaats, contact_email, linkedin, profiel_foto);
         res.status(201).json({ message: "Company registered successfully", Id: bedrijfId });
     } catch (error) {
         console.error('Error registering company:', error);
