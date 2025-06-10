@@ -94,6 +94,23 @@ async function modifyOpleiding(id, naam, type) {
 
 }
 
+async function getOpleidingById(id) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'SELECT * FROM opleiding WHERE id = ?';
+
+    try {
+        const [rows] = await pool.query(query, [id]);
+        if (rows.length > 0) {
+            return rows[0]; // Return the first row if found
+        } else {
+            return null; // Return null if no opleiding is found
+        }
+    }
+    catch (error) {
+        console.error('Database query error in getOpleidingById:', error.message, error.stack);
+        throw new Error('Getting opleiding by ID failed');
+    }
+}
 
 
 module.exports = {
@@ -102,5 +119,6 @@ module.exports = {
     removeOpleidingBijBedrijf,
     addOpleiding,
     deleteOpleiding,
-    modifyOpleiding
+    modifyOpleiding,
+    getOpleidingById
 };
