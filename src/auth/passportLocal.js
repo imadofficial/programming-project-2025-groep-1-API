@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const users = require('../../data/users.json'); // Assuming you have a users.json file with user data
 const { login, isAdmin } = require('../sql/login.js'); // Adjust the path as necessary
 
+console.log("Loading passport local strategy...");
+
 passport.use(new LocalStrategy(
     {
         emailField: 'email',
