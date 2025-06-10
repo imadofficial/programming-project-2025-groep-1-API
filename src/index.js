@@ -8,6 +8,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+app.use(function(req, res, next) {
+  res.locals.ua = req.get('User-Agent');
+  next();
+});
+
 require('./auth/passportJWT.js');
 
 
@@ -41,7 +46,9 @@ const port = process.env.STATUS == "production" ? 3000 : 3001;
 app.get('/about', (req, res) => {
   res.json({
     "ProdName": "EhBMatch",
-    "Version": `v${process.env.VERSION} (Build: ${process.env.BUILD})`
+    "Version": `v${process.env.VERSION} (Build: ${process.env.BUILD})`,
+    "Description": "EhBMatch is a platform that connects students with companies for internships and projects, facilitating skill development and career opportunities.",
+    "UserAgent": res.locals.ua,
   })
 })
 
