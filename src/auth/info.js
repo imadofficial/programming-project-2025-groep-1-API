@@ -1,5 +1,5 @@
 const express = require('express');
-const { getUserInfo } = require('../sql/user.js');
+const { getUserInfo } = require('../sql/users.js');
 
 require('./passportJWT.js');
 
