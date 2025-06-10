@@ -53,9 +53,41 @@ async function removeFunctie(id_functie) {
     }
 }
 
+async function modifyFunctie(id_functie, naam) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'UPDATE functie SET naam = ? WHERE id = ?';
+
+    try {
+        const [result] = await pool.query(query, [naam, id_functie]);
+        return result.affectedRows > 0; // Return true if a row was updated
+    } catch (error) {
+        console.error('Database query error in modifyFunctie:', error.message, error.stack);
+        throw new Error('Modifying functie failed');
+    }
+}
+
+async function getFunctieById(id_functie) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'SELECT * FROM functie WHERE id = ?';
+
+    try {
+        const [rows] = await pool.query(query, [id_functie]);
+        if (rows.length > 0) {
+            return rows[0]; // Return the first row if found
+        } else {
+            return null; // Return null if no row is found
+        }
+    } catch (error) {
+        console.error('Database query error in getFunctieById:', error.message, error.stack);
+        throw new Error('Getting functie by ID failed');
+    }
+}
+
 
 module.exports = {
     getAllFuncties,
     addFunctie,
-    removeFunctie
+    removeFunctie,
+    modifyFunctie,
+    getFunctieById
 };
