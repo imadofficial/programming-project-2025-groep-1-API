@@ -63,8 +63,8 @@ async function registerBedrijf(email, wachtwoord, naam, plaats, contact_email, l
         }
         return result2.insertId; // Return the ID of the newly inserted user
     } catch (error) {
-        console.error('Database query error in registerStudent:', error.message, error.stack);
-        throw new Error('Student registration failed');
+        console.error('Database query error in registerBedrijf:', error.message, error.stack);
+        throw new Error('Bedrijf registration failed');
     }
 }
 
