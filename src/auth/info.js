@@ -1,15 +1,12 @@
 const express = require('express');
 const { getUserInfo } = require('../sql/users.js');
+const passport = require('passport');
 
 require('./passportJWT.js');
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
-    if (!req.user || !req.user.id) {
-        return res.status(401).json({ message: 'Unauthorized' });
-    }
-
+router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const user = await getUserInfo(req.user.id);
 
     if (!user) {
