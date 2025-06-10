@@ -29,8 +29,8 @@ router.post('/', async (req, res, next) => {
         const accessTokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
         const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
-        if (res.locals.ua == 'EhBMatch/Mobile') return res.status(200).json({ message: 'Login successful', accessToken: accessToken, refreshToken: refreshToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt });
-        return res.status(200).json({ message: 'Login successful', accessToken: accessToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt });
+        if (res.locals.ua == 'EhBMatch/Mobile') return res.json({ message: 'Login successful', accessToken: accessToken, refreshToken: refreshToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt });
+        return res.json({ message: 'Login successful', accessToken: accessToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt });
     })(req, res, next);
 });
 

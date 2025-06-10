@@ -22,7 +22,7 @@ router.post('/', (req, res, next) => {
             const accessTokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
             const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
-            return res.status(200).json({ message: 'Token refreshed successfully', accessToken: accessToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt });
+            return res.json({ message: 'Token refreshed successfully', accessToken: accessToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt });
         });
     } catch (error) {
         return res.status(500).json({ message: 'Internal server error: ' + error.message });
