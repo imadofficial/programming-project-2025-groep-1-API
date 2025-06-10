@@ -18,7 +18,7 @@ function getPool(dbName = 'Accounts') {
             port: process.env.SQL_PORT || 3306,
             database: dbName,
             waitForConnections: true,
-            connectionLimit: 20,
+            connectionLimit: 50,
             queueLimit: 0
         }).promise();
     }
