@@ -6,8 +6,13 @@ const authAdmin = require('./authAdmin.js');
 const router = express.Router();
 
 router.post('/user', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const email = req.body.email ? req.body.email.toLowerCase() : res.status(400).json({ error: 'Email is required' });
-    const wachtwoord = req.body.wachtwoord ? req.body.wachtwoord.toLowerCase() : res.status(400).json({ error: 'Password is required' });
+    if (!req.body.email) {
+        return res.status(400).json({ error: 'Email is required' });
+    }
+    const email = req.body.email.toLowerCase();
+
+    const wachtwoord = req.body.wachtwoord;
+
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
     try {
         const userId = await register(email, hashedPassword);
@@ -19,7 +24,13 @@ router.post('/user', passport.authenticate('jwt', { session: false }), async (re
 });
 
 router.post('/admin', [passport.authenticate('jwt', { session: false }), authAdmin], async (req, res) => {
-    const { email, wachtwoord } = req.body;
+    if (!req.body.email) {
+        return res.status(400).json({ error: 'Email is required' });
+    }
+    const email = req.body.email.toLowerCase();
+
+    const wachtwoord = req.body.wachtwoord;
+
     const hashedPassword = await bcrypt.hash(wachtwoord, 14); // Hash the password before storing it
     if (!bcrypt.compare(wachtwoord, hashedPassword)) {
         console.error('Password hashing failed');
