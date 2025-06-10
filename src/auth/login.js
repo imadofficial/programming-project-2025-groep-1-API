@@ -22,9 +22,10 @@ router.post('/', async (req, res, next) => {
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            secure: process.env.STATUS === 'production', // Use secure cookies in production
-            sameSite: 'Strict', // Adjust as necessary
+            secure: true, // Use secure cookies in production
+            sameSite: 'none', // Adjust as necessary
             path: "/auth/refresh", // Ensure the cookie is only sent to the refresh endpoint
+            domain: "api.ehb-match.me",
             maxAge: refreshMaxAge,
         });
 
