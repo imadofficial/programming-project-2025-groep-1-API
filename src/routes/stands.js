@@ -18,7 +18,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
 });
 
 router.get('/:standId', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const stand = getStandById(req.params['standId']);
+    const stand = await getStandById(req.params['standId']);
 
     if (!stand) {
         return res.status(404).json({ message: 'Stand not found' });
