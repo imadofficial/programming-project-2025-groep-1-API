@@ -82,6 +82,8 @@ async function uploadFile(file) {
     body: formData,
   });
 
+  console.log("Upload response:", response);
+
   if (!response.ok) {
     throw new Error(`Upload failed: ${response.statusText}`);
   }
