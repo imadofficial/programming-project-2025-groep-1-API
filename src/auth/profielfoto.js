@@ -1,6 +1,6 @@
 const express = require('express');
 const multer = require('multer');
-const { utapi } = require ('../modules/uploadthing.js');
+const { uploadFile } = require ('../modules/uploadthing.js');
 const passport = require('passport');
 
 require('../auth/passportJWT.js'); // Ensure JWT authentication is set up
@@ -13,12 +13,6 @@ const upload = multer({
     maxFiles: 1 // Limit to one file per request
   }
 });
-
-async function uploadFiles(file) {
-  "use server";
-  const response = await utapi.uploadFiles(file);
-  return response;
-}
 
 router.post('/', passport.authenticate('jwt', { session: false }), upload.single('image'), async (req, res) => {
   try {
@@ -35,7 +29,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), upload.single
 
     console.log("Received file:", file);
 
-    const uploadResponse = await uploadFiles(file);
+    const uploadResponse = await uploadFile(file);
 
     console.log("Upload response:", uploadResponse);
     res.json({ message: 'File uploaded successfully', data: uploadResponse });
