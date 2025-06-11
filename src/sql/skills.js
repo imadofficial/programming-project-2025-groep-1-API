@@ -74,11 +74,69 @@ async function getSkillsByUserId(id_gebruiker) {
     }
 }
 
+async function addSkill(naam) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'INSERT INTO skills (naam) VALUES (?)';
 
+    try {
+        const [result] = await pool.query(query, [naam]);
+        return result.insertId; // Return the ID of the newly inserted skill
+    } catch (error) {
+        console.error('Database query error in addSkill:', error.message, error.stack);
+        throw new Error('Adding skill failed');
+    }
+}
+
+async function removeSkill(id_skill) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'DELETE FROM skills WHERE id = ?';
+
+    try {
+        const [result] = await pool.query(query, [id_skill]);
+        return result.affectedRows > 0; // Return true if a row was deleted
+    } catch (error) {
+        console.error('Database query error in removeSkill:', error.message, error.stack);
+        throw new Error('Removing skill failed');
+    }
+}
+
+async function modifySkill(id_skill, newName) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'UPDATE skills SET naam = ? WHERE id = ?';
+
+    try {
+        const [result] = await pool.query(query, [newName, id_skill]);
+        return result.affectedRows > 0; // Return true if a row was updated
+    } catch (error) {
+        console.error('Database query error in modifySkill:', error.message, error.stack);
+        throw new Error('Modifying skill failed');
+    }
+}
+
+async function getSkillById(id_skill) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'SELECT * FROM skills WHERE id = ?';
+
+    try {
+        const [rows] = await pool.query(query, [id_skill]);
+        if (rows.length > 0) {
+            return rows[0]; // Return the first row if found
+        } else {
+            return null; // Return null if no skill is found
+        }
+    } catch (error) {
+        console.error('Database query error in getSkillById:', error.message, error.stack);
+        throw new Error('Getting skill by ID failed');
+    }
+}
 
 module.exports = {
     getAllSkills,
     addSkillToUser,
     removeSkillFromUser,
-    getSkillsByUserId
+    getSkillsByUserId,
+    addSkill,
+    removeSkill,
+    modifySkill,
+    getSkillById
 };
