@@ -22,12 +22,12 @@ router.post('/', passport.authenticate('jwt', { session: false }), upload.single
 
     console.log("Received file:", req.file);
 
-    const uploadResponse = await uploadFiles(req.file);
+    const uploadResponse = await uploadFiles(req.file.buffer);
 
     console.log("Upload response:", uploadResponse);
-    res.json({ message: 'Files uploaded successfully', data: uploadResponse });
+    res.json({ message: 'File uploaded successfully', data: uploadResponse });
   } catch (error) {
-    console.error("Error uploading files:", error);
+    console.error("Error uploading file:", error);
     res.status(500).json({ message: 'File upload failed', error: error.message });
   }
 });
