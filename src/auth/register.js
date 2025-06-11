@@ -23,6 +23,10 @@ router.post('/user', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
+    if (!bcrypt.compare(wachtwoord, hashedPassword)) {
+        console.error('Password hashing failed');
+        return res.status(400).json({ error: 'Password hashing failed' });
+    }   
     try {
         const userId = await register(email, hashedPassword);
         res.status(201).json({ message: "User registered successfully", Id: userId });
@@ -74,6 +78,10 @@ router.post('/student', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
+    if (!bcrypt.compare(wachtwoord, hashedPassword)) {
+        console.error('Password hashing failed');
+        return res.status(400).json({ error: 'Password hashing failed' });
+    }   
     try {
         const studentId = await registerStudent(email, hashedPassword, voornaam, achternaam, linkedin, profiel_foto, studiejaar, opleiding_id, date_of_birth);
         res.status(201).json({ message: "Student registered successfully", Id: studentId });
@@ -95,6 +103,10 @@ router.post('/bedrijf', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
+    if (!bcrypt.compare(wachtwoord, hashedPassword)) {
+        console.error('Password hashing failed');
+        return res.status(400).json({ error: 'Password hashing failed' });
+    }   
     try {
         const bedrijfId = await registerBedrijf(email, hashedPassword, naam, plaats, contact_email, linkedin, profiel_foto);
         res.status(201).json({ message: "Company registered successfully", Id: bedrijfId });
