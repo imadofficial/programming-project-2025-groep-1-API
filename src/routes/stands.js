@@ -60,3 +60,5 @@ router.delete('/:standId', passport.authenticate('jwt', { session: false }), asy
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+module.exports = router;
