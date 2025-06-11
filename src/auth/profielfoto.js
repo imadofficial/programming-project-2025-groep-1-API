@@ -16,6 +16,7 @@ async function uploadFiles(formData) {
 router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const formData = req.body;
+    console.log("Received form data:", formData);
     if (!formData || !formData.files || formData.files.length === 0) {
       return res.status(400).json({ message: 'No files provided' });
     }
