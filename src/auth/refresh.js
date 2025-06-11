@@ -17,12 +17,12 @@ router.post('/', (req, res, next) => {
             }
 
             // Generate new access token
-            const accessToken = jwt.sign({ id: decoded.id }, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
+            const accessToken = jwt.sign({ id: decoded.id, is_admin: decoded.is_admin }, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
 
             const accessTokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
             const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
-            return res.status(200).json({ message: 'Token refreshed successfully', accessToken: accessToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt });
+            return res.json({ message: 'Token refreshed successfully', accessToken: accessToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt });
         });
     } catch (error) {
         return res.status(500).json({ message: 'Internal server error: ' + error.message });

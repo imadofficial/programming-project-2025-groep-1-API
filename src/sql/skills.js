@@ -44,7 +44,7 @@ async function addSkillToUser(id_gebruiker, id_skill) {
 async function removeSkillFromUser(id_gebruiker, id_skill) {
     const pool = getPool('ehbmatchdev');
 
-    const query = ' FROM gebruiker_skills WHERE id_gebruiker = ? AND id_skill = ?';
+    const query = 'DELETE FROM gebruiker_skills WHERE id_gebruiker = ? AND id_skill = ?';
 
     try {
         const [result] = await pool.query(query, [id_gebruiker, id_skill]);
