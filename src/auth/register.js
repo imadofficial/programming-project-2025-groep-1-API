@@ -23,7 +23,7 @@ router.post('/user', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
-    if (!bcrypt.compare(wachtwoord, hashedPassword)) {
+    if (!(await bcrypt.compare(wachtwoord, hashedPassword))) {
         console.error('Password hashing failed');
         return res.status(400).json({ error: 'Password hashing failed' });
     }   
@@ -53,7 +53,7 @@ router.post('/admin', [passport.authenticate('jwt', { session: false }), authAdm
     }
 
     const hashedPassword = await bcrypt.hash(wachtwoord, 14); // Hash the password before storing it
-    if (!bcrypt.compare(wachtwoord, hashedPassword)) {
+    if (!(await bcrypt.compare(wachtwoord, hashedPassword))) {
         console.error('Password hashing failed');
         return res.status(400).json({ error: 'Password hashing failed' });
     }   
@@ -78,7 +78,7 @@ router.post('/student', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
-    if (!bcrypt.compare(wachtwoord, hashedPassword)) {
+    if (!(await bcrypt.compare(wachtwoord, hashedPassword))) {
         console.error('Password hashing failed');
         return res.status(400).json({ error: 'Password hashing failed' });
     }   
@@ -103,7 +103,7 @@ router.post('/bedrijf', async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
-    if (!bcrypt.compare(wachtwoord, hashedPassword)) {
+    if (!(await bcrypt.compare(wachtwoord, hashedPassword))) {
         console.error('Password hashing failed');
         return res.status(400).json({ error: 'Password hashing failed' });
     }   
