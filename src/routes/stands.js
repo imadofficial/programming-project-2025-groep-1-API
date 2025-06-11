@@ -1,6 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const { getAllStands, getStandById, addStand, removeStand } = require('../sql/stands.js');
+const authAdmin = require('../auth/authAdmin.js');
 
 require('../auth/passportJWT.js');
 
@@ -26,7 +27,7 @@ router.get('/:standId', passport.authenticate('jwt', { session: false }), async 
     res.json(stand);
 });
 
-router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.post('/', [passport.authenticate('jwt', { session: false }), authAdmin], async (req, res) => {
     const { lokaal, id_bedrijf } = req.body;
     if (!lokaal || !id_bedrijf) {
         return res.status(400).json({ message: 'Lokaal and id_bedrijf are required' });
@@ -41,7 +42,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
     }
 });
 
-router.delete('/:standId', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.delete('/:standId', [passport.authenticate('jwt', { session: false }), authAdmin], async (req, res) => {
     const standId = req.params['standId'];
 
     if (!standId) {
