@@ -1,4 +1,4 @@
-const { SQIds, defaultOptions } = require("sqids");
+const { Sqids, defaultOptions } = require("sqids");
 require("dotenv").config();
 
 function djb2(s) {
@@ -40,7 +40,7 @@ function generateKey(appId, fileSeed) {
   // Hash and Encode the parts and apiKey as sqids
   const alphabet = shuffle(defaultOptions.alphabet, appId);
 
-  const encodedAppId = new SQIds({ alphabet, minLength: 12 }).encode([
+  const encodedAppId = new Sqids({ alphabet, minLength: 12 }).encode([
     Math.abs(djb2(appId)),
   ]);
 
