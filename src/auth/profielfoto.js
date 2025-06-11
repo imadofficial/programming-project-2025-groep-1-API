@@ -14,7 +14,7 @@ async function uploadFiles(file) {
   return response;
 }
 
-router.post('/', passport.authenticate('jwt', { session: false }), upload.single('file'), async (req, res) => {
+router.post('/', passport.authenticate('jwt', { session: false }), upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
