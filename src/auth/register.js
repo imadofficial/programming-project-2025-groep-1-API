@@ -13,8 +13,13 @@ router.post('/user', async (req, res) => {
     const email = req.body.email.toLowerCase();
 
     const wachtwoord = req.body.password || req.body.wachtwoord; // Use wachtwoord if password is not provided
+
     if (!wachtwoord) {
         return res.status(400).json({ error: 'Password is required' });
+    }
+
+    if (wachtwoord.length < 8) {
+        return res.status(400).json({ error: 'Password must be at least 8 characters long' });
     }
 
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
@@ -39,6 +44,10 @@ router.post('/admin', [passport.authenticate('jwt', { session: false }), authAdm
         return res.status(400).json({ error: 'Password is required' });
     }
 
+    if (wachtwoord.length < 8) {
+        return res.status(400).json({ error: 'Password must be at least 8 characters long' });
+    }
+
     const hashedPassword = await bcrypt.hash(wachtwoord, 14); // Hash the password before storing it
     if (!bcrypt.compare(wachtwoord, hashedPassword)) {
         console.error('Password hashing failed');
@@ -60,6 +69,10 @@ router.post('/student', async (req, res) => {
         return res.status(400).json({ error: 'Password is required' });
     }
 
+    if (wachtwoord.length < 8) {
+        return res.status(400).json({ error: 'Password must be at least 8 characters long' });
+    }
+
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
     try {
         const studentId = await registerStudent(email, hashedPassword, voornaam, achternaam, linkedin, profiel_foto, studiejaar, opleiding_id, date_of_birth);
@@ -75,6 +88,10 @@ router.post('/bedrijf', async (req, res) => {
 
     if (!wachtwoord) {
         return res.status(400).json({ error: 'Password is required' });
+    }
+
+    if (wachtwoord.length < 8) {
+        return res.status(400).json({ error: 'Password must be at least 8 characters long' });
     }
 
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
