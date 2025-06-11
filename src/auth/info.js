@@ -14,7 +14,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
     if (!user) {
         return res.status(404).json({ message: 'User not found' });
     }
-    res.json(user);
+    res.json({ message: 'User information retrieved successfully', user });
 });
 
 module.exports = router;
