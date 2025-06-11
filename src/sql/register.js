@@ -22,6 +22,7 @@ async function register(email, wachtwoord) {
 
 async function registerAdmin(email, wachtwoord) {
     const pool = getPool('ehbmatchdev');
+    const pool = getPool('ehbmatchdev');
     const query = 'INSERT INTO gebruiker (email, wachtwoord, is_admin) VALUES (?,?,1)';
 
     try {
@@ -67,7 +68,6 @@ async function registerBedrijf(email, wachtwoord, naam, plaats, contact_email, l
         throw new Error('Bedrijf registration failed');
     }
 }
-
 
 module.exports = {
     register,
