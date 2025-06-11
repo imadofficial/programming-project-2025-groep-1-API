@@ -6,16 +6,10 @@ require('../auth/passportJWT.js');
 
 const router = express.Router();
 
-router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const skills = await getAllSkills();
-        res.json({
-            message: 'List of skills',
-            skills: skills.map(skill => ({
-                id: skill.id,
-                skill: skill.skill,
-            }))
-        });
+        res.json(skills);
     } catch (error) {
         console.error('Error fetching skills:', error);
         res.status(500).json({ message: 'Internal server error' });

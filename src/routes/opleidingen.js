@@ -4,7 +4,7 @@ const { getAllOpleidingen } = require('../sql/opleidingen.js');
 
 const router = express.Router();
 
-router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const opleidingen = await getAllOpleidingen();
         res.json(opleidingen);
