@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const { getAllStands, getStandById, addStand, removeStand } = require('../sql/stand.js');
+const { getAllStand, getStandById, addStand, removeStand } = require('../sql/stand.js');
 const authAdmin = require('../auth/authAdmin.js');
 
 require('../auth/passportJWT.js');
@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
     try {
-        const stands = await getAllStands();
+        const stands = await getAllStand();
         res.json(stands);
     } catch (error) {
         console.error('Error fetching stands:', error);
