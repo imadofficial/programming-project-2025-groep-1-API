@@ -1,5 +1,6 @@
 const Sqids = require("sqids").default;
 const { defaultOptions } = require("sqids");
+const crypto = require("crypto");
 require("dotenv").config();
 
 function djb2(s) {
@@ -70,7 +71,7 @@ async function uploadFile(file) {
   );
   url.search = searchParams.toString();
 
-  const signature = `hmac-sha256=${hmacSha256(url, process.env.UPLOADTHING_TOKEN)}`;
+  const signature = `hmac-sha256=${crypto.createHmac("sha256", process.env.UPLOADTHING_TOKEN).update(url.toString()).digest("hex")}`;
   url.searchParams.append("signature", signature);
 
   const formData = new FormData();
