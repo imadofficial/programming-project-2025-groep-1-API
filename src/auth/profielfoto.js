@@ -4,7 +4,7 @@ const f = createUploadthing();
 
 // Define the file router for UploadThing
 const uploadthingsRouter = f.router({
-  profielFoto: f.file({
+  profielFoto: f.upload({
     maxFileSize: '4MB',
     maxFileCount: 1,
     allowedFileTypes: ['image/jpeg', 'image/png', 'image/webp'],
