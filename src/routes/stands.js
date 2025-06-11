@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const { getAllStands, getStandById, addStand, removeStand } = require('../sql/stands.js');
+const { getAllStands, getStandById, addStand, removeStand } = require('../sql/stand.js');
 const authAdmin = require('../auth/authAdmin.js');
 
 require('../auth/passportJWT.js');
