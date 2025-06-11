@@ -1,32 +1,31 @@
 const express = require('express');
+const multer = require('multer');
 const { utapi } = require ('../modules/uploadthing.js');
 const passport = require('passport');
 
 require('../auth/passportJWT.js'); // Ensure JWT authentication is set up
 
 const router = express.Router();
+const upload = multer();
 
-async function uploadFiles(formData) {
+async function uploadFiles(file) {
   "use server";
-  const files = formData.getAll("files");
-  const response = await utapi.uploadFiles(files);
+  const response = await utapi.uploadFiles(file);
   return response;
 }
 
-router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.post('/', passport.authenticate('jwt', { session: false }), upload.single('file'), async (req, res) => {
   try {
-    const formData = req.body;
-    console.log("Received form data:", formData);
-    if (!formData || !formData.files || formData.files.length === 0) {
-      return res.status(400).json({ message: 'No files provided' });
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    console.log("Received form data:", formData);
-    
-    const uploadResponse = await uploadFiles(formData);
-    
+    console.log("Received file:", req.file);
+
+    const uploadResponse = await uploadFiles(req.file);
+
     console.log("Upload response:", uploadResponse);
-    res.status(200).json({ message: 'Files uploaded successfully', data: uploadResponse });
+    res.json({ message: 'Files uploaded successfully', data: uploadResponse });
   } catch (error) {
     console.error("Error uploading files:", error);
     res.status(500).json({ message: 'File upload failed', error: error.message });
