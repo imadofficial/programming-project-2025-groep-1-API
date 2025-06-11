@@ -4,6 +4,8 @@ const { register, registerAdmin, registerStudent, registerBedrijf } = require('.
 const authAdmin = require('./authAdmin.js');
 const bcrypt = require('bcrypt');
 
+require('../auth/passportJWT.js');
+
 const router = express.Router();
 
 router.post('/user', async (req, res) => {
