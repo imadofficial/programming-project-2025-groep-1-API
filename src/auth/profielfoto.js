@@ -9,7 +9,6 @@ const uploadRouter = {
     image: {
       maxFileSize: "4MB",
       maxFileCount: 1,
-      allowedFileTypes: ["image/jpeg", "image/png", "image/webp"],
     },
   })
     .middleware(async ({ req, res }) => {
