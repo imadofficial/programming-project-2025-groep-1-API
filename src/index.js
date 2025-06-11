@@ -72,6 +72,8 @@ app.use('/uploadthing', createRouteHandler({
   router: uploadRouter,
 }));
 
+app.use('/auth/profielfoto', profielfoto);
+
 app.use('/auth/login', login);
 app.use('/auth/refresh', refresh);
 app.use('/auth/logout', logout);

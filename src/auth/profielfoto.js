@@ -32,3 +32,5 @@ router.post('/', passport.authenticate('jwt', { session: false }), upload.single
     return res.status(500).json({ message: 'Error uploading file' });
   }
 })
+
+module.exports = router;
