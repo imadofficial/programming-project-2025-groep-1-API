@@ -1,15 +1,18 @@
 const passport = require('passport');
 const { createUploadthing } = require("uploadthing/express");
+
 const f = createUploadthing();
 
-// Define the file router for UploadThing
-const uploadthingsRouter = f.router({
-  profielFoto: f.upload({
-    maxFileSize: '4MB',
-    maxFileCount: 1,
-    allowedFileTypes: ['image/jpeg', 'image/png', 'image/webp'],
+const uploadRouter = {
+  // Define as many FileRoutes as you like, each with a unique routeSlug
+  imageUploader: f({
+    image: {
+      maxFileSize: "4MB",
+      maxFileCount: 1,
+      allowedFileTypes: ["image/jpeg", "image/png", "image/webp"],
+    },
   })
-    .middleware(async ({ req }) => {
+    .middleware(async ({ req, res }) => {
       // Use passport JWT authentication
       return new Promise((resolve, reject) => {
         passport.authenticate('jwt', { session: false }, (err, user) => {
@@ -18,14 +21,13 @@ const uploadthingsRouter = f.router({
           } else {
             resolve();
           }
-        })(req);
+        })(req, res);
       });
     })
     .onUploadComplete(async ({ file, metadata }) => {
       // Optionally handle post-upload logic here
-      // file.url contains the uploaded file URL
-      return { url: file.url };
+      return { url: file.ufsUrl };
     }),
-});
+};
 
-module.exports = uploadthingsRouter;
+module.exports = uploadRouter;
