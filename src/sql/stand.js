@@ -51,9 +51,27 @@ async function removeStand(id_stand) {
     }
 }
 
+async function getStandById(id) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'SELECT * FROM stand WHERE id = ?';
+
+    try {
+        const [rows] = await pool.query(query, [id]);
+        if (rows.length > 0) {
+            return rows[0]; // Return the first row if found
+        } else {
+            return null; // Return null if no row is found
+        }
+    } catch (error) {
+        console.error('Database query error in getStandById:', error.message, error.stack);
+        throw new Error('Getting stand by ID failed');
+    }
+}
+
+
 module.exports = {
     getAllStand,
     addStand,
-    removeStand
-
+    removeStand,
+    getStandById
 };
