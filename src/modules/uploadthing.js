@@ -67,7 +67,7 @@ async function uploadFile(file) {
   );
 
   const url = new URL(
-    `https://por1.ingest.uploadthing.com/${fileKey}`
+    `https://sea1.ingest.uploadthing.com/${fileKey}`
   );
   url.search = searchParams.toString();
 
