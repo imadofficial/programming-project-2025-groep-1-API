@@ -34,6 +34,7 @@ router.post('/admin', [passport.authenticate('jwt', { session: false }), authAdm
     const email = req.body.email.toLowerCase();
 
     const wachtwoord = req.body.password || req.body.wachtwoord; // Use wachtwoord if password is not provided
+
     if (!wachtwoord) {
         return res.status(400).json({ error: 'Password is required' });
     }
@@ -54,6 +55,11 @@ router.post('/admin', [passport.authenticate('jwt', { session: false }), authAdm
 
 router.post('/student', async (req, res) => {
     const { email, wachtwoord, voornaam, achternaam, linkedin, profiel_foto, studiejaar, opleiding_id, date_of_birth } = req.body;
+
+    if (!wachtwoord) {
+        return res.status(400).json({ error: 'Password is required' });
+    }
+
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
     try {
         const studentId = await registerStudent(email, hashedPassword, voornaam, achternaam, linkedin, profiel_foto, studiejaar, opleiding_id, date_of_birth);
@@ -66,6 +72,11 @@ router.post('/student', async (req, res) => {
 
 router.post('/bedrijf', async (req, res) => {
     const { email, wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto } = req.body;
+
+    if (!wachtwoord) {
+        return res.status(400).json({ error: 'Password is required' });
+    }
+
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
     try {
         const bedrijfId = await registerBedrijf(email, hashedPassword, naam, plaats, contact_email, linkedin, profiel_foto);
