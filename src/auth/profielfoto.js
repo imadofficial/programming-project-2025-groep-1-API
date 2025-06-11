@@ -1,5 +1,5 @@
 const passport = require('passport');
-const { createUploadthing } = require("uploadthing/next");
+const { createUploadthing } = require("uploadthing/express");
 const f = createUploadthing();
 
 // Define the file router for UploadThing
