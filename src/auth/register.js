@@ -12,7 +12,10 @@ router.post('/user', async (req, res) => {
     }
     const email = req.body.email.toLowerCase();
 
-    const wachtwoord = req.body.wachtwoord;
+    const wachtwoord = req.body.password || req.body.wachtwoord; // Use wachtwoord if password is not provided
+    if (!wachtwoord) {
+        return res.status(400).json({ error: 'Password is required' });
+    }
 
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
     try {
@@ -30,7 +33,10 @@ router.post('/admin', [passport.authenticate('jwt', { session: false }), authAdm
     }
     const email = req.body.email.toLowerCase();
 
-    const wachtwoord = req.body.wachtwoord;
+    const wachtwoord = req.body.password || req.body.wachtwoord; // Use wachtwoord if password is not provided
+    if (!wachtwoord) {
+        return res.status(400).json({ error: 'Password is required' });
+    }
 
     const hashedPassword = await bcrypt.hash(wachtwoord, 14); // Hash the password before storing it
     if (!bcrypt.compare(wachtwoord, hashedPassword)) {
