@@ -41,6 +41,7 @@ async function registerStudent(email, wachtwoord, voornaam, achternaam, linkedin
     try {
         const [result] = await pool.query(query1, [email, wachtwoord]);
         const gebruikerId = result.insertId;
+        console.log('New gebruiker ID:', gebruikerId);
         const [result2] = await pool.query(query2, [gebruikerId, voornaam, achternaam, linkedin, profielFoto, studiejaar, opleidingId, dob]);
         return gebruikerId; // Return the ID of the newly inserted user
     } catch (error) {
