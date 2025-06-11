@@ -1,4 +1,5 @@
 const Sqids = require("sqids");
+const { defaultOptions } = require("sqids");
 require("dotenv").config();
 
 function djb2(s) {
