@@ -148,6 +148,20 @@ paths:
                 password:
                   type: string
                   example: 'password123'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'User registered successfully'
+                  id:
+                    type: integer
+                    example: 42
   /auth/register/admin:
     post:
       tags:
@@ -167,6 +181,126 @@ paths:
                 password:
                   type: string
                   example: 'password123'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Admin registered successfully'
+                  id:
+                    type: integer
+                    example: 42
+  
+  /auth/register/student:
+    post:
+      tags:
+        - Registration
+      summary: Register a new student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'jan.jansen@example.com'
+                password:
+                  type: string
+                  example: 'password123'
+                voornaam:
+                  type: string
+                  example: 'Jan'
+                achternaam:
+                  type: string
+                  example: 'Jansen'
+                linkedin:
+                  type: string
+                  format: uri
+                  example: '/in/janjansen'
+                profiel_foto:
+                  type: string
+                  format: uri
+                  example: '/profile.jpg'
+                studiejaar:
+                  type: integer
+                  example: 2
+                opleiding_id:
+                  type: integer
+                  example: 1
+                date_of_birth:
+                  type: string
+                  format: date
+                  example: '1970-01-01'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Student registered successfully'
+                  id:
+                    type: integer
+                    example: 42
+
+  /auth/register/bedrijf:
+    post:
+      tags:
+        - Registration
+      summary: Register a new company
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'info@techsolutions.com'
+                password:
+                  type: string
+                  example: 'password123'
+                naam:
+                  type: string
+                  example: 'Tech Solutions'
+                plaats:
+                  type: string
+                  example: 'Brussel'
+                contact_email:
+                  type: string
+                  format: email
+                  example: 'contact@techsolutions.com'
+                linkedin:
+                  type: string
+                  format: uri
+                  example: '/company/techsolutions'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Company registered successfully'
+                  id:
+                    type: integer
+                    example: 42
 
   /skills:
     description: List of available skills

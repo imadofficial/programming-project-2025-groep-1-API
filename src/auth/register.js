@@ -13,11 +13,20 @@ router.post('/user', async (req, res) => {
     const email = req.body.email.toLowerCase();
 
     const wachtwoord = req.body.password || req.body.wachtwoord; // Use wachtwoord if password is not provided
+
     if (!wachtwoord) {
         return res.status(400).json({ error: 'Password is required' });
     }
 
+    if (wachtwoord.length < 8) {
+        return res.status(400).json({ error: 'Password must be at least 8 characters long' });
+    }
+
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
+    if (!(await bcrypt.compare(wachtwoord, hashedPassword))) {
+        console.error('Password hashing failed');
+        return res.status(400).json({ error: 'Password hashing failed' });
+    }   
     try {
         const userId = await register(email, hashedPassword);
         res.status(201).json({ message: "User registered successfully", Id: userId });
@@ -39,8 +48,12 @@ router.post('/admin', [passport.authenticate('jwt', { session: false }), authAdm
         return res.status(400).json({ error: 'Password is required' });
     }
 
+    if (wachtwoord.length < 8) {
+        return res.status(400).json({ error: 'Password must be at least 8 characters long' });
+    }
+
     const hashedPassword = await bcrypt.hash(wachtwoord, 14); // Hash the password before storing it
-    if (!bcrypt.compare(wachtwoord, hashedPassword)) {
+    if (!(await bcrypt.compare(wachtwoord, hashedPassword))) {
         console.error('Password hashing failed');
         return res.status(400).json({ error: 'Password hashing failed' });
     }   
@@ -60,7 +73,15 @@ router.post('/student', async (req, res) => {
         return res.status(400).json({ error: 'Password is required' });
     }
 
+    if (wachtwoord.length < 8) {
+        return res.status(400).json({ error: 'Password must be at least 8 characters long' });
+    }
+
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
+    if (!(await bcrypt.compare(wachtwoord, hashedPassword))) {
+        console.error('Password hashing failed');
+        return res.status(400).json({ error: 'Password hashing failed' });
+    }   
     try {
         const studentId = await registerStudent(email, hashedPassword, voornaam, achternaam, linkedin, profiel_foto, studiejaar, opleiding_id, date_of_birth);
         res.status(201).json({ message: "Student registered successfully", Id: studentId });
@@ -77,7 +98,15 @@ router.post('/bedrijf', async (req, res) => {
         return res.status(400).json({ error: 'Password is required' });
     }
 
+    if (wachtwoord.length < 8) {
+        return res.status(400).json({ error: 'Password must be at least 8 characters long' });
+    }
+
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
+    if (!(await bcrypt.compare(wachtwoord, hashedPassword))) {
+        console.error('Password hashing failed');
+        return res.status(400).json({ error: 'Password hashing failed' });
+    }   
     try {
         const bedrijfId = await registerBedrijf(email, hashedPassword, naam, plaats, contact_email, linkedin, profiel_foto);
         res.status(201).json({ message: "Company registered successfully", Id: bedrijfId });
