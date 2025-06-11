@@ -2,6 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const { register, registerAdmin, registerStudent, registerBedrijf } = require('../sql/register.js');
 const authAdmin = require('./authAdmin.js');
+const bcrypt = require('bcrypt');
 
 const router = express.Router();
 
