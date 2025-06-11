@@ -1,4 +1,4 @@
-const Sqids = require("sqids");
+const Sqids = require("sqids").default;
 const { defaultOptions } = require("sqids");
 require("dotenv").config();
 
