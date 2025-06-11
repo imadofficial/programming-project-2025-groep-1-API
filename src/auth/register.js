@@ -4,6 +4,8 @@ const { register, registerAdmin, registerStudent, registerBedrijf } = require('.
 const authAdmin = require('./authAdmin.js');
 const bcrypt = require('bcrypt');
 
+require('../auth/passportJWT.js');
+
 const router = express.Router();
 
 router.post('/user', async (req, res) => {
@@ -67,6 +69,7 @@ router.post('/admin', [passport.authenticate('jwt', { session: false }), authAdm
 });
 
 router.post('/student', async (req, res) => {
+    // The frontend should upload the file to /auth/profielfoto first and send the returned URL as 'profiel_foto'
     const { email, password: wachtwoord, voornaam, achternaam, linkedin, profiel_foto, studiejaar, opleiding_id, date_of_birth } = req.body;
 
     if (!wachtwoord) {
@@ -92,6 +95,7 @@ router.post('/student', async (req, res) => {
 });
 
 router.post('/bedrijf', async (req, res) => {
+    // The frontend should upload the file to /auth/profielfoto first and send the returned URL as 'profiel_foto'
     const { email, password: wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto } = req.body;
 
     if (!wachtwoord) {
