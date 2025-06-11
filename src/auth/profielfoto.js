@@ -2,12 +2,17 @@ const express = require('express');
 const multer = require('multer');
 const { utapi } = require ('../modules/uploadthing.js');
 const passport = require('passport');
-const fileFromBuffer = require('file-from-buffer');
 
 require('../auth/passportJWT.js'); // Ensure JWT authentication is set up
 
 const router = express.Router();
-const upload = multer();
+const upload = multer({
+  storage: multer.memoryStorage(), // Store files in memory
+  limits: {
+    fileSize: 5 * 1024 * 1024, // Limit file size to 5MB
+    maxFiles: 1 // Limit to one file per request
+  }
+});
 
 async function uploadFiles(file) {
   "use server";
@@ -17,17 +22,16 @@ async function uploadFiles(file) {
 
 router.post('/', passport.authenticate('jwt', { session: false }), upload.single('image'), async (req, res) => {
   try {
+
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const file = fileFromBuffer({
-      buffer: req.file.buffer,
-      size: req.file.size,
-      name: req.file.originalname,
-      type: req.file.mimetype,
-      lastmodified: Date.now(),
-    });
+    if (!req.file.mimetype.startsWith('image/')) {
+      return res.status(400).json({ message: 'Only image files are allowed' });
+    }
+
+    const file = req.file;
 
     console.log("Received file:", file);
 
