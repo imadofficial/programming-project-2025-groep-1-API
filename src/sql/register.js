@@ -42,7 +42,7 @@ async function registerStudent(email, wachtwoord, voornaam, achternaam, linkedin
         const [result] = await pool.query(query1, [email, wachtwoord]);
         const gebruikerId = result.insertId;
         const [result2] = await pool.query(query2, [gebruikerId, voornaam, achternaam, linkedin, profielFoto, studiejaar, opleidingId, dob]);
-        return result2.insertId; // Return the ID of the newly inserted user
+        return gebruikerId; // Return the ID of the newly inserted user
     } catch (error) {
         console.error('Database query error in registerStudent:', error.message, error.stack);
         throw new Error('Student registration failed');
@@ -61,7 +61,7 @@ async function registerBedrijf(email, wachtwoord, naam, plaats, contact_email, l
         if (result2.affectedRows === 0) {
             throw new Error('Bedrijf registration failed');
         }
-        return result2.insertId; // Return the ID of the newly inserted user
+        return gebruikerId; // Return the ID of the newly inserted user
     } catch (error) {
         console.error('Database query error in registerBedrijf:', error.message, error.stack);
         throw new Error('Bedrijf registration failed');
