@@ -52,6 +52,9 @@ const info = require('./auth/info.js');
 
 const profielfoto = require('./auth/profielfoto.js');
 
+const { createRouteHandler } = require('uploadthing/express');
+const uploadRouter = require('./modules/uploadthing.js');
+
 const stands = require('./routes/stands.js');
 
 
@@ -65,7 +68,9 @@ app.use('/stands', stands);
 // Authentication routes
 app.use('/auth/info', info);
 
-app.use('/auth/profielfoto', profielfoto);
+app.use('/uploadthing', createRouteHandler({
+  router: uploadRouter,
+}));
 
 app.use('/auth/login', login);
 app.use('/auth/refresh', refresh);
