@@ -58,7 +58,7 @@ async function uploadFile(file) {
     expires: Date.now() + 1000 * 60 * 10, // 10 minutes
     "x-u-identifier": "gt0kk4fbet",
     "x-ut-file-name": file.originalname,
-    "x-ut-file-size": file.size,
+    "x-ut-file-size": 5 * 1024 * 1024, // 5MB limit
   });
 
   const fileKey = generateKey(
