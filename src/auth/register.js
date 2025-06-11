@@ -54,7 +54,7 @@ router.post('/admin', [passport.authenticate('jwt', { session: false }), authAdm
 });
 
 router.post('/student', async (req, res) => {
-    const { email, wachtwoord, voornaam, achternaam, linkedin, profiel_foto, studiejaar, opleiding_id, date_of_birth } = req.body;
+    const { email, password: wachtwoord, voornaam, achternaam, linkedin, profiel_foto, studiejaar, opleiding_id, date_of_birth } = req.body;
 
     if (!wachtwoord) {
         return res.status(400).json({ error: 'Password is required' });
@@ -71,7 +71,7 @@ router.post('/student', async (req, res) => {
 });
 
 router.post('/bedrijf', async (req, res) => {
-    const { email, wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto } = req.body;
+    const { email, password: wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto } = req.body;
 
     if (!wachtwoord) {
         return res.status(400).json({ error: 'Password is required' });
