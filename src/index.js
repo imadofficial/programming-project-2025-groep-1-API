@@ -51,7 +51,7 @@ const register = require('./auth/register.js');
 const info = require('./auth/info.js');
 
 const { createRouteHandler } = require('uploadthing/express');
-const uploadthingsRouter = require('./auth/profielfoto.js');
+const uploadthingRouter = require('./auth/profielfoto.js');
 
 const stands = require('./routes/stands.js');
 
@@ -67,7 +67,7 @@ app.use('/stands', stands);
 app.use('/auth/info', info);
 
 app.use('/auth/profielfoto', createRouteHandler({
-  router: uploadthingsRouter,
+  router: uploadthingRouter,
   config: {
     token: process.env.UPLOADTHING_TOKEN,
   }
