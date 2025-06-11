@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 
 const router = express.Router();
 
-router.post('/user', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.post('/user', async (req, res) => {
     if (!req.body.email) {
         return res.status(400).json({ error: 'Email is required' });
     }
@@ -46,7 +46,7 @@ router.post('/admin', [passport.authenticate('jwt', { session: false }), authAdm
     }
 });
 
-router.post('/student', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.post('/student', async (req, res) => {
     const { email, wachtwoord, voornaam, achternaam, linkedin, profiel_foto, studiejaar, opleiding_id, date_of_birth } = req.body;
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
     try {
@@ -58,7 +58,7 @@ router.post('/student', passport.authenticate('jwt', { session: false }), async 
     }
 });
 
-router.post('/bedrijf', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.post('/bedrijf', async (req, res) => {
     const { email, wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto } = req.body;
     const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
     try {
