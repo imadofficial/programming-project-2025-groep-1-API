@@ -75,7 +75,7 @@ async function uploadFile(file) {
   url.searchParams.append("signature", signature);
 
   const formData = new FormData();
-  formData.append("file", file.buffer);
+  formData.append("file", file);
 
   const response = await fetch(url, {
     method: "PUT",
