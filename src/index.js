@@ -52,9 +52,6 @@ const info = require('./auth/info.js');
 
 const profielfoto = require('./auth/profielfoto.js');
 
-const { createRouteHandler } = require('uploadthing/express');
-const uploadRouter = require('./modules/uploadthing.js');
-
 const stands = require('./routes/stands.js');
 
 
@@ -68,11 +65,7 @@ app.use('/stands', stands);
 // Authentication routes
 app.use('/auth/info', info);
 
-app.use('/uploadthing', createRouteHandler({
-  router: uploadRouter,
-}));
-
-app.use('/auth/profielfoto', profielfoto);
+// app.use('/auth/profielfoto', profielfoto); // TODO: implement Uploadthing using https://docs.uploadthing.com/api-reference/ut-api
 
 app.use('/auth/login', login);
 app.use('/auth/refresh', refresh);
