@@ -9,6 +9,125 @@ components:
       description: >
         Use a JWT access token in the Authorization header:
         `Authorization: Bearer <access_token>`.
+  schemas:
+    Student:
+      type: object
+      description: A student user object.
+      required:
+        - type
+        - gebruiker_id
+        - voornaam
+        - achternaam
+        - linkedin
+        - profiel_foto
+        - studiejaar
+        - opleiding_id
+      properties:
+        type:
+          type: integer
+          enum: [2]
+          description: The type of user (always "student" for this schema).
+        gebruiker_id:
+          type: integer
+          description: The unique user ID.
+        voornaam:
+          type: string
+          description: The student's first name.
+        achternaam:
+          type: string
+          description: The student's last name.
+        linkedin:
+          type: string
+          format: uri
+          description: The student's LinkedIn profile URL.
+        profiel_foto:
+          type: string
+          format: uri
+          description: The student's profile photo URL.
+        studiejaar:
+          type: integer
+          description: The student's year of study.
+        opleiding_id:
+          type: integer
+          description: The ID of the student's opleiding (program).
+      example:
+        type: 2
+        gebruiker_id: 1
+        voornaam: Jan
+        achternaam: Jansen
+        linkedin: /in/janjansen
+        profiel_foto: /profile.jpg
+        studiejaar: 2
+        opleiding_id: 1
+    Bedrijf:
+      type: object
+      description: A company (bedrijf) user object.
+      required:
+        - type
+        - gebruiker_id
+        - naam
+        - plaats
+        - contact_email
+        - linkedin
+        - profiel_foto
+      properties:
+        type:
+          type: integer
+          enum: [3]
+          description: The type of user (always "bedrijf" for this schema).
+        gebruiker_id:
+          type: integer
+          description: The unique user ID.
+        naam:
+          type: string
+          description: The company's name.
+        plaats:
+          type: string
+          description: The company's location.
+        contact_email:
+          type: string
+          format: email
+          description: The company's contact email.
+        linkedin:
+          type: string
+          format: uri
+          description: The company's LinkedIn profile URL.
+        profiel_foto:
+          type: string
+          format: uri
+          description: The company's profile photo URL.
+      example:
+        type: 3
+        gebruiker_id: 2
+        naam: Tech Solutions
+        plaats: Brussel
+        contact_email: contact@techsolutions.com
+        linkedin: /company/techsolutions
+        profiel_foto: /company_logo.jpg
+    Admin:
+      type: object
+      description: An admin user object.
+      required:
+        - type
+        - gebruiker_id
+        - email
+      properties:
+        type:
+          type: integer
+          enum: [1]
+          description: The type of user (always "admin" for this schema).
+        gebruiker_id:
+          type: integer
+          description: The unique user ID.
+        email:
+          type: string
+          format: email
+          example: 'admin@example.com'
+          description: The admin's email address.
+      example:
+        type: 1
+        gebruiker_id: 3
+        email: admin@example.com
 
 
 security:
@@ -17,24 +136,61 @@ security:
 
 info:
   title: EHB Match API
-  version: '0.1'
+  version: '0.2'
 
 tags:
   - name: Auth
     description: >
       Authentication endpoints for the API.
+  - name: Registration
+    description: >
+      Endpoints for user registration and management.
   - name: Bedrijven
     description: >
       Endpoints for managing companies.
   - name: Studenten
     description: >
       Endpoints for managing students.
+  - name: Opleidingen
+    description: >
+      Endpoints for managing educational programs (opleidingen).
+  - name: Skills
+    description: >
+      Endpoints for managing skills.
+  - name: Stands
+    description: >
+      Endpoints for managing stands.
 
 servers:
   - url: https://api.ehb-match.me
     description: Dev Server
 
 paths:
+  /auth/info:
+    get:
+      tags:
+        - Auth
+      summary: Get information about the authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                discriminator:
+                  propertyName: type
+                  mapping:
+                    student: '#/components/schemas/Student'
+                    bedrijf: '#/components/schemas/Bedrijf'
+                    admin: '#/components/schemas/Admin'
+                oneOf:
+                 - $ref: '#/components/schemas/Student'
+                 - $ref: '#/components/schemas/Bedrijf'
+                 - $ref: '#/components/schemas/Admin'
+
+
   /auth/login:
     post:
       tags:
@@ -47,12 +203,18 @@ paths:
             schema:
               type: object
               properties:
-                username:
+                email:
                   type: string
-                  example: 'janjansen'
+                  example: 'jan.jansen@example.com'
                 password:
                   type: string
                   example: 'password123'
+                user:
+                  type: object
+                  oneOf:
+                    - $ref: '#/components/schemas/Student'
+                    - $ref: '#/components/schemas/Bedrijf'
+                    - $ref: '#/components/schemas/Admin'
       responses:
         '200':
           description: Successful login
@@ -123,22 +285,28 @@ paths:
                     type: string
                     example: 'Logout successful'
 
-  /bedrijven:
-    description: List of companies
+  /auth/register/user:
     post:
       tags:
-        - Bedrijven
-      summary: 'Create a new company [NOTE: This endpoint is not implemented yet]'
-      description: 'Create a new company [NOTE: This endpoint is not implemented yet]'
+        - Registration
+      summary: Register a new user
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - email
+                - password
               properties:
-                name:
+                email:
                   type: string
+                  format: email
+                  example: 'janjansen@example.com'
+                password:
+                  type: string
+                  example: 'password123'
       responses:
         '201':
           description: Created
@@ -147,11 +315,182 @@ paths:
               schema:
                 type: object
                 properties:
+                  message:
+                    type: string
+                    example: 'User registered successfully'
                   id:
                     type: integer
-                  name:
+                    example: 42
+  /auth/register/admin:
+    post:
+      tags:
+        - Registration
+      summary: Register a new admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'admin@example.com'
+                password:
+                  type: string
+                  example: 'password123'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
                     type: string
+                    example: 'Admin registered successfully'
+                  id:
+                    type: integer
+                    example: 42
+  
+  /auth/register/student:
+    post:
+      tags:
+        - Registration
+      summary: Register a new student account
+      description: >
+        This endpoint allows the registration of a new student account.
+        The student must provide their email, password, first name, last name,
+        LinkedIn profile, profile photo, study year, and opleiding ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - voornaam
+                - achternaam
+                - studiejaar
+                - opleiding_id
+                - date_of_birth
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'jan.jansen@example.com'
+                password:
+                  type: string
+                  example: 'password123'
+                voornaam:
+                  type: string
+                  example: 'Jan'
+                achternaam:
+                  type: string
+                  example: 'Jansen'
+                linkedin:
+                  type: string
+                  format: uri
+                  example: '/in/janjansen'
+                profiel_foto:
+                  type: string
+                  format: uri
+                  example: '/profile.jpg'
+                studiejaar:
+                  type: integer
+                  example: 2
+                opleiding_id:
+                  type: integer
+                  example: 1
+                date_of_birth:
+                  type: string
+                  format: date
+                  example: '1970-01-01'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Student registered successfully'
+                  id:
+                    type: integer
+                    example: 42
+
+  /auth/register/bedrijf:
+    post:
+      tags:
+        - Registration
+      summary: Register a new company
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - naam
+                - plaats
+                - contact_email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'info@techsolutions.com'
+                password:
+                  type: string
+                  example: 'password123'
+                naam:
+                  type: string
+                  example: 'Tech Solutions'
+                plaats:
+                  type: string
+                  example: 'Brussel'
+                contact_email:
+                  type: string
+                  format: email
+                  example: 'contact@techsolutions.com'
+                linkedin:
+                  type: string
+                  format: uri
+                  example: '/company/techsolutions'
+                profiel_foto:
+                  type: string
+                  format: uri
+                  example: '/company_logo.jpg'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Company registered successfully'
+                  id:
+                    type: integer
+                    example: 42
+
+ 
+  /bedrijven:
+    description: List of companies
     get:
+      summary: Get all companies
       tags:
         - Bedrijven
       responses:
@@ -164,14 +503,24 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
+                    gebruiker_id:
                       type: integer
-                    name:
+                    naam:
                       type: string
+                    plaats:
+                      type: string
+                    contact_email:
+                      type: string
+                      format: email
+                    linkedin:
+                      type: string
+                      format: uri
 
   /bedrijven/{id}:
     description: Get a specific company by ID
+    summary: Get a company by ID
     get:
+      summary: Get a company by ID
       tags:
         - Bedrijven
       parameters:
@@ -183,36 +532,32 @@ paths:
       responses:
         '200':
           description: OK
-
-  /studenten:
-    description: List of students
-    post:
-      tags:
-        - Studenten
-      summary: 'Create a new student [NOTE: This endpoint is not implemented yet]'
-      description: 'Create a new student [NOTE: This endpoint is not implemented yet]'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-      responses:
-        '201':
-          description: Created
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  id:
+                  gebruiker_id:
                     type: integer
-                  name:
+                  naam:
+                    type: string 
+                    example: 'Tech Solutions'
+                  plaats:
                     type: string
+                  contact_email:
+                    type: string
+                    format: email
+                    example: 'info@techsolutions.com'
+                  linkedin:
+                    type: string
+                    format: uri
+                    example: 'https://www.linkedin.com/company/techsolutions'
+
+  /studenten:
+    description: List of students
+    summary: Get all students
     get:
+      summary: Get all students
       tags:
         - Studenten
       responses:
@@ -225,15 +570,29 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
+                    gebruiker_id:
                       type: integer
-                    name:
+                    voornaam:
                       type: string
-
+                      example: 'Jan'
+                    achternaam:
+                      type: string
+                      example: 'Jansen'
+                    linkedin:
+                      type: string
+                      format: uri
+                    profiel_foto:
+                      type: string
+                      format: uri
+                    studiejaar:
+                      type: integer
+                    opleiding_id:
+                      type: integer
 
   /studenten/{id}:
     description: Get a specific student by ID
     get:
+      summary: Get a student by ID
       tags:
         - Studenten
       parameters:
@@ -250,7 +609,186 @@ paths:
               schema:
                 type: object
                 properties:
+                  gebruiker_id:
+                    type: integer
+                  voornaam:
+                    type: string
+                    example: 'Jan'
+                  achternaam:
+                    type: string
+                    example: 'Jansen'
+                  linkedin:
+                    type: string
+                    format: uri
+                  profiel_foto:
+                    type: string
+                    format: uri
+                  studiejaar:
+                    type: integer
+                  opleiding_id:
+                    type: integer
+
+
+  /opleidingen:
+    description: List of available opleidingen
+    post:
+      tags:
+        - Opleidingen
+      summary: 'Create a new opleiding'
+      description: 'Create a new opleiding'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
                   id:
                     type: integer
-                  name:
+                  naam:
                     type: string
+    get:
+      tags:
+        - Opleidingen
+      summary: Get all available opleidingen
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    naam:
+                      type: string
+                      example: 'Informatica'
+                    type:
+                      type: string
+                      example: 'Bachelor'
+
+
+  /skills:
+    description: List of available skills
+    get:
+      tags:
+        - Skills
+      summary: Get all available skills
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    skill:
+                      type: string
+                      example: 'JavaScript'
+
+
+  /stands:
+    description: List of available stands
+    post:
+      tags:
+        - Stands
+      summary: 'Create a new stand'
+      description: 'Create a new stand'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                lokaal:
+                  type: string
+                  example: 'A101'
+                id_bedrijf:
+                  type: integer
+                  example: 42
+      responses:
+        '201':
+          description: Created
+    get:
+      tags:
+        - Stands
+      summary: Get all available stands
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    lokaal:
+                      type: string
+                      example: 'A101'
+                    id_bedrijf:
+                      type: integer
+                      example: 42
+
+  /stands/{id}:
+    description: Get a specific stand by ID
+    get:
+      summary: Get a stand by ID
+      tags:
+        - Stands
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  lokaal:
+                    type: string
+                    example: 'A101'
+                  id_bedrijf:
+                    type: integer
+                    example: 42
+    delete:
+      tags:
+        - Stands
+      summary: 'Delete a stand'
+      description: 'Delete a stand'
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
