@@ -14,6 +14,9 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
     }
 
     const studenten = await getAllStudenten();
+    for (const student of studenten) {
+        student.skills = await getSkillsByUserId(student.id);
+    }
     res.json(studenten);
 })
 
