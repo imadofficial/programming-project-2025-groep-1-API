@@ -160,6 +160,9 @@ tags:
   - name: Skills
     description: >
       Endpoints for managing skills.
+  - name: Speeddates
+    description: >
+      Endpoints for managing speeddates.
   - name: Stands
     description: >
       Endpoints for managing stands.
@@ -190,7 +193,7 @@ paths:
                   propertyName: type
                   mapping:
                     1: '#/components/schemas/Admin'
-                    2: '#components/schemas/Student'
+                    2: '#/components/schemas/Student'
                     3: '#/components/schemas/Bedrijf'
                 oneOf:
                  - $ref: '#/components/schemas/Student'
@@ -507,9 +510,10 @@ paths:
     delete:
       tags:
         - Users
-      summary: Delete a user
+      summary: Delete a user and their associated student or company profile
       description: >
         This endpoint allows an admin to delete a user by their ID.
+        The user and their associated profile will be removed from the system.
         Only accessible by admin users.
       security:
         - bearerAuth: []
@@ -526,6 +530,85 @@ paths:
           description: Forbidden
         '404':
           description: User not found
+    put:
+      tags:
+        - Users
+      summary: Update a user's email or password
+      description: >
+        This endpoint allows an admin to update a user's email or password.
+        At least one field must be provided in the request body.
+        Only accessible by the user themselves or an admin.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        summary: User data to update
+        description: >
+          At least one field must be provided in the request body.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'jan.jansen@example.com'
+                password:
+                  type: string
+                  example: 'newpassword123'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'User updated successfully'
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 42
+                      email:
+                        type: string
+                        format: email
+                        example: 'jan.jansen@example.com'
+                      type:
+                        type: integer
+                        enum: [0, 1, 2, 3]
+                        description: >
+                          The type of user (0 for user, 1 for admin, 2 for student, 3 for bedrijf).
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Forbidden: You can only update your own user record or must be admin.'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'User not found'
 
  
   /bedrijven:
@@ -556,6 +639,10 @@ paths:
                     linkedin:
                       type: string
                       format: uri
+                    profiel_foto:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
 
   /bedrijven/{bedrijfID}:
     description: Get a specific company by ID
@@ -593,6 +680,228 @@ paths:
                     type: string
                     format: uri
                     example: 'https://www.linkedin.com/company/techsolutions'
+                  profiel_foto:
+                    type: string
+                    format: uri
+                    example: 'https://example.com/company_logo.jpg'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Company not found'
+    put:
+      summary: Update a company by ID
+      description: >
+        This endpoint allows updating a company's information.
+        Only the company itself or an admin can update the record.
+        At least one field must be provided in the request body.
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: Company data to update [Note: At least one field must be provided]
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                naam:
+                  type: string
+                  example: 'Tech Solutions'
+                plaats:
+                  type: string
+                  example: 'Brussel'
+                contact_email:
+                  type: string
+                  format: email
+                  example: 'contact@techsolutions.com'
+                linkedin:
+                  type: string
+                  format: uri
+                  example: 'https://www.linkedin.com/company/techsolutions'
+                profiel_foto:
+                  type: string
+                  format: uri
+                  example: 'https://example.com/company_logo.jpg'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: 'Company updated successfully'
+                    bedrijf:
+                      type: object
+                      properties:
+                        gebruiker_id:
+                          type: integer
+                          example: 42
+                        naam:
+                          type: string
+                          example: 'Tech Solutions'
+                        plaats:
+                          type: string
+                          example: 'Brussel'
+                        contact_email:
+                          type: string
+                          format: email
+                          example: 'contact@techsolutions.com'
+                        linkedin:
+                          type: string
+                          format: uri
+                          example: 'https://www.linkedin.com/company/techsolutions'
+                        profiel_foto:
+                          type: string
+                          format: uri
+                          example: 'https://example.com/company_logo.jpg'
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: 'Company not found'
+          '403':
+            description: Forbidden
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: 'Forbidden: You can only update your own company record or must be admin.'
+
+  /bedrijven/goedgekeurd:
+    description: List of approved companies
+    summary: Get all approved companies
+    get:
+      summary: Get all approved companies
+      tags:
+        - Bedrijven
+      responses:
+        '200':
+          description: OK
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    gebruiker_id:
+                      type: integer
+                    naam:
+                      type: string
+                    plaats:
+                      type: string
+                    contact_email:
+                      type: string
+                      format: email
+                    linkedin:
+                      type: string
+                      format: uri
+                    profiel_foto:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
+
+  /bedrijven/keur/{bedrijfID}:
+    description: Approve or reject a company by ID
+    summary: Approve or reject a company
+    post:
+      summary: Approve or reject a company
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Company approved successfully'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Company not found'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Forbidden: You must be an admin to approve or reject companies'
+
+  /bedrijven/nietgoedgekeurd:
+    description: List of non-approved companies
+    summary: Get all non-approved companies
+    get:
+      summary: Get all non-approved companies
+      tags:
+        - Bedrijven
+      responses:
+        '200':
+          description: OK
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    gebruiker_id:
+                      type: integer
+                    naam:
+                      type: string
+                    plaats:
+                      type: string
+                    contact_email:
+                      type: string
+                      format: email
+                    linkedin:
+                      type: string
+                      format: uri
+                    profiel_foto:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
 
   /studenten:
     description: List of students
@@ -688,7 +997,19 @@ paths:
                     type: integer
                   opleiding_id:
                     type: integer
+      '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Student not found'
     put:
+      security:
+        - bearerAuth: []
       summary: Update a student by ID
       description: >
         This endpoint allows updating a student's information.
@@ -775,6 +1096,16 @@ paths:
                         type: string
                         format: date
                         example: '2006-05-16'
+          '404':
+            description: Not Found
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      example: 'Student not found'
 
 
   /opleidingen:
@@ -806,6 +1137,7 @@ paths:
                   naam:
                     type: string
     get:
+      security: []
       tags:
         - Opleidingen
       summary: Get all available opleidingen
@@ -832,6 +1164,7 @@ paths:
   /skills:
     description: List of available skills
     get:
+      security: []
       tags:
         - Skills
       summary: Get all available skills
@@ -851,6 +1184,130 @@ paths:
                       type: string
                       example: 'JavaScript'
 
+  /skills/{skillID}:
+    delete:
+      tags:
+        - Skills
+      summary: 'Delete a skill'
+      description: 'Delete a skill by ID'
+      parameters:
+        - name: skillID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Skill ID is required'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Skill not found'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'An error occurred while deleting the skill'
+
+  /speeddates:
+    description: List of available speed dates
+    get:
+      tags:
+        - Speeddates
+      summary: Get all speeddates of user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                id_student:
+                  type: integer
+                  example: 42
+                id_bedrijf:
+                  type: integer
+                  example: 24
+                datum:
+                  type: string
+                  format: date-time
+                  example: '2023-10-01T10:00:00Z'
+                akkoord:
+                  type: boolean
+                  example: true
+
+  /speeddates/{speeddateID}:
+    get:
+      summary: Get a specific speed date by ID
+      tags:
+        - Speeddates
+      parameters:
+        - name: speeddateID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  id_student:
+                    type: integer
+                    example: 42
+                  id_bedrijf:
+                    type: integer
+                    example: 24
+                  datum:
+                    type: string
+                    format: date-time
+                    example: '2023-10-01T10:00:00Z'
+                  akkoord:
+                    type: boolean
+                    example: true
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Speeddate not found'
 
   /stands:
     description: List of available stands
