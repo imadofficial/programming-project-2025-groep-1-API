@@ -4,7 +4,7 @@ const { getPool } = require('../globalEntries.js');
 
 async function getUserById(id) {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT id, email, is_admin FROM gebruiker WHERE id = ?'; // Corrected table name
+    const query = 'SELECT id, email, type FROM gebruiker WHERE id = ?'; // Corrected table name
 
     try {
         const [rows] = await pool.query(query, [id]);
