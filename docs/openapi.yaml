@@ -174,6 +174,10 @@ paths:
       tags:
         - Auth
       summary: Get information about the authenticated user
+      description: >
+        This endpoint returns information about the authenticated user.
+        The user must be logged in and provide a valid access token.
+        The response includes the user's type (student, bedrijf, or admin) and their details.
       security:
         - bearerAuth: []
       responses:
@@ -185,9 +189,10 @@ paths:
                 discriminator:
                   propertyName: type
                   mapping:
-                    student: '#/components/schemas/Student'
-                    bedrijf: '#/components/schemas/Bedrijf'
-                    admin: '#/components/schemas/Admin'
+                    0: 'User'
+                    1: 'Admin'
+                    2: 'Student'
+                    3: 'Bedrijf'
                 oneOf:
                  - $ref: '#/components/schemas/Student'
                  - $ref: '#/components/schemas/Bedrijf'
@@ -199,6 +204,12 @@ paths:
       tags:
         - Auth
       summary: Login to the API
+      description: >
+        This endpoint allows users to log in to the API.
+        It returns an access token and stores a refresh token in the cookies upon successful login.
+        The access token is valid for 15 minutes, and the refresh token is valid for 7 days.
+        Use the access token for subsequent requests to protected endpoints.
+        Once the access token expires, make a POST request to the /auth/refresh endpoint.
       requestBody:
         required: true
         content:
@@ -212,12 +223,6 @@ paths:
                 password:
                   type: string
                   example: 'password123'
-                user:
-                  type: object
-                  oneOf:
-                    - $ref: '#/components/schemas/Student'
-                    - $ref: '#/components/schemas/Bedrijf'
-                    - $ref: '#/components/schemas/Admin'
       responses:
         '200':
           description: Successful login
@@ -229,6 +234,11 @@ paths:
                   message:
                     type: string
                     example: 'Login successful'
+                  user:
+                    oneOf:
+                      - $ref: '#/components/schemas/Student'
+                      - $ref: '#/components/schemas/Bedrijf'
+                      - $ref: '#/components/schemas/Admin'
                   accessToken:
                     type: string
                     example: 'your_access_token_here'
@@ -246,6 +256,11 @@ paths:
       tags:
         - Auth
       summary: Refresh the access token
+      description: >
+        This endpoint allows users to refresh their access token using a valid refresh token.
+        The refresh token is stored in the cookies.
+        If the refresh token is valid, a new access token will be issued.
+        The new access token will be valid for 15 minutes.
       responses:
         '200':
           description: Successful token refresh
@@ -500,8 +515,8 @@ paths:
       security:
         - bearerAuth: []
       parameters:
-        - name: id
-          in: query
+        - name: userID
+          in: path
           required: true
           schema:
             type: integer
@@ -543,7 +558,7 @@ paths:
                       type: string
                       format: uri
 
-  /bedrijven/{id}:
+  /bedrijven/{bedrijfID}:
     description: Get a specific company by ID
     summary: Get a company by ID
     get:
@@ -551,7 +566,7 @@ paths:
       tags:
         - Bedrijven
       parameters:
-        - name: id
+        - name: bedrijfID
           in: path
           required: true
           schema:
@@ -636,14 +651,14 @@ paths:
                     type: string
                     example: 'No students found'
 
-  /studenten/{id}:
+  /studenten/{studentID}:
     description: Get a specific student by ID
     get:
       summary: Get a student by ID
       tags:
         - Studenten
       parameters:
-        - name: id
+        - name: studentID
           in: path
           required: true
           schema:
@@ -676,6 +691,10 @@ paths:
                     type: integer
     put:
       summary: Update a student by ID
+      description: >
+        This endpoint allows updating a student's information.
+        Only the student themselves or an admin can update the record.
+        At least one field must be provided in the request body.
       tags:
         - Studenten
       parameters:
@@ -686,25 +705,43 @@ paths:
             type: integer
       requestBody:
         required: true
+        description: Student data to update [Note: At least one field must be provided]
         content:
           application/json:
             schema:
               type: object
               properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'jan.jansen@example.com'
+                password:
+                  type: string
+                  example: 'password123'
                 voornaam:
                   type: string
+                  example: 'Jan'
                 achternaam:
                   type: string
+                  example: 'Jansen'
                 linkedin:
                   type: string
                   format: uri
+                  example: '/in/janjansen'
                 profiel_foto:
                   type: string
                   format: uri
+                  example: '/profile.jpg'
                 studiejaar:
                   type: integer
+                  example: 2
                 opleiding_id:
                   type: integer
+                  example: 1
+                date_of_birth:
+                  type: string
+                  format: date
+                  example: '1970-01-01'
       responses:
         '200':
           description: OK
@@ -862,14 +899,14 @@ paths:
                       type: integer
                       example: 42
 
-  /stands/{id}:
+  /stands/{standID}:
     description: Get a specific stand by ID
     get:
       summary: Get a stand by ID
       tags:
         - Stands
       parameters:
-        - name: id
+        - name: standID
           in: path
           required: true
           schema:
@@ -896,7 +933,7 @@ paths:
       summary: 'Delete a stand'
       description: 'Delete a stand'
       parameters:
-        - name: id
+        - name: standID
           in: path
           required: true
           schema:
