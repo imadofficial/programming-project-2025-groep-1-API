@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const { getAlleBedrijven, getBedrijfById, getGoedgekeurdeBedrijven } = require('../sql/bedrijven.js');
+const { getAllBedrijven, getBedrijfById, getGoedgekeurdeBedrijven } = require('../sql/bedrijven.js');
 
 require('../auth/passportJWT.js');
 
@@ -11,7 +11,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
     for (const [param, value] of Object.entries(req.query)) {
         console.log(param, value);
     }
-    const bedrijven = await getAlleBedrijven();
+    const bedrijven = await getAllBedrijven();
     res.json(bedrijven);
 })
 
