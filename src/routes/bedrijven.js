@@ -2,6 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const { getAllBedrijven, getBedrijfById, getGoedgekeurdeBedrijven, getNietGoedgekeurdeBedrijven, keurBedrijfGoed, updateBedrijf } = require('../sql/bedrijven.js');
 const authAdmin = require('../auth/authAdmin.js');
+const canEdit = require('../auth/canEdit.js');
 
 require('../auth/passportJWT.js');
 
