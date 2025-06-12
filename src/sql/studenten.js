@@ -45,7 +45,7 @@ async function getStudentById(id) {
 
 async function updateStudent(id, data) {
     const pool = getPool('ehbmatchdev');
-    const query = 'UPDATE student SET ? WHERE id = ?';
+    const query = 'UPDATE student SET ? WHERE gebruiker_id = ?';
 
     if (!id || !data) {
         throw new Error('ID and data are required for update');
