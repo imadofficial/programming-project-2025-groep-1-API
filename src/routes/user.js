@@ -4,6 +4,8 @@ const passport = require('passport');
 require('../auth/passportJWT.js');
 
 const { addSkillToUser } = require('../sql/skills.js');
+const authAdmin = require('../auth/authAdmin.js');
+const { deleteUserById } = require('../sql/users.js');
 
 const router = express.Router();
 
@@ -22,6 +24,21 @@ router.post('/skills', passport.authenticate('jwt', { session: false }), async (
     } catch (error) {
         console.error('Error adding skill:', error);
         res.status(500).json({ error: 'Failed to add skill' });
+    }
+});
+
+router.delete('/:userID', [passport.authenticate('jwt', { session: false }), authAdmin], async (req, res) => {
+    const userId = req.params['userID'];
+    if (!userId) {
+        return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    try {
+        await deleteUserById(userId);
+        res.status(204).send();
+    } catch (error) {
+        console.error('Error deleting user:', error);
+        res.status(500).json({ error: 'Failed to delete user' });
     }
 });
 

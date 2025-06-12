@@ -81,7 +81,30 @@ async function getUserInfo(id) {
     }
 }
 
+async function deleteUserById(id) {
+    const pool = getPool('ehbmatchdev');
+    await pool.query('START TRANSACTION');
+
+    const query = 'DELETE FROM gebruiker WHERE id = ?';
+
+    try {
+        const [result] = await pool.query(query, [id]);
+        if (result.affectedRows > 0) {
+            await pool.query('COMMIT');
+            return true; // Return true if the user was deleted
+        } else {
+            await pool.query('ROLLBACK');
+            return false; // Return false if no user was found to delete
+        }
+    } catch (error) {
+        console.error('Database query error:', error);
+        await pool.query('ROLLBACK');
+        throw new Error('Database query failed');
+    }
+}
+
 module.exports = {
     getUserById,
-    getUserInfo
+    getUserInfo,
+    deleteUserById
 };
