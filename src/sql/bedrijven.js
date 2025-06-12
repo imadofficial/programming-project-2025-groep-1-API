@@ -92,6 +92,25 @@ async function keurBedrijfGoed(id){
     }
 }
 
+async function updateBedrijf(id, data) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'UPDATE bedrijf SET ? WHERE id = ?';
+
+    if (!id || !data) {
+        throw new Error('ID and data are required for update');
+    }
+
+    // No need to check for invalid keys here; handled in the route
+
+    try {
+        const [result] = await pool.query(query, [data, id]);
+
+        return result.affectedRows > 0; // Return true if the update was successful
+    } catch (error) {
+        console.error('Database update error:', error);
+        throw new Error('Database update failed');
+    }
+}
 
 
 module.exports = {
@@ -99,5 +118,6 @@ module.exports = {
     getBedrijfById,
     getGoedgekeurdeBedrijven,
     getNietGoedgekeurdeBedrijven,
-    keurBedrijfGoed
+    keurBedrijfGoed,
+    updateBedrijf
 };
