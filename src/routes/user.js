@@ -1,10 +1,11 @@
 const express = require('express');
 const passport = require('passport');
+const bcrypt = require('bcrypt');
 
 require('../auth/passportJWT.js');
 
 const { addSkillToUser } = require('../sql/skills.js');
-const { updateUser, deleteUserById } = require('../sql/users.js');
+const { updateUser, deleteUserById, getUserById } = require('../sql/users.js');
 
 const authAdmin = require('../auth/authAdmin.js');
 const canEdit = require('../auth/canEdit.js');
@@ -33,7 +34,7 @@ router.post('/skills', passport.authenticate('jwt', { session: false }), async (
 
 // List of allowed columns for update
 const allowedUserColumns = [
-    'email', 'password'
+    'email', 'password', 'type'
 ];
 
 // PUT /:userID
@@ -70,11 +71,16 @@ router.put('/:userID', passport.authenticate('jwt', { session: false }), canEdit
 
     // If password is provided, hash it
     if (filteredData.password) {
-        const bcrypt = require('bcrypt');
-        const saltRounds = 11;
+        // Get user type to determine salt rounds
+        const userType = await getUserById(userId).then(user => user.type);
+
+        const saltRounds = userType === 1 ? 14 : 11; // Use different salt rounds for admin vs regular users
+
         try {
             // Hash and map to wachtwoord for DB
             filteredData.wachtwoord = await bcrypt.hash(filteredData.password, saltRounds);
+
+            // Remove the original password field (now renamed to wachtwoord)
             delete filteredData.password;
         } catch (error) {
             console.error('Error hashing password:', error);
