@@ -145,6 +145,9 @@ tags:
   - name: Registration
     description: >
       Endpoints for user registration and management.
+  - name: Users
+    description: >
+      Endpoints for managing users.
   - name: Bedrijven
     description: >
       Endpoints for managing companies.
@@ -486,6 +489,30 @@ paths:
                     type: integer
                     example: 42
 
+  /user/{userID}:
+    delete:
+      tags:
+        - Users
+      summary: Delete a user
+      description: >
+        This endpoint allows an admin to delete a user by their ID.
+        Only accessible by admin users.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+        '403':
+          description: Forbidden
+        '404':
+          description: User not found
+
  
   /bedrijven:
     description: List of companies
@@ -588,6 +615,26 @@ paths:
                       type: integer
                     opleiding_id:
                       type: integer
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Forbidden: You can only update your own user record or must be admin.'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'No students found'
 
   /studenten/{id}:
     description: Get a specific student by ID
@@ -627,6 +674,71 @@ paths:
                     type: integer
                   opleiding_id:
                     type: integer
+    put:
+      summary: Update a student by ID
+      tags:
+        - Studenten
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                voornaam:
+                  type: string
+                achternaam:
+                  type: string
+                linkedin:
+                  type: string
+                  format: uri
+                profiel_foto:
+                  type: string
+                  format: uri
+                studiejaar:
+                  type: integer
+                opleiding_id:
+                  type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Student updated successfully'
+                  student:
+                    type: object
+                    properties:
+                      gebruiker_id:
+                        type: integer
+                      voornaam:
+                        type: string
+                      achternaam:
+                        type: string
+                      linkedin:
+                        type: string
+                        format: uri
+                      profiel_foto:
+                        type: string
+                        format: uri
+                      studiejaar:
+                        type: integer
+                      opleiding_id:
+                        type: integer
+                      date_of_birth:
+                        type: string
+                        format: date
+                        example: '2006-05-16'
 
 
   /opleidingen:
