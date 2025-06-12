@@ -510,9 +510,10 @@ paths:
     delete:
       tags:
         - Users
-      summary: Delete a user
+      summary: Delete a user and their associated student or company profile
       description: >
         This endpoint allows an admin to delete a user by their ID.
+        The user and their associated profile will be removed from the system.
         Only accessible by admin users.
       security:
         - bearerAuth: []
@@ -532,10 +533,11 @@ paths:
     put:
       tags:
         - Users
-      summary: Update a user
+      summary: Update a user's email or password
       description: >
-        This endpoint allows an admin to update a user's information.
-        Only accessible by admin users.
+        This endpoint allows an admin to update a user's email or password.
+        At least one field must be provided in the request body.
+        Only accessible by the user themselves or an admin.
       security:
         - bearerAuth: []
       parameters:
@@ -547,7 +549,6 @@ paths:
       requestBody:
         summary: User data to update
         description: >
-          This endpoint allows an admin to update a user's information.
           At least one field must be provided in the request body.
         required: true
         content:
