@@ -13,7 +13,7 @@ router.post('/skills', passport.authenticate('jwt', { session: false }), async (
     const id_gebruiker = req.user.id;
 
     if (!id_skill) {
-        return res.status(400).json({ error: 'id_gebruiker and id_skill are required' });
+        return res.status(400).json({ error: 'id_skill is required' });
     }
 
     try {
