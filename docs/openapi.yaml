@@ -189,10 +189,9 @@ paths:
                 discriminator:
                   propertyName: type
                   mapping:
-                    0: 'User'
-                    1: 'Admin'
-                    2: 'Student'
-                    3: 'Bedrijf'
+                    1: '#/components/schemas/Admin'
+                    2: '#components/schemas/Student'
+                    3: '#/components/schemas/Bedrijf'
                 oneOf:
                  - $ref: '#/components/schemas/Student'
                  - $ref: '#/components/schemas/Bedrijf'
@@ -698,7 +697,7 @@ paths:
       tags:
         - Studenten
       parameters:
-        - name: id
+        - name: studentID
           in: path
           required: true
           schema:
