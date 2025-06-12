@@ -83,7 +83,12 @@ async function getUserInfo(id) {
 
 async function deleteUserById(id) {
     const pool = getPool('ehbmatchdev');
-    await pool.query('START TRANSACTION');
+    try {
+        await pool.query('START TRANSACTION');
+    } catch (error) {
+        console.error('Failed to start transaction:', error);
+        throw new Error('Transaction initiation failed');
+    }
 
     const query = 'DELETE FROM gebruiker WHERE id = ?';
 
