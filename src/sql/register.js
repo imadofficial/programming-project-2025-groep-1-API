@@ -9,7 +9,7 @@ dotenv.config();
 
 async function register(email, wachtwoord) {
     const pool = getPool('ehbmatchdev');
-    const query = 'INSERT INTO gebruiker (email, wachtwoord) VALUES (?,?)';
+    const query = 'INSERT INTO gebruiker (email, wachtwoord, type) VALUES (?,?,0)';
 
     try {
         const [result] = await pool.query(query, [email, wachtwoord]);
@@ -22,7 +22,7 @@ async function register(email, wachtwoord) {
 
 async function registerAdmin(email, wachtwoord) {
     const pool = getPool('ehbmatchdev');
-    const query = 'INSERT INTO gebruiker (email, wachtwoord, is_admin) VALUES (?,?,1)';
+    const query = 'INSERT INTO gebruiker (email, wachtwoord, type) VALUES (?,?,1)';
 
     try {
         const [result] = await pool.query(query, [email, wachtwoord]);
@@ -35,7 +35,7 @@ async function registerAdmin(email, wachtwoord) {
 
 async function registerStudent(email, wachtwoord, voornaam, achternaam, linkedin, profielFoto, studiejaar, opleidingId, dob) {
     const pool = getPool('ehbmatchdev');
-    const query1 = 'INSERT INTO gebruiker (email, wachtwoord, is_admin) VALUES (?,?,0)';
+    const query1 = 'INSERT INTO gebruiker (email, wachtwoord, type) VALUES (?,?,2)';
     const query2 = 'INSERT INTO student (gebruiker_id, voornaam, achternaam, linkedin, profiel_foto, studiejaar, opleiding_id, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 
     try {
@@ -52,7 +52,7 @@ async function registerStudent(email, wachtwoord, voornaam, achternaam, linkedin
 
 async function registerBedrijf(email, wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto) {
     const pool = getPool('ehbmatchdev');
-    const query1 = 'INSERT INTO gebruiker (email, wachtwoord, is_admin) VALUES (?,?,0)';
+    const query1 = 'INSERT INTO gebruiker (email, wachtwoord, type) VALUES (?,?,3)';
     const query2 = 'INSERT INTO bedrijf (gebruiker_id, naam, plaats, contact_email, linkedin, profiel_foto) VALUES (?, ?, ?, ?, ?, ?)';
 
     try {
