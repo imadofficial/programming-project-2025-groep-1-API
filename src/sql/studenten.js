@@ -27,7 +27,7 @@ async function getAllStudenten() {
 }
 async function getStudentById(id) {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM student WHERE id = ?';
+    const query = 'SELECT * FROM student WHERE gebruiker_id = ?';
 
     try {
         const [rows] = await pool.query(query, [id]);

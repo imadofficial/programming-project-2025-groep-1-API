@@ -46,6 +46,9 @@ app.use('/stands', require('./routes/stands.js'));
 
 app.use('/speeddates', require('./routes/speeddates.js'));
 
+// User routes
+app.use('/user', require('./routes/user.js'));
+
 // Authentication routes
 app.use('/auth/info', require('./auth/info.js'));
 
