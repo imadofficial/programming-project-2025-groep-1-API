@@ -9,8 +9,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.options('*', cors()); // Enable pre-flight requests for all routes
-
 const allowedOrigins = [
   'http://localhost:3001',
   'https://www.ehb-match.me',
