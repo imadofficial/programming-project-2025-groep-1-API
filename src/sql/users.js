@@ -108,8 +108,26 @@ async function deleteUserById(id) {
     }
 }
 
+async function updateUser(id, data) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'UPDATE gebruiker SET ? WHERE id = ?';
+
+    if (!id || !data) {
+        throw new Error('ID and data are required for update');
+    }
+
+    try {
+        const [result] = await pool.query(query, [data, id]);
+        return result.affectedRows > 0; // Return true if the update was successful
+    } catch (error) {
+        console.error('Database update error:', error);
+        throw new Error('Database update failed');
+    }
+}
+
 module.exports = {
     getUserById,
     getUserInfo,
-    deleteUserById
+    deleteUserById,
+    updateUser
 };
