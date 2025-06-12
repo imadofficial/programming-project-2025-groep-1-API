@@ -52,9 +52,9 @@ const allowedStudentColumns = [
     'voornaam', 'achternaam', 'date_of_birth', 'linkedin', 'profiel_foto', 'studiejaar', 'opleiding_id'
 ];
 
-// PUT /:id
-router.put('/:id', passport.authenticate('jwt', { session: false }), canEdit, async (req, res) => {
-    const studentId = req.params.id;
+// PUT /:studentID
+router.put('/:studentID', passport.authenticate('jwt', { session: false }), canEdit, async (req, res) => {
+    const studentId = req.params.studentID;
 
     const data = req.body;
     if (!data || Object.keys(data).length === 0) {

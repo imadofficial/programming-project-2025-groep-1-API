@@ -5,7 +5,7 @@ module.exports = function canEdit(req, res, next) {
         return res.status(401).json({ message: 'Unauthorized: User information is missing.' });
     }
     // Accept id from either req.params.id or req.params.userID (case-insensitive)
-    const idParam = req.params.id || req.params.userID || req.params.userid || req.params.gebruikerID || req.params.gebruikerid;
+    const idParam = req.params.id || req.params.userID || req.params.gebruikerID || req.params.studentID || req.params.bedrijfID;
     if (!idParam) {
         return res.status(400).json({ message: 'No user id provided in route parameters' });
     }
