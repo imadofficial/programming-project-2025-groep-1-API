@@ -73,7 +73,13 @@ router.put('/:studentID', passport.authenticate('jwt', { session: false }), canE
     try {
         const success = await updateStudent(studentId, filteredData);
         if (success) {
-            res.json({ message: 'Student updated successfully' });
+            // Fetch the updated student and their skills
+            const updatedStudent = await getStudentById(studentId);
+            if (updatedStudent) {
+                res.json({ message: "Student updated successfully", student: updatedStudent });
+            } else {
+                res.status(404).json({ message: 'Student not found after update' });
+            }
         } else {
             res.status(404).json({ message: 'Student not found or not updated' });
         }
