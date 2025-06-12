@@ -14,9 +14,9 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
     }
 
     const studenten = await getAllStudenten();
-    for (const student of studenten) {
+    await Promise.all(studenten.map(async (student) => {
         student.skills = await getSkillsByUserId(student.id);
-    }
+    }));
     res.json(studenten);
 })
 
@@ -28,7 +28,7 @@ router.get('/:studentID', passport.authenticate('jwt', { session: false }), asyn
 router.get('/:studentID/skills', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const studentId = req.params['studentID'];
     if (!studentId) {
-        return res.status(400).json({ message: 'Student ID is required' });
+        return res.status(400).json({ error: 'Student ID is required' });
     }
 
     try {
