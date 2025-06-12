@@ -24,6 +24,25 @@ async function getSpeeddateById(id) {
     }
 }
 
+// function to get all speeddates by user ID (id_bedrijf or id_student)
+async function getSpeeddatesByUserId(id) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'SELECT * FROM speeddate WHERE id_bedrijf = ? OR id_student = ?';
+
+    try {
+        const [rows] = await pool.query(query, [id, id]);
+        console.log('Query result:', rows); // Log the query result
+        if (rows.length > 0) {
+            return rows; // Return all speeddates for the user
+        } else {
+            return []; // Return an empty array if no speeddates are found
+        }
+    } catch (error) {
+        console.error('Database query error:', error); // Log the error
+        throw new Error('Database query failed');
+    }
+}
+
 async function getAllSpeeddates() {
     const pool = getPool('ehbmatchdev');
     const query = 'SELECT * FROM speeddate';
@@ -118,6 +137,7 @@ async function getInfo(id) {
 
 module.exports = {
     getSpeeddateById,
+    getSpeeddatesByUserId,
     getAllSpeeddates,
     getDatum,
     speeddateAkkoord,

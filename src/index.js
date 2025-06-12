@@ -37,40 +37,24 @@ app.use(function(req, res, next) {
 require('./auth/passportJWT.js');
 
 
-const bedrijven = require('./routes/bedrijven.js');
-const studenten = require('./routes/studenten.js');
+app.use('/bedrijven', require('./routes/bedrijven.js'));
+app.use('/studenten', require('./routes/studenten.js'));
 
-const skills = require('./routes/skills.js');
-const opleidingen = require('./routes/opleidingen.js');
+app.use('/skills', require('./routes/skills.js'));
+app.use('/opleidingen', require('./routes/opleidingen.js'));
+app.use('/stands', require('./routes/stands.js'));
 
-const login = require('./auth/login.js');
-const refresh = require('./auth/refresh.js');
-const logout = require('./auth/logout.js');
-const register = require('./auth/register.js');
-
-const info = require('./auth/info.js');
-
-const profielfoto = require('./auth/profielfoto.js');
-
-const stands = require('./routes/stands.js');
-
-
-app.use('/bedrijven', bedrijven);
-app.use('/studenten', studenten);
-
-app.use('/skills', skills);
-app.use('/opleidingen', opleidingen);
-app.use('/stands', stands);
+app.use('/speeddates', require('./routes/speeddates.js'));
 
 // Authentication routes
-app.use('/auth/info', info);
+app.use('/auth/info', require('./auth/info.js'));
 
 // app.use('/auth/profielfoto', profielfoto); // TODO: implement Uploadthing using https://docs.uploadthing.com/api-reference/ut-api
 
-app.use('/auth/login', login);
-app.use('/auth/refresh', refresh);
-app.use('/auth/logout', logout);
-app.use('/auth/register', register);
+app.use('/auth/login', require('./auth/login.js'));
+app.use('/auth/refresh', require('./auth/refresh.js'));
+app.use('/auth/logout', require('./auth/logout.js'));
+app.use('/auth/register', require('./auth/register.js'));
 
 const port = process.env.STATUS == "production" ? 3000 : 3001;
 
