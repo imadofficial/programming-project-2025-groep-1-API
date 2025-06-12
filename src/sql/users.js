@@ -41,8 +41,8 @@ async function getUserInfo(id) {
         const row = rows[0];
         // Check which table has data and return accordingly
         switch (row.type) {
-            // User is a student
             case 2:
+                // User is a student
                 return {
                     type: 2,
                     id: row.id,
