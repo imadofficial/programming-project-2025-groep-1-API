@@ -24,8 +24,8 @@ components:
         - opleiding_id
       properties:
         type:
-          type: string
-          enum: [student]
+          type: integer
+          enum: [2]
           description: The type of user (always "student" for this schema).
         gebruiker_id:
           type: integer
@@ -51,7 +51,7 @@ components:
           type: integer
           description: The ID of the student's opleiding (program).
       example:
-        type: student
+        type: 2
         gebruiker_id: 1
         voornaam: Jan
         achternaam: Jansen
@@ -72,8 +72,8 @@ components:
         - profiel_foto
       properties:
         type:
-          type: string
-          enum: [bedrijf]
+          type: integer
+          enum: [3]
           description: The type of user (always "bedrijf" for this schema).
         gebruiker_id:
           type: integer
@@ -97,7 +97,7 @@ components:
           format: uri
           description: The company's profile photo URL.
       example:
-        type: bedrijf
+        type: 3
         gebruiker_id: 2
         naam: Tech Solutions
         plaats: Brussel
@@ -113,8 +113,8 @@ components:
         - email
       properties:
         type:
-          type: string
-          enum: [admin]
+          type: integer
+          enum: [1]
           description: The type of user (always "admin" for this schema).
         gebruiker_id:
           type: integer
@@ -125,7 +125,7 @@ components:
           example: 'admin@example.com'
           description: The admin's email address.
       example:
-        type: admin
+        type: 1
         gebruiker_id: 3
         email: admin@example.com
 
@@ -209,6 +209,12 @@ paths:
                 password:
                   type: string
                   example: 'password123'
+                user:
+                  type: object
+                  oneOf:
+                    - $ref: '#/components/schemas/Student'
+                    - $ref: '#/components/schemas/Bedrijf'
+                    - $ref: '#/components/schemas/Admin'
       responses:
         '200':
           description: Successful login
