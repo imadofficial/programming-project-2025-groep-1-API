@@ -55,10 +55,7 @@ async function updateStudent(id, data) {
 
     try {
         const [result] = await pool.query(query, [data, id]);
-        
-        if (result.affectedRows === 0) {
-            throw new Error('No rows updated, check if the ID exists');
-        }
+
         return result.affectedRows > 0; // Return true if the update was successful
     } catch (error) {
         console.error('Database update error:', error);
