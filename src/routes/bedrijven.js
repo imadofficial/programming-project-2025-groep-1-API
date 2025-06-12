@@ -81,7 +81,7 @@ router.put('/:bedrijfID', passport.authenticate('jwt', { session: false }), canE
         if (success) {
             const updatedBedrijf = await getBedrijfById(bedrijfId);
             if (!updatedBedrijf) {
-                return res.status(404).json({ message: 'Bedrijf not found' });
+                return res.status(404).json({ message: 'Bedrijf not found after update' });
             }
             res.json({ message: 'Bedrijf updated successfully', bedrijf: updatedBedrijf });
         } else {
