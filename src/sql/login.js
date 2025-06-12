@@ -78,6 +78,7 @@ async function login(email, wachtwoord) {
 }
 
 module.exports = {
+    getUserType,
     login,
     isAdmin,
     getWachtwoord
