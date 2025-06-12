@@ -18,11 +18,11 @@ async function getWachtwoord(emailadres) {
 
 
 async function getUserType(id) {
-    const pol = getPool('ehbmatchdev');
+    const pool = getPool('ehbmatchdev');
     const query = 'SELECT type FROM gebruiker WHERE id = ?'; // Corrected table name
 
     try {
-        const [rows] = await pol.query(query, [id]);
+        const [rows] = await pool.query(query, [id]);
         if (rows.length > 0) {
             return rows[0].type; // Return the type of the user
         } else {
