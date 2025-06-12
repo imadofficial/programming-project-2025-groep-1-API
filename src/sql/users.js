@@ -4,7 +4,7 @@ const { getPool } = require('../globalEntries.js');
 
 async function getUserById(id) {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT id, email, is_admin FROM gebruiker WHERE id = ?'; // Corrected table name
+    const query = 'SELECT id, email, type FROM gebruiker WHERE id = ?'; // Corrected table name
 
     try {
         const [rows] = await pool.query(query, [id]);
@@ -24,7 +24,7 @@ async function getUserInfo(id) {
     console.log('Fetching user info for ID:', id); // Log the ID being fetched
     const query = `
         SELECT 
-            g.id, g.email, g.is_admin,
+            g.id, g.email, g.type,
             s.voornaam AS student_voornaam, s.achternaam AS student_achternaam, s.date_of_birth, s.linkedin AS student_linkedin, s.profiel_foto, s.studiejaar, o.naam AS opleiding,
             b.naam AS bedrijf_naam, b.plaats, b.contact_email, b.linkedin AS bedrijf_linkedin, b.profiel_foto AS bedrijf_profiel_foto
         FROM gebruiker g
@@ -40,42 +40,40 @@ async function getUserInfo(id) {
 
         const row = rows[0];
         // Check which table has data and return accordingly
-        if (row.student_voornaam) {
-            // User is a student
-            return {
-                type: 'student',
-                id: row.id,
-                email: row.email,
-                is_admin: row.is_admin,
-                voornaam: row.student_voornaam,
-                achternaam: row.student_achternaam,
-                date_of_birth: row.date_of_birth,
-                profiel_foto: row.profiel_foto,
-                linkedin: row.student_linkedin,
-                studiejaar: row.studiejaar,
-                opleiding: row.opleiding
-            };
-        } else if (row.bedrijf_naam) {
-            // User is a company
-            return {
-                type: 'bedrijf',
-                id: row.id,
-                email: row.email,
-                is_admin: row.is_admin,
-                naam: row.bedrijf_naam,
-                plaats: row.plaats,
-                profiel_foto: row.bedrijf_profiel_foto,
-                contact_email: row.contact_email,
-                linkedin: row.bedrijf_linkedin
-            };
-        } else {
-            // User is neither student nor company
-            return {
-                type: 'gebruiker',
-                id: row.id,
-                email: row.email,
-                is_admin: row.is_admin
-            };
+        switch (row.type) {
+            case 2:
+                // User is a student
+                return {
+                    type: 2,
+                    id: row.id,
+                    email: row.email,
+                    voornaam: row.student_voornaam,
+                    achternaam: row.student_achternaam,
+                    date_of_birth: row.date_of_birth,
+                    profiel_foto: row.profiel_foto,
+                    linkedin: row.student_linkedin,
+                    studiejaar: row.studiejaar,
+                    opleiding: row.opleiding
+                };
+            case 3:
+                // User is a company
+                return {
+                    type: 3,
+                    id: row.id,
+                    email: row.email,
+                    naam: row.bedrijf_naam,
+                    plaats: row.plaats,
+                    profiel_foto: row.bedrijf_profiel_foto,
+                    contact_email: row.contact_email,
+                    linkedin: row.bedrijf_linkedin
+                };
+            default:
+                // User is neither student nor company
+                return {
+                    type: row.type,
+                    id: row.id,
+                    email: row.email,
+                };
         }
     } catch (error) {
         console.error('Database query error:', error);

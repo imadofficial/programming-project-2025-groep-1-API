@@ -19,8 +19,8 @@ router.post('/', async (req, res, next) => {
         const accessMaxAge = 15 * 60 * 1000; // 15 minutes
         const refreshMaxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-        const accessToken = jwt.sign({ id: user.id, is_admin: user.is_admin }, process.env.JWT_ACCESS_SECRET, { expiresIn: accessMaxAge });
-        const refreshToken = jwt.sign({ id: user.id, is_admin: user.is_admin }, process.env.JWT_REFRESH_SECRET, { expiresIn: refreshMaxAge });
+        const accessToken = jwt.sign({ id: user.id, type: user.type }, process.env.JWT_ACCESS_SECRET, { expiresIn: accessMaxAge });
+        const refreshToken = jwt.sign({ id: user.id, type: user.type }, process.env.JWT_REFRESH_SECRET, { expiresIn: refreshMaxAge });
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
