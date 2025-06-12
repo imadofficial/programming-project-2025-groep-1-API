@@ -96,7 +96,11 @@ router.put('/:userID', passport.authenticate('jwt', { session: false }), canEdit
     try {
         const success = await updateUser(userId, filteredData);
         if (success) {
-            res.json({ message: 'User updated successfully' });
+            const updatedUser = await getUserById(userId);
+            if (!updatedUser) {
+                return res.status(404).json({ message: 'User not found after update' });
+            }
+            res.json({ message: 'User updated successfully', user: updatedUser });
         } else {
             res.status(404).json({ message: 'User not found or not updated' });
         }
