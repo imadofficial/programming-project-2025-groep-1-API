@@ -193,7 +193,7 @@ paths:
                   propertyName: type
                   mapping:
                     1: '#/components/schemas/Admin'
-                    2: '#components/schemas/Student'
+                    2: '#/components/schemas/Student'
                     3: '#/components/schemas/Bedrijf'
                 oneOf:
                  - $ref: '#/components/schemas/Student'
