@@ -42,3 +42,9 @@ async function getStudentById(id) {
         throw new Error('Database query failed');
     }
 }
+
+
+module.exports = {
+    getAllStudenten,
+    getStudentById
+};
