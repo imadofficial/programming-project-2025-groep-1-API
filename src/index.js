@@ -49,7 +49,7 @@ app.use('/speeddates', require('./routes/speeddates.js'));
 // Authentication routes
 app.use('/auth/info', require('./auth/info.js'));
 
-app.use('/auth/profielfoto', require('./auth/profielfoto.js'));
+// app.use('/auth/profielfoto', profielfoto); // TODO: implement Uploadthing using https://docs.uploadthing.com/api-reference/ut-api
 
 app.use('/auth/login', require('./auth/login.js'));
 app.use('/auth/refresh', require('./auth/refresh.js'));
