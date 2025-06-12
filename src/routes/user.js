@@ -34,7 +34,7 @@ router.post('/skills', passport.authenticate('jwt', { session: false }), async (
 
 // List of allowed columns for update
 const allowedUserColumns = [
-    'email', 'password', 'type'
+    'email', 'password'
 ];
 
 // PUT /:userID
