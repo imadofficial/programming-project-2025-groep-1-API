@@ -72,8 +72,12 @@ router.put('/:userID', passport.authenticate('jwt', { session: false }), canEdit
 
     // If password is provided, hash it
     if (filteredData.password) {
-        // Get user type to determine salt rounds
-        const userType = await getUserById(userId).then(user => user.type);
+        // Fetch user type to determine salt rounds
+        const user = await getUserById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const userType = user.type;
 
         const saltRounds = userType === 1 ? 14 : 11; // Use different salt rounds for admin vs regular users
 
