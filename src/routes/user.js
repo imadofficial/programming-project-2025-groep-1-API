@@ -12,7 +12,8 @@ const canEdit = require('../auth/canEdit.js');
 
 const router = express.Router();
 
-// GET /skills
+
+// POST /skills
 router.post('/skills', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const { id_skill } = req.body;
 
