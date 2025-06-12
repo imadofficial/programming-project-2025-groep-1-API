@@ -1,7 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const { getAllStudenten, getStudentById } = require('../sql/studenten.js');
-const { getSkillsByUserId } = require('../sql/skills.js');``
+const { getSkillsByUserId } = require('../sql/skills.js');
 
 require('../auth/passportJWT.js');
 
