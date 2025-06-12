@@ -22,3 +22,5 @@ router.get('/:speeddateID', passport.authenticate('jwt', { session: false }), as
         res.status(404).json({ message: 'Speeddate not found' });
     }
 });
+
+module.exports = router;
