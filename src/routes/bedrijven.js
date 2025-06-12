@@ -19,13 +19,6 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
 });
 
 
-// GET /:bedrijfID
-router.get('/:bedrijfID', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const bedrijf = await getBedrijfById(req.params['bedrijfID']);
-    res.json(bedrijf);
-});
-
-
 // GET /goedgekeurd
 router.get('/goedgekeurd', passport.authenticate('jwt', { session: false }), async (req, res) => {
    const bedrijven = await getGoedgekeurdeBedrijven();
@@ -37,6 +30,13 @@ router.get('/goedgekeurd', passport.authenticate('jwt', { session: false }), asy
 router.get('/nietgoedgekeurd', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const bedrijven = await getNietGoedgekeurdeBedrijven();
     res.json(bedrijven);
+});
+
+
+// GET /:bedrijfID
+router.get('/:bedrijfID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const bedrijf = await getBedrijfById(req.params['bedrijfID']);
+    res.json(bedrijf);
 });
 
 
