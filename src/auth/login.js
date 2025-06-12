@@ -1,6 +1,7 @@
 const express = require('express')
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
+const { getUserInfo } = require('../sql/users.js');
 
 require('./passportLocal.js');
 
@@ -34,8 +35,8 @@ router.post('/', async (req, res, next) => {
         const accessTokenExpiresAt = new Date(Date.now() + accessMaxAge).toISOString();
         const refreshTokenExpiresAt = new Date(Date.now() + refreshMaxAge).toISOString();
 
-        if (res.locals.ua == 'EhBMatch/Mobile') return res.json({ message: 'Login successful', accessToken: accessToken, refreshToken: refreshToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt });
-        return res.json({ message: 'Login successful', accessToken: accessToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt });
+        if (res.locals.ua == 'EhBMatch/Mobile') return res.json({ message: 'Login successful', accessToken: accessToken, refreshToken: refreshToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt, user: getUserInfo(user.id) });
+        return res.json({ message: 'Login successful', accessToken: accessToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt, user: getUserInfo(user.id) });
     })(req, res, next);
 });
 
