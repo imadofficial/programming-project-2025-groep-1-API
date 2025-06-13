@@ -60,7 +60,7 @@ const allowedBedrijfColumns = [
 ];
 
 // PUT /:bedrijfID
-router.put('/:bedrijfID', passport.authenticate('jwt', { session: false }), canEdit, async (req, res) => {
+router.put('/:bedrijfID', [passport.authenticate('jwt', { session: false }), canEdit], async (req, res) => {
     const bedrijfId = req.params['bedrijfID'];
 
     const data = req.body;
@@ -110,13 +110,13 @@ router.get('/:bedrijfID/skills', passport.authenticate('jwt', { session: false }
 });
 
 // POST /:bedrijfID/skills
-router.post('/:bedrijfID/skills', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.post('/:bedrijfID/skills', [passport.authenticate('jwt', { session: false }), canEdit], async (req, res) => {
     const bedrijfId = req.params['bedrijfID'];
     if (!bedrijfId) {
         return res.status(400).json({ error: 'Bedrijf ID is required' });
     }
 
-    const { skills } = req.body;
+    let { skills } = req.body;
     if (!skills || !Array.isArray(skills)) {
         return res.status(400).json({ error: 'Skills must be an array' });
     }
@@ -147,7 +147,7 @@ router.post('/:bedrijfID/skills', passport.authenticate('jwt', { session: false 
 });
 
 // DELETE /:bedrijfID/skills/:skillID
-router.delete('/:bedrijfID/skills/:skillID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.delete('/:bedrijfID/skills/:skillID', [passport.authenticate('jwt', { session: false }), canEdit], async (req, res) => {
     const bedrijfId = req.params['bedrijfID'];
     const skillId = req.params['skillID'];
 
