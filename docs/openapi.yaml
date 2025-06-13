@@ -953,40 +953,6 @@ paths:
                       type: string
                       example: 'Forbidden: You can only update your own company record or must be admin.'
 
-  /bedrijven/goedgekeurd:
-    description: List of approved companies
-    summary: Get all approved companies
-    get:
-      summary: Get all approved companies
-      tags:
-        - Bedrijven
-      responses:
-        '200':
-          description: OK
-          content: 
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    gebruiker_id:
-                      type: integer
-                    naam:
-                      type: string
-                    plaats:
-                      type: string
-                    contact_email:
-                      type: string
-                      format: email
-                    linkedin:
-                      type: string
-                      format: uri
-                    profiel_foto:
-                      type: string
-                      format: uri
-                      example: 'https://example.com/company_logo.jpg'
-
   /bedrijven/keur/{bedrijfID}:
     description: Approve or reject a company by ID
     summary: Approve or reject a company
@@ -1032,6 +998,40 @@ paths:
                     type: string
                     example: 'Forbidden: You must be an admin to approve or reject companies'
 
+  /bedrijven/goedgekeurd:
+    description: List of approved companies
+    summary: Get all approved companies
+    get:
+      summary: Get all approved companies
+      tags:
+        - Bedrijven
+      responses:
+        '200':
+          description: OK
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    gebruiker_id:
+                      type: integer
+                    naam:
+                      type: string
+                    plaats:
+                      type: string
+                    contact_email:
+                      type: string
+                      format: email
+                    linkedin:
+                      type: string
+                      format: uri
+                    profiel_foto:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
+
   /bedrijven/nietgoedgekeurd:
     description: List of non-approved companies
     summary: Get all non-approved companies
@@ -1066,13 +1066,13 @@ paths:
                       format: uri
                       example: 'https://example.com/company_logo.jpg'
 
-  /studenten:
-    description: List of students
-    summary: Get all students
+  /bedrijven/{bedrijfID}/skills:
+    description: Get all skills for a specific company
+    summary: Get skills by company ID
     get:
-      summary: Get all students
+      summary: Get all skills for a specific company
       tags:
-        - Studenten
+        - Bedrijven
       responses:
         '200':
           description: OK
@@ -1083,24 +1083,16 @@ paths:
                 items:
                   type: object
                   properties:
-                    gebruiker_id:
+                    id:
                       type: integer
-                    voornaam:
+                    naam:
                       type: string
-                      example: 'Jan'
-                    achternaam:
-                      type: string
-                      example: 'Jansen'
-                    linkedin:
-                      type: string
-                      format: uri
-                    profiel_foto:
-                      type: string
-                      format: uri
-                    studiejaar:
+                      example: 'JavaScript'
+                    type:
                       type: integer
-                    opleiding_id:
-                      type: integer
+                      description: >
+                        The type of skill (0 for skills, 1 for languages)
+                      example: 0
         '403':
           description: Forbidden
           content:
@@ -1121,6 +1113,100 @@ paths:
                   message:
                     type: string
                     example: 'No students found'
+    post:
+      summary: Add skills to a company
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: >
+          List of skill IDs to add to the company
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+                example: 1
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Skills added successfully'
+                  skills:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        naam:
+                          type: string
+                          example: 'JavaScript'
+                        type:
+                          type: integer
+                          description: >
+                            The type of skill (0 for skills, 1 for languages)
+                          example: 0
+
+  /bedrijven/{bedrijfID}/skills/{skillID}:
+    description: Remove a skill from a specific company
+    summary: Remove a skill from a company
+    delete:
+      summary: Remove a skill from a company
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: skillID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Skill removed successfully'
+                  skills:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        naam:
+                          type: string
+                          example: 'JavaScript'
+                        type:
+                          type: integer
+                          description: >
+                            The type of skill (0 for skills, 1 for languages)
+                          example: 0
+
 
   /studenten/{studentID}:
     description: Get a specific student by ID
@@ -1304,7 +1390,7 @@ paths:
                         The type of skill (0 for skills, 1 for languages)
                       example: 0
 
-  /studenten/{studentID}/skills/{skillID}:
+  /studenten/{studentID}/skills:
     description: Add or remove a skill for a specific student
     post:
       summary: Add a skill to a student
@@ -1357,6 +1443,7 @@ paths:
                   message:
                     type: string
                     example: 'Student or skill not found'
+  /studenten/{studentID}/skills/{skillID}:
     delete:
       summary: Remove a skill from a student
       tags:
@@ -1535,6 +1622,74 @@ paths:
                       description: >
                         The type of skill (0 for skills, 1 for languages)
                       example: 0
+                    
+  /user/skills/{skillID}:
+    post:
+      tags:
+        - Users
+      summary: Add a skill to a user
+      description: >
+        Adds a skill to the specified user. Defaults to authenticated user.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: skillID
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: The ID of the skill to add.
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: The id of the user to add the skill to. If omitted, uses the authenticated user.
+      responses:
+        '201':
+          description: Skill added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Skill added successfully
+                  skillID:
+                    type: integer
+                  userID:
+                    type: integer
+        '400':
+          description: Bad request (missing skillID or userID)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'skillID is required'
+        '404':
+          description: User or skill not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Failed to add skill, user or skill not found'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Failed to add skill'
 
   /skills/{skillID}:
     get:
