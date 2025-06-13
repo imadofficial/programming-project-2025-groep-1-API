@@ -74,7 +74,7 @@ router.post('/:studentID/skills', passport.authenticate('jwt', { session: false 
     }
 });
 
-router.delete('/:studentID/:skillID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.delete('/:studentID/skills/:skillID', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const studentId = req.params['studentID'];
     const skillId = req.params['skillID'];
 
