@@ -1416,7 +1416,7 @@ paths:
                     example: 'An error occurred while deleting the skill'
 
   /speeddates:
-    description: List of available speed dates
+    description: List of the user's speeddates
     get:
       tags:
         - Speeddates
@@ -1447,6 +1447,62 @@ paths:
                 akkoord:
                   type: boolean
                   example: true
+    post:
+      tags:
+        - Speeddates
+      summary: 'Create a new speed date'
+      description: 'Create a new speed date'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id_student:
+                  type: integer
+                  example: 42
+                id_bedrijf:
+                  type: integer
+                  example: 24
+                datum:
+                  type: string
+                  format: date-time
+                  example: '2025-10-01T10:00:00Z'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Speeddate created successfully'
+                  speeddate:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      id_student:
+                        type: integer
+                        example: 42
+                      id_bedrijf:
+                        type: integer
+                        example: 24
+                      akkoord:
+                        type: boolean
+                        example: false
+                      begin:
+                        type: string
+                        format: date-time
+                        example: '2023-10-01T10:00:00Z'
+                      einde:
+                        type: string
+                        format: date-time
+                        example: '2023-10-01T10:10:00Z'
 
   /speeddates/{speeddateID}:
     get:
@@ -1493,6 +1549,131 @@ paths:
                   message:
                     type: string
                     example: 'Speeddate not found'
+                  
+  /speeddates/accept/{speeddateID}:
+    description: Accept a speed date
+    post:
+      tags:
+        - Speeddates
+      summary: Accept a speed date
+      parameters:
+        - name: speeddateID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Speeddate accepted successfully'
+                  speeddate:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      id_student:
+                        type: integer
+                        example: 42
+                      id_bedrijf:
+                        type: integer
+                        example: 24
+                      akkoord:
+                        type: boolean
+                        example: true
+                      begin:
+                        type: string
+                        format: date-time
+                        example: '2023-10-01T10:00:00Z'
+                      einde:
+                        type: string
+                        format: date-time
+                        example: '2023-10-01T10:10:00Z'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Speeddate not found'
+
+  /speeddates/reject/{speeddateID}:
+    description: Reject a speed date
+    post:
+      tags:
+        - Speeddates
+      summary: Reject a speed date
+      parameters:
+        - name: speeddateID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Speeddate rejected successfully'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Speeddate not found'
+
+  /speeddates/user/{userID}/unavailable:
+    description: List of unavailable dates for a user
+    get:
+      tags:
+        - Speeddates
+      summary: Get all unavailable dates for a user
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    begin:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:00:00Z'
+                    einde:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:10:00Z'
 
   /stands:
     description: List of available stands
