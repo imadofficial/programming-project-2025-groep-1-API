@@ -13,7 +13,13 @@ async function getDiscoverBedrijven(studentId, suggestions = true) {
             SELECT b.*, 
                 COALESCE(opleiding_match.count, 0) AS opleiding_matches,
                 COALESCE(skill_match.count, 0) AS skill_matches,
-                (COALESCE(opleiding_match.count, 0) * 3 + COALESCE(skill_match.count, 0)) AS match_score
+                (COALESCE(opleiding_match.count, 0) * 3 + COALESCE(skill_match.count, 0)) AS match_score,
+                ROUND(
+                    100 * ((COALESCE(opleiding_match.count, 0) * 3 + COALESCE(skill_match.count, 0)) /
+                    (3 + (
+                        SELECT COUNT(*) FROM gebruiker_skills WHERE id_gebruiker = ?
+                    )))
+                , 2) AS match_percentage
             FROM bedrijf b
             LEFT JOIN (
                 SELECT bo.id_bedrijf, 1 AS count
@@ -30,13 +36,20 @@ async function getDiscoverBedrijven(studentId, suggestions = true) {
                   )
                 GROUP BY bedrijf_gebruiker.id
             ) AS skill_match ON skill_match.bedrijf_id = b.gebruiker_id
-            ORDER BY total_matches DESC, b.naam ASC
+            ORDER BY match_score DESC, b.naam ASC
         `;
+        params = [studentId, studentId, studentId];
     } else {
         query = `
             SELECT b.*, 
                 CASE WHEN bo.id_bedrijf IS NOT NULL THEN 1 ELSE 0 END AS same_opleiding,
-                COALESCE(skill_matches.count, 0) AS skill_matches
+                COALESCE(skill_matches.count, 0) AS skill_matches,
+                ROUND(
+                    100 * ((CASE WHEN bo.id_bedrijf IS NOT NULL THEN 3 ELSE 0 END + COALESCE(skill_matches.count, 0)) /
+                    (3 + (
+                        SELECT COUNT(*) FROM gebruiker_skills WHERE id_gebruiker = ?
+                    )))
+                , 2) AS match_percentage
             FROM bedrijf b
             LEFT JOIN bedrijf_opleiding bo 
                 ON bo.id_bedrijf = b.gebruiker_id 
@@ -53,7 +66,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true) {
             ) AS skill_matches ON skill_matches.bedrijf_id = b.gebruiker_id
             ORDER BY same_opleiding DESC, skill_matches DESC, b.naam ASC
         `;
-        params = [studentId, studentId];
+        params = [studentId, studentId, studentId];
     }
     const [rows] = await pool.query(query, params);
     return rows;
@@ -73,7 +86,13 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true) {
             SELECT s.*, 
                 COALESCE(opleiding_match.count, 0) AS opleiding_matches,
                 COALESCE(skill_match.count, 0) AS skill_matches,
-                (COALESCE(opleiding_match.count, 0) * 3 + COALESCE(skill_match.count, 0)) AS match_score
+                (COALESCE(opleiding_match.count, 0) * 3 + COALESCE(skill_match.count, 0)) AS match_score,
+                ROUND(
+                    100 * ((COALESCE(opleiding_match.count, 0) * 3 + COALESCE(skill_match.count, 0)) /
+                    (3 + (
+                        SELECT COUNT(*) FROM gebruiker_skills WHERE id_gebruiker = ?
+                    )))
+                , 2) AS match_percentage
             FROM student s
             LEFT JOIN (
                 SELECT s2.gebruiker_id AS id_student, 1 AS count
@@ -87,13 +106,20 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true) {
                 WHERE bedrijf_skills.id_gebruiker = ?
                 GROUP BY student_skills.id_gebruiker
             ) AS skill_match ON skill_match.student_id = s.gebruiker_id
-            ORDER BY total_matches DESC, s.voornaam ASC
+            ORDER BY match_score DESC, s.voornaam ASC
         `;
+        params = [bedrijfId, bedrijfId, bedrijfId];
     } else {
         query = `
             SELECT s.*, 
                 CASE WHEN bo.id_bedrijf IS NOT NULL THEN 1 ELSE 0 END AS same_opleiding,
-                COALESCE(skill_match.count, 0) AS skill_matches
+                COALESCE(skill_match.count, 0) AS skill_matches,
+                ROUND(
+                    100 * ((CASE WHEN bo.id_bedrijf IS NOT NULL THEN 3 ELSE 0 END + COALESCE(skill_match.count, 0)) /
+                    (3 + (
+                        SELECT COUNT(*) FROM gebruiker_skills WHERE id_gebruiker = ?
+                    )))
+                , 2) AS match_percentage
             FROM student s
             LEFT JOIN bedrijf_opleiding bo 
                 ON bo.id_opleiding = s.opleiding_id 
@@ -107,6 +133,7 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true) {
             ) AS skill_match ON skill_match.student_id = s.gebruiker_id
             ORDER BY same_opleiding DESC, skill_matches DESC, s.voornaam ASC
         `;
+        params = [bedrijfId, bedrijfId, bedrijfId];
     }
     const [rows] = await pool.query(query, params);
     return rows;
