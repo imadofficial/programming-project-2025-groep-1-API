@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const { getAllSkills, removeSkill, addSkill } = require('../sql/skills.js');
+const { getAllSkills, removeSkill, addSkill, getSkillById } = require('../sql/skills.js');
 const authAdmin = require('../auth/authAdmin.js');
 
 require('../auth/passportJWT.js');
@@ -13,6 +13,24 @@ router.get('/', async (req, res) => {
         res.json(skills);
     } catch (error) {
         console.error('Error fetching skills:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+router.get('/:skillID', async (req, res) => {
+    const skillId = req.params['skillID'];
+    if (!skillId) {
+        return res.status(400).json({ error: 'Skill ID is required' });
+    }
+
+    try {
+        const skill = await getSkillById(skillId);
+        if (!skill) {
+            return res.status(404).json({ error: 'Skill not found' });
+        }
+        res.json({ message: 'Skill retrieved successfully', skill: { id: skill.id, naam: skill.naam } });
+    } catch (error) {
+        console.error('Error fetching skill:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
