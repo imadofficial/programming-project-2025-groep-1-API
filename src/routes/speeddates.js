@@ -112,9 +112,10 @@ router.get('/user/:userID/unavailable', passport.authenticate('jwt', { session: 
         const speeddates = await getSpeeddatesByUserId(userId);
         // Map to time windows
         const windows = speeddates.map(sd => {
+            const id = sd.id;
             const begin = sd.datum;
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
-            return { begin, einde };
+            return { id, begin, einde };
         });
         res.json(windows);
     } catch (error) {
