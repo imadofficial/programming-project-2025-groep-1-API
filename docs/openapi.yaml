@@ -1025,7 +1025,8 @@ paths:
             type: integer
       requestBody:
         required: true
-        description: Student data to update [Note: At least one field must be provided]
+        description: >
+          Student data to update [Note: At least one field must be provided]
         content:
           application/json:
             schema:
@@ -1183,6 +1184,41 @@ paths:
                     skill:
                       type: string
                       example: 'JavaScript'
+    post:
+      tags:
+        - Skills
+      summary: 'Create a new skill'
+      description: 'Create a new skill'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                skill:
+                  type: string
+                  example: 'JavaScript'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Skill created successfully'
+                  skill:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      naam:
+                        type: string
+                        example: 'JavaScript'
 
   /skills/{skillID}:
     delete:
