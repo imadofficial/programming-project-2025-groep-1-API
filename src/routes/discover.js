@@ -9,10 +9,10 @@ const router = express.Router();
 // GET /discover/bedrijven
 router.get('/bedrijven', passport.authenticate('jwt', { session: false }), async (req, res) => {
     // Get studentId from authenticated user
-    const studentId = req.user.id;
+    const studentId = req.query.id ? req.query.id : req.user.id;
 
     // Check if suggestion parameter is provided
-    const suggestions = req.query.suggestions === 'true';
+    const suggestions = req.query.suggestions === undefined ? true : req.query.suggestions === 'true';
 
     if (!studentId) {
         return res.status(400).json({ error: 'Student ID is required' });
@@ -29,10 +29,10 @@ router.get('/bedrijven', passport.authenticate('jwt', { session: false }), async
 // GET /discover/studenten
 router.get('/studenten', passport.authenticate('jwt', { session: false }), async (req, res) => {
     // Get bedrijfId from authenticated user
-    const bedrijfId = req.user.id;
+    const bedrijfId = req.query.id ? req.query.id : req.user.id;
 
     // Check if suggestion parameter is provided
-    const suggestions = req.query.suggestions === 'true';
+    const suggestions = req.query.suggestions === undefined ? true : req.query.suggestions === 'true';
 
     if (!bedrijfId) {
         return res.status(400).json({ error: 'Bedrijf ID is required' });
