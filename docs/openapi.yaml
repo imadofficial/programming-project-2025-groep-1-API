@@ -1579,21 +1579,29 @@ paths:
                       id:
                         type: integer
                         example: 1
-                      id_student:
-                        type: integer
-                        example: 42
                       id_bedrijf:
                         type: integer
                         example: 24
                       naam_bedrijf:
                         type: string
                         example: 'Techsolutions'
+                      profiel_foto_bedrijf:
+                        type: string
+                        format: uri
+                        example: 'https://example.com/company_logo.jpg'
+                      id_student:
+                        type: integer
+                        example: 42
                       voornaam_student:
                         type: string
                         example: 'Jan'
                       achternaam_student:
                         type: string
                         example: 'Jansen'
+                      profiel_foto_student:
+                        type: string
+                        format: uri
+                        example: 'https://example.com/student_profile.jpg'
                       akkoord:
                         type: boolean
                         example: true
