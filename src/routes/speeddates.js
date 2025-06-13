@@ -43,9 +43,9 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
     const dateObj = new Date(datum);
     const isValidDate = !isNaN(dateObj.getTime());
     const hasTime = typeof datum === 'string' && datum.includes('T');
-    if (!isValidDate || !hasTime) {
-        return res.status(400).json({ error: 'Invalid datetime format. Use ISO 8601 (e.g., 2025-06-13T15:30:00)' });
-    }
+    //if (!isValidDate || !hasTime) {
+    //    return res.status(400).json({ error: 'Invalid datetime format. Use ISO 8601 (e.g., 2025-06-13T15:30:00)' });
+    //}
 
     if (isNaN(id_bedrijf) || isNaN(id_student)) {
         return res.status(400).json({ error: 'id_bedrijf and id_student must be valid numbers' });
