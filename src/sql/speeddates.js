@@ -147,7 +147,16 @@ async function getInfo(id) {
     try {
         const [rows] = await pool.query(query, [id]);
         if (rows.length > 0) {
-            return rows[0]; // Return the first row if found
+            const speeddate = rows[0];
+            // Rename datum to begin and add einde (10 minutes later), omit datum
+            const { datum, ...rest } = speeddate;
+            const begin = datum;
+            const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            return {
+                ...rest,
+                begin,
+                einde,
+            };
         } else {
             return null; // Return null if no row is found
         }

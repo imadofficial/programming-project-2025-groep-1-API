@@ -50,7 +50,8 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
     try {
         const newSpeeddate = await addSpeeddate(bedrijf_id, student_id, datum);
         if (newSpeeddate) {
-            res.status(201).json({ message: 'Speeddate created successfully', speeddate: await getInfo(newSpeeddate) });
+            const info = await getInfo(newSpeeddate);
+            res.status(201).json({ message: 'Speeddate created successfully', speeddate: info });
         } else {
             res.status(400).json({ message: 'Failed to create speeddate' });
         }
