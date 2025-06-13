@@ -1,0 +1,79 @@
+const mysql = require('mysql2');
+
+
+const { getPool } = require('../globalEntries.js');
+
+require('dotenv').config();
+
+
+async function getAllSectoren() {
+    const pool = getPool('ehbmatchdev');
+    const query = 'SELECT * FROM sector';
+
+    try {
+        const [rows] = await pool.query(query);
+        console.log('Query result:', rows); // Log the query result
+
+        if (rows.length > 0) {
+            return rows; // Return all rows instead of just the first one
+        } else {
+            return []; // Return an empty array if no rows are found
+        }
+    } catch (error) {
+        console.error('Database query error:', error); // Log the error
+        throw new Error('Database query failed');
+    }
+}
+
+async function getSectorById(id) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'SELECT * FROM sector WHERE id = ?';
+
+    try {
+        const [rows] = await pool.query(query, [id]);
+        if (rows.length > 0) {
+            return rows[0]; // Return the first sector found
+        } else {
+            return null; // Return null if no sector is found
+        }
+    } catch (error) {
+        console.error('Database query error:', error);
+        throw new Error('Database query failed');
+    }
+}
+
+async function addSector(naam) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'INSERT INTO sector (naam) VALUES (?)';
+
+    try {
+        const [result] = await pool.query(query, [naam]);
+        return { id: result.insertId, naam: naam }; // Return the new sector with its ID
+    } catch (error) {
+        console.error('Database query error:', error);
+        throw new Error('Database query failed');
+    }
+}
+
+async function deleteSector(id) {
+    const pool = getPool('ehbmatchdev');
+    if (!id) {
+        throw new Error('Sector ID is required for deletion');
+    }
+    const query = 'DELETE FROM sector WHERE id = ?';
+
+    try {
+        const [result] = await pool.query(query, [id]);
+        return result.affectedRows > 0; // Return true if a sector was deleted
+    } catch (error) {
+        console.error('Database query error:', error);
+        throw new Error('Database query failed');
+    }
+}
+
+module.exports = {
+    getAllSectoren,
+    getSectorById,
+    addSector,
+    deleteSector
+};
