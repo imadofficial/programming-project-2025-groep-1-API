@@ -15,10 +15,10 @@ async function getSpeeddateById(id) {
         LEFT JOIN student st ON s.id_student = st.id
         LEFT JOIN bedrijf b ON s.id_bedrijf = b.id
         LEFT JOIN sector sec ON b.id_sector = sec.id
-        WHERE (s.id_bedrijf = ? OR s.id_student = ?)
+        WHERE s.id = ?
     `;
     try {
-        const [rows] = await pool.query(query, [id, id]);
+        const [rows] = await pool.query(query, [id]);
         // Map each row to omit datum, add begin/einde
         return rows.map(speeddate => {
             const { datum, ...rest } = speeddate;
@@ -39,16 +39,27 @@ async function getSpeeddateById(id) {
 // function to get all speeddates by user ID (id_bedrijf or id_student)
 async function getSpeeddatesByUserId(id) {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM speeddate WHERE id_bedrijf = ? OR id_student = ?';
-
+    const query = `
+        SELECT s.id, s.id_bedrijf, b.naam AS naam_bedrijf, b.profiel_foto AS profiel_foto_bedrijf, sec.naam AS sector_bedrijf, s.id_student, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student, st.profiel_foto AS profiel_foto_student, s.datum
+        FROM speeddate s
+        LEFT JOIN student st ON s.id_student = st.id
+        LEFT JOIN bedrijf b ON s.id_bedrijf = b.id
+        LEFT JOIN sector sec ON b.id_sector = sec.id
+        WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.akkoord = 1
+    `;
     try {
         const [rows] = await pool.query(query, [id, id]);
-        console.log('Query result:', rows); // Log the query result
-        if (rows.length > 0) {
-            return rows; // Return all speeddates for the user
-        } else {
-            return []; // Return an empty array if no speeddates are found
-        }
+        // Map each row to omit datum, add begin/einde
+        return rows.map(speeddate => {
+            const { datum, ...rest } = speeddate;
+            const begin = datum;
+            const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            return {
+                ...rest,
+                begin,
+                einde,
+            };
+        });
     } catch (error) {
         console.error('Database query error:', error); // Log the error
         throw new Error('Database query failed');
