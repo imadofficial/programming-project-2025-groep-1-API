@@ -47,18 +47,18 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
         return res.status(400).json({ error: 'Invalid datetime format. Use ISO 8601 (e.g., 2025-06-13T15:30:00)' });
     }
 
-    if (isNaN(bedrijf_id) || isNaN(student_id)) {
-        return res.status(400).json({ error: 'bedrijf_id and student_id must be valid numbers' });
+    if (isNaN(id_bedrijf) || isNaN(id_student)) {
+        return res.status(400).json({ error: 'id_bedrijf and id_student must be valid numbers' });
     }
 
-    const isAvailable = await isDateAvailable(bedrijf_id, student_id, datum);
+    const isAvailable = await isDateAvailable(id_bedrijf, id_student, datum);
 
     if (!isAvailable) {
         return res.status(400).json({ error: 'The selected date and time is not available for the student or company' });
     }
 
     try {
-        const newSpeeddate = await addSpeeddate(bedrijf_id, student_id, datum);
+        const newSpeeddate = await addSpeeddate(id_bedrijf, id_student, datum);
         if (newSpeeddate) {
             const info = await getSpeeddateInfo(newSpeeddate);
             res.status(201).json({ message: 'Speeddate created successfully', speeddate: info });
@@ -84,6 +84,7 @@ router.post('/accept/:speeddateID', passport.authenticate('jwt', { session: fals
             return res.status(404).json({ error: 'Speeddate not found' });
         }
         const info = await getSpeeddateInfo(speeddateId);
+        await sendNotification([info.id_bedrijf, info.id_student], 'Speeddate geaccepteerd', `Jouw speeddate met ${info.naam_bedrijf} om ${info.begin} is geaccepteerd.`);
         res.json({ message: 'Speeddate accepted', speeddate: info });
     } catch (error) {
         console.error('Error accepting speeddate:', error);
