@@ -2,6 +2,9 @@ const express = require('express');
 const passport = require('passport');
 const multer = require('multer');
 const utapi = require('../modules/uploadthing.js');
+const { UTFile } = require('uploadthing/server');
+
+require('../auth/passportJWT.js');
 
 const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
@@ -17,7 +20,11 @@ router.post('/', upload.single('image'), passport.authenticate('jwt', { session:
 
     try {
         // Assuming utapi.upload is a method to handle file uploads
-        const uploadResult = await utapi.uploadFiles(req.file);
+        const utFile = new UTFile([req.file.buffer], req.file.originalname, {
+            type: req.file.mimetype,
+            lastModified: Date.now(),
+        });
+        const uploadResult = await utapi.uploadFiles(utFile);
         res.status(201).json({ message: 'File uploaded successfully', data: uploadResult });
     } catch (error) {
         console.error('Error uploading file:', error);
