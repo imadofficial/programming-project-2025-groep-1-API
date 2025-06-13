@@ -1,7 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const { getAllStudenten, getStudentById, updateStudent } = require('../sql/studenten.js');
-const { getSkillsByUserId, addSkillsToUser } = require('../sql/skills.js');
+const { getSkillsByUserId, addSkillsToUser, removeSkillFromUser } = require('../sql/skills.js');
 const canEdit = require('../auth/canEdit.js');
 
 require('../auth/passportJWT.js');
