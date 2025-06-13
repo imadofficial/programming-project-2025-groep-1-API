@@ -37,14 +37,18 @@ router.get('/:skillID', async (req, res) => {
 
 
 router.post('/', [passport.authenticate('jwt', { session: false })], async (req, res) => {
-    const { naam } = req.body;
+    const { naam, type } = req.body;
     if (!naam) {
         return res.status(400).json({ error: 'Skill name is required' });
     }
 
+    if (type && !(type instanceof Boolean)) {
+        return res.status(400).json({ error: 'Invalid skill type. Must be "soft" or "hard".' });
+    }
+
     try {
-        const newSkill = await addSkill(naam);
-        res.status(201).json({ message: 'Skill added successfully', skill: { id: newSkill.id, naam: naam } });
+        const newSkill = await addSkill(naam, type);
+        res.status(201).json({ message: 'Skill added successfully', skill: { id: newSkill.id, naam: naam, type: type } });
     } catch (error) {
         console.error('Error adding skill:', error);
         res.status(500).json({ message: 'Internal server error' });

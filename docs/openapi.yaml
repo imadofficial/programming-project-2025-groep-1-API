@@ -1343,6 +1343,10 @@ paths:
                 naam:
                   type: string
                   example: 'JavaScript'
+                type:
+                  type: boolean
+                  description: >
+                    The type of skill (0 for skills, 1 for languages)
       responses:
         '201':
           description: Created

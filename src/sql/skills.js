@@ -74,12 +74,12 @@ async function getSkillsByUserId(id_gebruiker) {
     }
 }
 
-async function addSkill(naam) {
+async function addSkill(naam, type) {
     const pool = getPool('ehbmatchdev');
-    const query = 'INSERT INTO skills (naam) VALUES (?)';
+    const query = 'INSERT INTO skills (naam, type) VALUES (?, ?)';
 
     try {
-        const [result] = await pool.query(query, [naam]);
+        const [result] = await pool.query(query, [naam, type]);
         return result.insertId; // Return the ID of the newly inserted skill
     } catch (error) {
         console.error('Database query error in addSkill:', error.message, error.stack);
