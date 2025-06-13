@@ -148,6 +148,9 @@ tags:
   - name: Users
     description: >
       Endpoints for managing users.
+  - name: Discover
+    description: >
+      Endpoints for discovering companies and students.
   - name: Bedrijven
     description: >
       Endpoints for managing companies.
@@ -610,6 +613,166 @@ paths:
                     type: string
                     example: 'User not found'
 
+  /discover/bedrijven:
+    description: Discover companies
+    get:
+      summary: Discover bedrijven for a student
+      description: >
+        Returns a list of companies (bedrijven) ordered by most relevant opleiding and skills matches for a given student.
+        If `suggestions` is true (default), results are weighted by opleiding and skills. If false, companies that want the student's opleiding are listed first, then others, both ordered by skill matches.
+      tags:
+        - Discover
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: The id of the student to compare to. If omitted, uses the authenticated user.
+        - name: suggestions
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: >
+            If true (default), results are weighted by opleiding and skills. If false, companies that want the student's opleiding are listed first, then others, both ordered by skill matches.
+      responses:
+        '200':
+          description: List of bedrijven ordered by relevance
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    gebruiker_id:
+                      type: integer
+                    naam:
+                      type: string
+                    plaats:
+                      type: string
+                    contact_email:
+                      type: string
+                      format: email
+                    linkedin:
+                      type: string
+                      format: uri
+                    profiel_foto:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
+                    id_sector:
+                      type: integer
+                      example: 1
+                    same_opleiding:
+                      type: boolean
+                      description: >
+                        Indicates if the company is looking for students from the same opleiding as the authenticated user.
+                        True if the company is looking for students from the same opleiding, false otherwise.
+                      example: 1
+                    skill_matches:
+                      type: integer
+                      description: >
+                        The number of skill matches between the company and the student.
+                        This is used to order the results by relevance.
+                      example: 5
+                    match_score:
+                      type: number
+                      format: float
+                      description: >
+                        A score representing the match between the company and the student.
+                        This is used to order the results by relevance.
+                      example: 5
+                    match_percentage:
+                      type: number
+                      format: float
+                      description: >
+                        A percentage representing the match between the company and the student.
+                        This is used to order the results by relevance.
+                      example: 85.5
+
+  /discover/studenten:
+    description: Discover students
+    get:
+      summary: Discover studenten for a bedrijf
+      description: >
+        Returns a list of students ordered by most relevant opleiding and skills matches for a given bedrijf.
+        If `suggestions` is true (default), results are weighted by opleiding and skills. If false, students with matching opleiding are listed first, then others, both ordered by skill matches.
+      tags:
+        - Discover
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: The id of the bedrijf to compare to. If omitted, uses the authenticated user.
+        - name: suggestions
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: >
+            If true (default), results are weighted by opleiding and skills. If false, students with matching opleiding are listed first, then others, both ordered by skill matches.
+      responses:
+        '200':
+          description: List of studenten ordered by relevance
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    gebruiker_id:
+                      type: integer
+                    voornaam:
+                      type: string
+                    achternaam:
+                      type: string
+                    linkedin:
+                      type: string
+                      format: uri
+                    profiel_foto:
+                      type: string
+                      format: uri
+                    studiejaar:
+                      type: integer
+                    opleiding_id:
+                      type: integer
+                    date_of_birth:
+                      type: string
+                      format: date
+                      example: '2006-05-16'
+                    same_opleiding:
+                      type: boolean
+                      description: >
+                        Indicates if the student is from the same opleiding as the authenticated user.
+                        True if the student is from the same opleiding, false otherwise.
+                      example: 1
+                    skill_matches:
+                      type: integer
+                      description: >
+                        The number of skill matches between the student and the bedrijf.
+                        This is used to order the results by relevance.
+                      example: 5
+                    match_score:
+                      type: number
+                      format: float
+                      description: >
+                        A score representing the match between the student and the bedrijf.
+                        This is used to order the results by relevance.
+                      example: 5
+                    match_percentage:
+                      type: number
+                      format: float
+                      description: >
+                        A percentage representing the match between the student and the bedrijf.
+                        This is used to order the results by relevance.
+                      example: 85.5
  
   /bedrijven:
     description: List of companies
