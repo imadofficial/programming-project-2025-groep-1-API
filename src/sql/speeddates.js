@@ -140,10 +140,16 @@ async function addSpeeddate(id_bedrijf, id_student, datum) {
     }
 }
 
-async function getInfo(id) {
+async function getSpeeddateInfo(id) {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM speeddate WHERE id = ?';
-
+    // Join with users and bedrijven to get names
+    const query = `
+        SELECT s.*, b.naam AS naam_bedrijf, b.profiel_foto, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student
+        FROM speeddate s
+        LEFT JOIN student st ON s.id_student = st.id
+        LEFT JOIN bedrijf b ON s.id_bedrijf = b.id
+        WHERE s.id = ?
+    `;
     try {
         const [rows] = await pool.query(query, [id]);
         if (rows.length > 0) {
@@ -174,6 +180,6 @@ module.exports = {
     speeddateAkkoord,
     speeddateAfgekeurd,
     addSpeeddate,
-    getInfo,
+    getSpeeddateInfo,
     isDateAvailable
 };

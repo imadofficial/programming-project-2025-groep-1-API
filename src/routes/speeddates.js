@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const { getAllSpeeddates, getSpeeddateById, getSpeeddatesByUserId, addSpeeddate, isDateAvailable, getInfo, speeddateAkkoord, speeddateAfgekeurd } = require('../sql/speeddates.js');
+const { getAllSpeeddates, getSpeeddateById, getSpeeddatesByUserId, addSpeeddate, isDateAvailable, getSpeeddateInfo, speeddateAkkoord, speeddateAfgekeurd } = require('../sql/speeddates.js');
 
 require('../auth/passportJWT.js');
 
@@ -50,7 +50,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
     try {
         const newSpeeddate = await addSpeeddate(bedrijf_id, student_id, datum);
         if (newSpeeddate) {
-            const info = await getInfo(newSpeeddate);
+            const info = await getSpeeddateInfo(newSpeeddate);
             res.status(201).json({ message: 'Speeddate created successfully', speeddate: info });
         } else {
             res.status(400).json({ message: 'Failed to create speeddate' });
@@ -73,7 +73,7 @@ router.post('/accept/:speeddateID', passport.authenticate('jwt', { session: fals
         if (!accepted) {
             return res.status(404).json({ error: 'Speeddate not found' });
         }
-        const info = await getInfo(speeddateId);
+        const info = await getSpeeddateInfo(speeddateId);
         res.json({ message: 'Speeddate accepted', speeddate: info });
     } catch (error) {
         console.error('Error accepting speeddate:', error);
