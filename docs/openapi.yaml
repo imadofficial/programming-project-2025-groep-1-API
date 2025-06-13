@@ -1108,6 +1108,145 @@ paths:
                       type: string
                       example: 'Student not found'
 
+  /studenten/{studentID}/skills:
+    description: List of skills for a specific student
+    get:
+      summary: Get all skills of a student
+      tags:
+        - Studenten
+      parameters:
+        - name: studentID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    naam:
+                      type: string
+                      example: 'JavaScript'
+                    type:
+                      type: integer
+                      description: >
+                        The type of skill (0 for skills, 1 for languages)
+                      example: 0
+
+  /studenten/{studentID}/skills/{skillID}:
+    description: Add or remove a skill for a specific student
+    post:
+      summary: Add a skill to a student
+      tags:
+        - Studenten
+      parameters:
+        - name: studentID
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: skillID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Skill added successfully'
+                  skills:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        naam:
+                          type: string
+                          example: 'JavaScript'
+                        type:
+                          type: integer
+                          description: >
+                            The type of skill (0 for skills, 1 for languages)
+                          example: 0
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Student or skill not found'
+    delete:
+      summary: Remove a skill from a student
+      tags:
+        - Studenten
+      parameters:
+        - name: studentID
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: skillID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Skill removed successfully'
+                  skills:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        naam:
+                          type: string
+                          example: 'JavaScript'
+                        type:
+                          type: integer
+                          description: >
+                            The type of skill (0 for skills, 1 for languages)
+                          example: 0
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Student or skill not found'
+
+
 
   /opleidingen:
     description: List of available opleidingen
@@ -1181,9 +1320,14 @@ paths:
                   properties:
                     id:
                       type: integer
-                    skill:
+                    naam:
                       type: string
                       example: 'JavaScript'
+                    type:
+                      type: integer
+                      description: >
+                        The type of skill (0 for skills, 1 for languages)
+                      example: 0
     post:
       tags:
         - Skills
@@ -1219,6 +1363,11 @@ paths:
                       naam:
                         type: string
                         example: 'JavaScript'
+                      type:
+                        type: integer
+                        description: >
+                          The type of skill (0 for skills, 1 for languages)
+                        example: 0
 
   /skills/{skillID}:
     delete:
