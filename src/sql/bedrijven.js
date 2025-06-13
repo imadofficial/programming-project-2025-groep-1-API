@@ -45,7 +45,7 @@ async function getBedrijfById(id) {
 
 async function getGoedgekeurdeBedrijven() {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM bedrijf WHERE goedgekeurd = 1';
+    const query = 'SELECT * FROM bedrijf WHERE goedkeuring = 1';
 
     try {
         const [rows] = await pool.query(query);
@@ -63,7 +63,7 @@ async function getGoedgekeurdeBedrijven() {
 
 async function getNietGoedgekeurdeBedrijven() {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM bedrijf WHERE goedgekeurd = 0';
+    const query = 'SELECT * FROM bedrijf WHERE goedkeuring = 0';
 
     try {
         const [rows] = await pool.query(query);
@@ -81,7 +81,7 @@ async function getNietGoedgekeurdeBedrijven() {
 
 async function keurBedrijfGoed(id){
     const pool = getPool('ehbmatchdev');
-    const query = 'UPDATE bedrijf SET goedgekeurd = 1 WHERE gebruiker_id = ?';
+    const query = 'UPDATE bedrijf SET goedkeuring = 1 WHERE gebruiker_id = ?';
 
     try {
         const [result] = await pool.query(query, [id]);
