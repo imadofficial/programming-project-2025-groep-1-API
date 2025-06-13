@@ -1585,6 +1585,15 @@ paths:
                       id_bedrijf:
                         type: integer
                         example: 24
+                      naam_bedrijf:
+                        type: string
+                        example: 'Techsolutions'
+                      voornaam_student:
+                        type: string
+                        example: 'Jan'
+                      achternaam_student:
+                        type: string
+                        example: 'Jansen'
                       akkoord:
                         type: boolean
                         example: true
