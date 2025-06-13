@@ -1130,10 +1130,10 @@ paths:
         content:
           application/json:
             schema:
+              example: [1, 2, 3]
               type: array
               items:
                 type: integer
-                example: 1
 
       responses:
         '200':
@@ -1358,7 +1358,6 @@ paths:
                       example: 'Student not found'
 
   /studenten/{studentID}/skills:
-    description: List of skills for a specific student
     get:
       summary: Get all skills of a student
       tags:
@@ -1389,9 +1388,6 @@ paths:
                       description: >
                         The type of skill (0 for skills, 1 for languages)
                       example: 0
-
-  /studenten/{studentID}/skills:
-    description: Add or remove a skill for a specific student
     post:
       summary: Add a skill to a student
       tags:
@@ -1402,11 +1398,17 @@ paths:
           required: true
           schema:
             type: integer
-        - name: skillID
-          in: path
-          required: true
-          schema:
-            type: integer
+      requestBody:
+        required: true
+        description: >
+          List of skill IDs to add to the student
+        content:
+          application/json:
+            schema:
+              example: [1, 2, 3]
+              type: array
+              items:
+                type: integer
       responses:
         '200':
           description: OK
@@ -1443,6 +1445,7 @@ paths:
                   message:
                     type: string
                     example: 'Student or skill not found'
+
   /studenten/{studentID}/skills/{skillID}:
     delete:
       summary: Remove a skill from a student
