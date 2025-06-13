@@ -42,8 +42,8 @@ router.post('/', [passport.authenticate('jwt', { session: false })], async (req,
         return res.status(400).json({ error: 'Skill name is required' });
     }
 
-    if (type && !(type instanceof Boolean)) {
-        return res.status(400).json({ error: 'Invalid skill type. Must be "soft" or "hard".' });
+    if (!type) {
+        return res.status(400).json({ error: 'Skill type is required' });
     }
 
     try {
