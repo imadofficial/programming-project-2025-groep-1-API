@@ -9,7 +9,13 @@ const router = express.Router();
 // GET /discover/bedrijven
 router.get('/bedrijven', passport.authenticate('jwt', { session: false }), async (req, res) => {
     // Get studentId from authenticated user
-    const studentId = req.query.id ? req.query.id : req.user.id;
+    let studentId = req.query.id ? req.query.id : req.user.id;
+
+    // Parse and validate studentId as integer
+    studentId = parseInt(studentId, 10);
+    if (isNaN(studentId)) {
+        return res.status(400).json({ error: 'Student ID must be a valid integer' });
+    }
 
     // Check if suggestion parameter is provided
     const suggestions = req.query.suggestions === undefined ? true : req.query.suggestions === 'true';
@@ -29,7 +35,13 @@ router.get('/bedrijven', passport.authenticate('jwt', { session: false }), async
 // GET /discover/studenten
 router.get('/studenten', passport.authenticate('jwt', { session: false }), async (req, res) => {
     // Get bedrijfId from authenticated user
-    const bedrijfId = req.query.id ? req.query.id : req.user.id;
+    let bedrijfId = req.query.id ? req.query.id : req.user.id;
+
+    // Parse and validate bedrijfId as integer
+    bedrijfId = parseInt(bedrijfId, 10);
+    if (isNaN(bedrijfId)) {
+        return res.status(400).json({ error: 'Bedrijf ID must be a valid integer' });
+    }
 
     // Check if suggestion parameter is provided
     const suggestions = req.query.suggestions === undefined ? true : req.query.suggestions === 'true';

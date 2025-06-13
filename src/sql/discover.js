@@ -7,7 +7,7 @@ const { getPool } = require('../globalEntries.js');
 async function getDiscoverBedrijven(studentId, suggestions = true) {
     const pool = getPool('ehbmatchdev');
     let query;
-    let params = [studentId, studentId];
+    let params = [studentId, studentId, studentId];
     if (suggestions) {
         query = `
             SELECT b.*, 
@@ -80,7 +80,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true) {
 async function getDiscoverStudenten(bedrijfId, suggestions = true) {
     const pool = getPool('ehbmatchdev');
     let query;
-    let params = [bedrijfId, bedrijfId];
+    let params = [bedrijfId, bedrijfId, bedrijfId];
     if (suggestions) {
         query = `
             SELECT s.*, 
