@@ -17,7 +17,7 @@ async function sendNotification(userIds, title, message) {
     }
 
    const promises = userIds.map(userId =>
-       fetch(`https://school.raven.co.com/notifications/${userId}`, {
+       fetch(`https://school.raven.co.com/`, {
            method: 'POST',
            headers: {
                'Content-Type': 'application/json',
