@@ -1303,31 +1303,6 @@ paths:
 
   /skills:
     description: List of available skills
-    get:
-      security: []
-      tags:
-        - Skills
-      summary: Get all available skills
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                    naam:
-                      type: string
-                      example: 'JavaScript'
-                    type:
-                      type: integer
-                      description: >
-                        The type of skill (0 for skills, 1 for languages)
-                      example: 0
     post:
       tags:
         - Skills
@@ -1372,8 +1347,72 @@ paths:
                         description: >
                           The type of skill (0 for skills, 1 for languages)
                         example: 0
+    get:
+      security: []
+      tags:
+        - Skills
+      summary: Get all available skills
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    naam:
+                      type: string
+                      example: 'JavaScript'
+                    type:
+                      type: integer
+                      description: >
+                        The type of skill (0 for skills, 1 for languages)
+                      example: 0
 
   /skills/{skillID}:
+    get:
+      summary: Get a specific skill by ID
+      tags:
+        - Skills
+      parameters:
+        - name: skillID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  naam:
+                    type: string
+                    example: 'JavaScript'
+                  type:
+                    type: integer
+                    description: >
+                      The type of skill (0 for skills, 1 for languages)
+                    example: 0
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Skill not found'
     delete:
       tags:
         - Skills

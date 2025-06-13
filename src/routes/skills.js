@@ -28,7 +28,7 @@ router.get('/:skillID', async (req, res) => {
         if (!skill) {
             return res.status(404).json({ error: 'Skill not found' });
         }
-        res.json({ message: 'Skill retrieved successfully', skill: { id: skill.id, naam: skill.naam } });
+        res.json({ message: 'Skill retrieved successfully', skill: { id: skill.id, naam: skill.naam, type: skill.type } });
     } catch (error) {
         console.error('Error fetching skill:', error);
         res.status(500).json({ message: 'Internal server error' });
