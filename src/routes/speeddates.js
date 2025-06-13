@@ -61,4 +61,26 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
     }
 });
 
+// GET /user/:userID/unavailable
+router.get('/user/:userID/unavailable', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const userId = req.params['userID'];
+    if (!userId) {
+        return res.status(400).json({ error: 'userID is required' });
+    }
+    try {
+        // Get all speeddates for the given id (bedrijf or student)
+        const speeddates = await getSpeeddatesByUserId(userId);
+        // Map to time windows
+        const windows = speeddates.map(sd => {
+            const begin = sd.datum;
+            const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            return { begin, einde };
+        });
+        res.json(windows);
+    } catch (error) {
+        console.error('Error fetching unavailable time windows:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 module.exports = router;
