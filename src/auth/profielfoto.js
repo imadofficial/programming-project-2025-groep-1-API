@@ -9,7 +9,8 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // TODO: implement Uploadthing using https://docs.uploadthing.com/api-reference/ut-api
 
-router.post('/', upload.single('file'), passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.post('/', upload.single('image'), passport.authenticate('jwt', { session: false }), async (req, res) => {
+    console.log('File upload request received:', req.file);
     if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
     }
