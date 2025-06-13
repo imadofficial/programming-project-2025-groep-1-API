@@ -19,7 +19,7 @@ router.get('/accepted', passport.authenticate('jwt', { session: false }), async 
     res.json(speeddates);
 });
 
-router.get('/rejected', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.get('/pending', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const speeddates = await getRejectedSpeeddatesByUserId(req.user.id);
     res.json(speeddates);
 });
