@@ -1432,7 +1432,7 @@ paths:
                   type: object
                   properties:
                     id:
-                     type: integer
+                      type: integer
                       example: 1
                     id_bedrijf:
                       type: integer
