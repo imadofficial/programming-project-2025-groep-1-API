@@ -1,7 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const { getAllStudenten, getStudentById, updateStudent } = require('../sql/studenten.js');
-const { getSkillsByUserId } = require('../sql/skills.js');
+const { getSkillsByUserId, addSkillsToUser } = require('../sql/skills.js');
 const canEdit = require('../auth/canEdit.js');
 
 require('../auth/passportJWT.js');
@@ -46,6 +46,54 @@ router.get('/:studentID/skills', passport.authenticate('jwt', { session: false }
     }
 });
 
+router.post('/:studentID/skills', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const studentId = req.params['studentID'];
+    if (!studentId) {
+        return res.status(400).json({ error: 'Student ID is required' });
+    }
+
+    const { skills } = req.body;
+    if (!skills || !Array.isArray(skills)) {
+        return res.status(400).json({ error: 'Skills must be an array' });
+    }
+
+    if (skills.length === 0) {
+        return res.status(400).json({ error: 'Skills array cannot be empty' });
+    }
+
+    try {
+        const success = await addSkillsToUser(studentId, skills);
+        if (success) {
+            res.status(201).json({ message: 'Skills added successfully', skills: await getSkillsByUserId(studentId) });
+        } else {
+            res.status(404).json({ message: 'Student not found or skills not added' });
+        }
+    } catch (error) {
+        console.error('Error adding skills:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+router.delete('/:studentID/:skillID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const studentId = req.params['studentID'];
+    const skillId = req.params['skillID'];
+
+    if (!studentId || !skillId) {
+        return res.status(400).json({ error: 'Student ID and Skill ID are required' });
+    }
+
+    try {
+        const success = await removeSkillFromUser(studentId, skillId);
+        if (success) {
+            res.json({ message: 'Skill removed successfully', skills: await getSkillsByUserId(studentId) });
+        } else {
+            res.status(404).json({ message: 'Skill not found for this student' });
+        }
+    } catch (error) {
+        console.error('Error removing skill:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 // List of allowed columns for update
 const allowedStudentColumns = [
