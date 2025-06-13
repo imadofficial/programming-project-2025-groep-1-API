@@ -46,6 +46,7 @@ app.use('/studenten', require('./routes/studenten.js'));
 app.use('/skills', require('./routes/skills.js'));
 app.use('/opleidingen', require('./routes/opleidingen.js'));
 app.use('/stands', require('./routes/stands.js'));
+app.use('/sectoren', require('./routes/sectoren.js'));
 
 app.use('/speeddates', require('./routes/speeddates.js'));
 
