@@ -27,7 +27,7 @@ async function getAllStudenten() {
 }
 async function getStudentById(id) {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM student WHERE id = ?';
+    const query = 'SELECT * FROM student WHERE gebruiker_id = ?';
 
     try {
         const [rows] = await pool.query(query, [id]);
@@ -43,8 +43,29 @@ async function getStudentById(id) {
     }
 }
 
+async function updateStudent(id, data) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'UPDATE student SET ? WHERE gebruiker_id = ?';
+
+    if (!id || !data) {
+        throw new Error('ID and data are required for update');
+    }
+
+    // No need to check for invalid keys here; handled in the route
+
+    try {
+        const [result] = await pool.query(query, [data, id]);
+
+        return result.affectedRows > 0; // Return true if the update was successful
+    } catch (error) {
+        console.error('Database update error:', error);
+        throw new Error('Database update failed');
+    }
+}
+
 
 module.exports = {
     getAllStudenten,
-    getStudentById
+    getStudentById,
+    updateStudent
 };

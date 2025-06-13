@@ -81,7 +81,53 @@ async function getUserInfo(id) {
     }
 }
 
+async function deleteUserById(id) {
+    const pool = getPool('ehbmatchdev');
+    try {
+        await pool.query('START TRANSACTION');
+    } catch (error) {
+        console.error('Failed to start transaction:', error);
+        throw new Error('Transaction initiation failed');
+    }
+
+    const query = 'DELETE FROM gebruiker WHERE id = ?';
+
+    try {
+        const [result] = await pool.query(query, [id]);
+        if (result.affectedRows > 0) {
+            await pool.query('COMMIT');
+            return true; // Return true if the user was deleted
+        } else {
+            await pool.query('ROLLBACK');
+            return false; // Return false if no user was found to delete
+        }
+    } catch (error) {
+        console.error('Database query error:', error);
+        await pool.query('ROLLBACK');
+        throw new Error('Database query failed');
+    }
+}
+
+async function updateUser(id, data) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'UPDATE gebruiker SET ? WHERE id = ?';
+
+    if (!id || !data) {
+        throw new Error('ID and data are required for update');
+    }
+
+    try {
+        const [result] = await pool.query(query, [data, id]);
+        return result.affectedRows > 0; // Return true if the update was successful
+    } catch (error) {
+        console.error('Database update error:', error);
+        throw new Error('Database update failed');
+    }
+}
+
 module.exports = {
     getUserById,
-    getUserInfo
+    getUserInfo,
+    deleteUserById,
+    updateUser
 };

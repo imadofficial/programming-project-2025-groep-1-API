@@ -45,7 +45,7 @@ async function getBedrijfById(id) {
 
 async function getGoedgekeurdeBedrijven() {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM bedrijf WHERE goedgekeurd = 1';
+    const query = 'SELECT * FROM bedrijf WHERE goedkeuring = 1';
 
     try {
         const [rows] = await pool.query(query);
@@ -63,7 +63,7 @@ async function getGoedgekeurdeBedrijven() {
 
 async function getNietGoedgekeurdeBedrijven() {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM bedrijf WHERE goedgekeurd = 0';
+    const query = 'SELECT * FROM bedrijf WHERE goedkeuring = 0';
 
     try {
         const [rows] = await pool.query(query);
@@ -81,7 +81,7 @@ async function getNietGoedgekeurdeBedrijven() {
 
 async function keurBedrijfGoed(id){
     const pool = getPool('ehbmatchdev');
-    const query = 'UPDATE bedrijf SET goedgekeurd = 1 WHERE gebruiker_id = ?';
+    const query = 'UPDATE bedrijf SET goedkeuring = 1 WHERE gebruiker_id = ?';
 
     try {
         const [result] = await pool.query(query, [id]);
@@ -92,6 +92,25 @@ async function keurBedrijfGoed(id){
     }
 }
 
+async function updateBedrijf(id, data) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'UPDATE bedrijf SET ? WHERE id = ?';
+
+    if (!id || !data) {
+        throw new Error('ID and data are required for update');
+    }
+
+    // No need to check for invalid keys here; handled in the route
+
+    try {
+        const [result] = await pool.query(query, [data, id]);
+
+        return result.affectedRows > 0; // Return true if the update was successful
+    } catch (error) {
+        console.error('Database update error:', error);
+        throw new Error('Database update failed');
+    }
+}
 
 
 module.exports = {
@@ -99,5 +118,6 @@ module.exports = {
     getBedrijfById,
     getGoedgekeurdeBedrijven,
     getNietGoedgekeurdeBedrijven,
-    keurBedrijfGoed
+    keurBedrijfGoed,
+    updateBedrijf
 };
