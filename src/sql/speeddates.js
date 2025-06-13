@@ -43,6 +43,28 @@ async function getSpeeddatesByUserId(id) {
     }
 }
 
+async function isDateAvailable(id_bedrijf, id_student, datum) {
+    const pool = getPool('ehbmatchdev');
+    // Calculate 10-minute window (±10 minutes)
+    const dateObj = new Date(datum);
+    if (isNaN(dateObj.getTime())) {
+        throw new Error('Invalid date');
+    }
+    const startWindow = new Date(dateObj.getTime() - 10 * 60 * 1000); // 10 min before
+    const endWindow = new Date(dateObj.getTime() + 10 * 60 * 1000); // 10 min after
+    // Query for overlapping speeddates for the same student or company
+    const query = `SELECT * FROM speeddate 
+        WHERE (id_bedrijf = ? OR id_student = ?)
+        AND datum BETWEEN ? AND ?`;
+    try {
+        const [rows] = await pool.query(query, [id_bedrijf, id_student, startWindow, endWindow]);
+        return rows.length === 0; // true if available, false if overlap
+    } catch (error) {
+        console.error('Database query error in isDateAvailable:', error.message, error.stack);
+        throw new Error('Checking date availability failed');
+    }
+}
+
 async function getAllSpeeddates() {
     const pool = getPool('ehbmatchdev');
     const query = 'SELECT * FROM speeddate';
@@ -143,5 +165,6 @@ module.exports = {
     speeddateAkkoord,
     speeddateAfgekeurd,
     addSpeeddate,
-    getInfo
+    getInfo,
+    isDateAvailable
 };
