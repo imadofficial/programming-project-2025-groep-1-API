@@ -6,7 +6,7 @@ require('dotenv').config();
 const router = express.Router();
 
 router.post('/', (req, res, next) => {
-    const refreshToken = req.body.refreshToken || req.cookies.refreshToken;
+    let refreshToken = req.body.refreshToken || req.cookies.refreshToken;
 
     console.log('Received refresh token:', refreshToken);
 
