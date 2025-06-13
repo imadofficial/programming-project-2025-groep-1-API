@@ -13,7 +13,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true) {
             SELECT b.*, 
                 COALESCE(opleiding_match.count, 0) AS opleiding_matches,
                 COALESCE(skill_match.count, 0) AS skill_matches,
-                (COALESCE(opleiding_match.count, 0) * 3 + COALESCE(skill_match.count, 0)) AS total_matches
+                (COALESCE(opleiding_match.count, 0) * 3 + COALESCE(skill_match.count, 0)) AS match_score
             FROM bedrijf b
             LEFT JOIN (
                 SELECT bo.id_bedrijf, 1 AS count
@@ -73,7 +73,7 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true) {
             SELECT s.*, 
                 COALESCE(opleiding_match.count, 0) AS opleiding_matches,
                 COALESCE(skill_match.count, 0) AS skill_matches,
-                (COALESCE(opleiding_match.count, 0) * 3 + COALESCE(skill_match.count, 0)) AS total_matches
+                (COALESCE(opleiding_match.count, 0) * 3 + COALESCE(skill_match.count, 0)) AS match_score
             FROM student s
             LEFT JOIN (
                 SELECT s2.gebruiker_id AS id_student, 1 AS count
