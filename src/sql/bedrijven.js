@@ -27,7 +27,7 @@ async function getAllBedrijven() {
 }
 async function getBedrijfById(id) {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM bedrijf WHERE id = ?';
+    const query = 'SELECT * FROM bedrijf WHERE gebruiker_id = ?';
 
     try {
         const [rows] = await pool.query(query, [id]);
@@ -94,7 +94,7 @@ async function keurBedrijfGoed(id){
 
 async function updateBedrijf(id, data) {
     const pool = getPool('ehbmatchdev');
-    const query = 'UPDATE bedrijf SET ? WHERE id = ?';
+    const query = 'UPDATE bedrijf SET ? WHERE gebruiker_id = ?';
 
     if (!id || !data) {
         throw new Error('ID and data are required for update');
