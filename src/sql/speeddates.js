@@ -48,8 +48,8 @@ async function getAcceptedSpeeddatesByUserId(id) {
     const query = `
         SELECT s.id, s.id_bedrijf, b.naam AS naam_bedrijf, b.profiel_foto AS profiel_foto_bedrijf, sec.naam AS sector_bedrijf, s.id_student, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student, st.profiel_foto AS profiel_foto_student, s.datum
         FROM speeddate s
-        LEFT JOIN student st ON s.id_student = st.id
-        LEFT JOIN bedrijf b ON s.id_bedrijf = b.id
+        LEFT JOIN student st ON s.id_student = st.gebruiker_id
+        LEFT JOIN bedrijf b ON s.id_bedrijf = b.gebruiker_id
         LEFT JOIN sector sec ON b.id_sector = sec.id
         WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.akkoord = 1
     `;
@@ -77,8 +77,8 @@ async function getRejectedSpeeddatesByUserId(id) {
     const query = `
         SELECT s.id, s.id_bedrijf, b.naam AS naam_bedrijf, b.profiel_foto AS profiel_foto_bedrijf, sec.naam AS sector_bedrijf, s.id_student, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student, st.profiel_foto AS profiel_foto_student, s.datum
         FROM speeddate s
-        LEFT JOIN student st ON s.id_student = st.id
-        LEFT JOIN bedrijf b ON s.id_bedrijf = b.id
+        LEFT JOIN student st ON s.id_student = st.gebruiker_id
+        LEFT JOIN bedrijf b ON s.id_bedrijf = b.gebruiker_id
         LEFT JOIN sector sec ON b.id_sector = sec.id
         WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.akkoord = 0
     `;
@@ -205,8 +205,8 @@ async function getSpeeddateInfo(id) {
     const query = `
         SELECT s.id, s.id_bedrijf, b.naam AS naam_bedrijf, b.profiel_foto AS profiel_foto_bedrijf, b.id_sector, sec.naam AS naam_sector, s.id_student, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student, st.profiel_foto AS profiel_foto_student, s.datum
         FROM speeddate s
-        LEFT JOIN student st ON s.id_student = st.id
-        LEFT JOIN bedrijf b ON s.id_bedrijf = b.id
+        LEFT JOIN student st ON s.id_student = st.gebruiker_id
+        LEFT JOIN bedrijf b ON s.id_bedrijf = b.gebruiker_id
         LEFT JOIN sector sec ON b.id_sector = sec.id
         WHERE s.id = ?
     `;
