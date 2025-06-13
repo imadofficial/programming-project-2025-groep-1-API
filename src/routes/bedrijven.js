@@ -94,6 +94,21 @@ router.put('/:bedrijfID', passport.authenticate('jwt', { session: false }), canE
     }
 });
 
+router.get('/:bedrijfID/skills', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const bedrijfId = req.params['bedrijfID'];
+    if (!bedrijfId) {
+        return res.status(400).json({ error: 'Bedrijf ID is required' });
+    }
+
+    try {
+        const skills = await getSkillsByUserId(bedrijfId);
+        res.json(skills);
+    } catch (error) {
+        console.error('Error fetching skills:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // POST /:bedrijfID/skills
 router.post('/:bedrijfID/skills', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const bedrijfId = req.params['bedrijfID'];
@@ -108,6 +123,14 @@ router.post('/:bedrijfID/skills', passport.authenticate('jwt', { session: false 
 
     if (skills.length === 0) {
         return res.status(400).json({ error: 'Skills array cannot be empty' });
+    }
+
+    // Parse each skill to an integer
+    skills = skills.map(skill => parseInt(skill, 10));
+
+    // Validate each skill
+    if (skills.some(skill => isNaN(skill) || skill <= 0)) {
+        return res.status(400).json({ error: 'Each skill must be a valid positive integer' });
     }
 
     try {
