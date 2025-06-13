@@ -130,6 +130,23 @@ async function getSkillById(id_skill) {
     }
 }
 
+async function addSkillsToUser(id_gebruiker, skillIds) {
+    const pool = getPool('ehbmatchdev');
+    if (!Array.isArray(skillIds) || skillIds.length === 0) {
+        return 0;
+    }
+    // Build bulk insert values
+    const values = skillIds.map(id_skill => [id_gebruiker, id_skill]);
+    const query = 'INSERT INTO gebruiker_skills (id_gebruiker, id_skill) VALUES ?';
+    try {
+        const [result] = await pool.query(query, [values]);
+        return result.affectedRows > 0; // Return true if any rows were inserted
+    } catch (error) {
+        console.error('Database query error in addSkillsToUser:', error.message, error.stack);
+        throw new Error('Adding multiple skills to user failed');
+    }
+}
+
 module.exports = {
     getAllSkills,
     addSkillToUser,
@@ -138,5 +155,6 @@ module.exports = {
     addSkill,
     removeSkill,
     modifySkill,
-    getSkillById
+    getSkillById,
+    addSkillsToUser
 };
