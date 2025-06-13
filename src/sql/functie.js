@@ -83,11 +83,24 @@ async function getFunctieById(id_functie) {
     }
 }
 
+async function addFunctieToBedrijf(id_bedrijf, id_functie) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'INSERT INTO bedrijf_functie (id_bedrijf, id_functie) VALUES (?, ?)';
+
+    try {
+        const [result] = await pool.query(query, [id_bedrijf, id_functie]);
+        return result.affectedRows > 0; // Return true if the record was inserted
+    } catch (error) {
+        console.error('Database query error in addFunctieToBedrijf:', error.message, error.stack);
+        throw new Error('Adding functie to bedrijf failed');
+    }
+}
 
 module.exports = {
     getAllFuncties,
     addFunctie,
     removeFunctie,
     modifyFunctie,
-    getFunctieById
+    getFunctieById,
+    addFunctieToBedrijf
 };

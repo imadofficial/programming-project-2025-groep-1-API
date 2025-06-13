@@ -1,6 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const { getAllBedrijven, getBedrijfById, getGoedgekeurdeBedrijven, getNietGoedgekeurdeBedrijven, keurBedrijfGoed, updateBedrijf } = require('../sql/bedrijven.js');
+const { addFunctieToBedrijf } = require('../sql/functie.js');
 const authAdmin = require('../auth/authAdmin.js');
 const canEdit = require('../auth/canEdit.js');
 
@@ -52,6 +53,26 @@ router.post('/keur/:bedrijfID', [passport.authenticate('jwt', { session: false }
     }
 });
 
+router.post('/:bedrijfID/functie', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const bedrijfID = req.params['bedrijfID'];
+    const { id_functie } = req.body;
+
+    if (!id_functie) {
+        return res.status(400).json({ error: 'Functie ID is required' });
+    }
+
+    try {
+        const success = await addFunctieToBedrijf(bedrijfID, id_functie);
+        if (success) {
+            res.status(200).json({ message: 'Functie toegevoegd aan bedrijf' });
+        } else {
+            res.status(404).json({ message: 'Bedrijf not found or functie not added' });
+        }
+    } catch (error) {
+        console.error('Error adding functie to bedrijf:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 // List of allowed columns for update
 const allowedBedrijfColumns = [
