@@ -39,13 +39,12 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
         return res.status(400).json({ error: 'Datum (datetime), id_bedrijf, and id_student are required' });
     }
 
-    // Check if datum is a valid ISO datetime string (date and time)
-    const dateObj = new Date(datum);
-    const isValidDate = !isNaN(dateObj.getTime());
-    const hasTime = typeof datum === 'string' && datum.includes('T');
-    //if (!isValidDate || !hasTime) {
-    //    return res.status(400).json({ error: 'Invalid datetime format. Use ISO 8601 (e.g., 2025-06-13T15:30:00)' });
-    //}
+    // Check if datum is a valid MySQL DATETIME string (YYYY-MM-DD HH:MM:SS)
+    const mysqlDatetimeRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+    const isValidDate = typeof datum === 'string' && mysqlDatetimeRegex.test(datum);
+    if (!isValidDate) {
+        return res.status(400).json({ error: 'Invalid datetime format. Use MySQL DATETIME (e.g., 2025-06-13 15:30:00)' });
+    }
 
     if (isNaN(id_bedrijf) || isNaN(id_student)) {
         return res.status(400).json({ error: 'id_bedrijf and id_student must be valid numbers' });
