@@ -666,6 +666,25 @@ paths:
                     id_sector:
                       type: integer
                       example: 1
+                    same_opleiding:
+                      type: boolean
+                      description: >
+                        Indicates if the company is looking for students from the same opleiding as the authenticated user.
+                        True if the company is looking for students from the same opleiding, false otherwise.
+                      example: 1
+                    skill_matches:
+                      type: integer
+                      description: >
+                        The number of skill matches between the company and the student.
+                        This is used to order the results by relevance.
+                      example: 5
+                    match_score:
+                      type: number
+                      format: float
+                      description: >
+                        A score representing the match between the company and the student.
+                        This is used to order the results by relevance.
+                      example: 5
 
   /discover/studenten:
     description: Discover students
@@ -721,6 +740,25 @@ paths:
                       type: string
                       format: date
                       example: '2006-05-16'
+                    same_opleiding:
+                      type: boolean
+                      description: >
+                        Indicates if the student is from the same opleiding as the authenticated user.
+                        True if the student is from the same opleiding, false otherwise.
+                      example: 1
+                    skill_matches:
+                      type: integer
+                      description: >
+                        The number of skill matches between the student and the bedrijf.
+                        This is used to order the results by relevance.
+                      example: 5
+                    match_score:
+                      type: number
+                      format: float
+                      description: >
+                        A score representing the match between the student and the bedrijf.
+                        This is used to order the results by relevance.
+                      example: 5
  
   /bedrijven:
     description: List of companies
