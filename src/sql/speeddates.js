@@ -45,7 +45,7 @@ async function getSpeeddatesByUserId(id) {
         LEFT JOIN student st ON s.id_student = st.id
         LEFT JOIN bedrijf b ON s.id_bedrijf = b.id
         LEFT JOIN sector sec ON b.id_sector = sec.id
-        WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.akkoord = 1
+        WHERE (s.id_bedrijf = ? OR s.id_student = ?)
     `;
     try {
         const [rows] = await pool.query(query, [id, id]);
