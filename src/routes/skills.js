@@ -26,7 +26,7 @@ router.post('/', [passport.authenticate('jwt', { session: false })], async (req,
 
     try {
         const newSkill = await addSkill(naam);
-        res.status(201).json(newSkill);
+        res.status(201).json({ message: 'Skill added successfully', skill: { id: newSkill.id, naam: naam } });
     } catch (error) {
         console.error('Error adding skill:', error);
         res.status(500).json({ message: 'Internal server error' });
