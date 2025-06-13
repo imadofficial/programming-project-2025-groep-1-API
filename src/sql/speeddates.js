@@ -103,17 +103,18 @@ async function getRejectedSpeeddatesByUserId(id) {
 
 async function isDateAvailable(id_bedrijf, id_student, datum) {
     const pool = getPool('ehbmatchdev');
-    // Calculate 10-minute window (±10 minutes)
+    // Calculate 10-minute window (+10 minutes)
     const dateObj = new Date(datum.replace(' ', 'T')); // Convert to ISO format
     if (isNaN(dateObj.getTime())) {
         throw new Error('Invalid date');
     }
-    const startWindow = new Date(dateObj.getTime() - 10 * 60 * 1000); // 10 min before
+    const startWindow = new Date(dateObj.getTime());
     const endWindow = new Date(dateObj.getTime() + 10 * 60 * 1000); // 10 min after
     // Query for overlapping speeddates for the same student or company
     const query = `SELECT * FROM speeddate 
         WHERE (id_bedrijf = ? OR id_student = ?)
-        AND datum BETWEEN ? AND ?`;
+        AND datum >= ?
+        AND datum < ?`;
     try {
         const [rows] = await pool.query(query, [id_bedrijf, id_student, startWindow, endWindow]);
         return rows.length === 0; // true if available, false if overlap
