@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const { getAllSpeeddates, getSpeeddateById, getSpeeddatesByUserId, addSpeeddate, isDateAvailable, getInfo } = require('../sql/speeddates.js');
+const { getAllSpeeddates, getSpeeddateById, getSpeeddatesByUserId, addSpeeddate, isDateAvailable, getInfo, speeddateAkkoord, speeddateAfgekeurd } = require('../sql/speeddates.js');
 
 require('../auth/passportJWT.js');
 
@@ -24,9 +24,9 @@ router.get('/:speeddateID', passport.authenticate('jwt', { session: false }), as
 });
 
 router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const { bedrijf_id, student_id, datum } = req.body;
-    if (!datum || !bedrijf_id || !student_id) {
-        return res.status(400).json({ error: 'Datum (datetime), bedrijf_id, and student_id are required' });
+    const { id_bedrijf, id_student, datum } = req.body;
+    if (!datum || !id_bedrijf || !id_student) {
+        return res.status(400).json({ error: 'Datum (datetime), id_bedrijf, and id_student are required' });
     }
 
     // Check if datum is a valid ISO datetime string (date and time)
@@ -60,6 +60,46 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+
+// POST /accept/:speeddateID
+router.post('/accept/:speeddateID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const speeddateId = req.params['speeddateID'];
+    if (!speeddateId) {
+        return res.status(400).json({ error: 'Speeddate ID is required' });
+    }
+    try {
+        const accepted = await speeddateAkkoord(speeddateId);
+        if (!accepted) {
+            return res.status(404).json({ error: 'Speeddate not found' });
+        }
+        const info = await getInfo(speeddateId);
+        res.json({ message: 'Speeddate accepted', speeddate: info });
+    } catch (error) {
+        console.error('Error accepting speeddate:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+// POST /reject/:speeddateID
+router.post('/reject/:speeddateID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const speeddateId = req.params['speeddateID'];
+    if (!speeddateId) {
+        return res.status(400).json({ error: 'Speeddate ID is required' });
+    }
+    try {
+        const rejected = await speeddateAfgekeurd(speeddateId);
+        if (!rejected) {
+            return res.status(404).json({ error: 'Speeddate not found' });
+        }
+        res.json({ message: 'Speeddate rejected' });
+    } catch (error) {
+        console.error('Error rejecting speeddate:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 
 // GET /user/:userID/unavailable
 router.get('/user/:userID/unavailable', passport.authenticate('jwt', { session: false }), async (req, res) => {
