@@ -43,6 +43,64 @@ async function getSpeeddatesByUserId(id) {
     }
 }
 
+async function getAcceptedSpeeddatesByUserId(id) {
+    const pool = getPool('ehbmatchdev');
+    const query = `
+        SELECT s.id, s.id_bedrijf, b.naam AS naam_bedrijf, b.profiel_foto AS profiel_foto_bedrijf, sec.naam AS sector_bedrijf, s.id_student, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student, st.profiel_foto AS profiel_foto_student, s.datum
+        FROM speeddate s
+        LEFT JOIN student st ON s.id_student = st.id
+        LEFT JOIN bedrijf b ON s.id_bedrijf = b.id
+        LEFT JOIN sector sec ON b.id_sector = sec.id
+        WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.akkoord = 1
+    `;
+    try {
+        const [rows] = await pool.query(query, [id, id]);
+        // Map each row to omit datum, add begin/einde
+        return rows.map(speeddate => {
+            const { datum, ...rest } = speeddate;
+            const begin = datum;
+            const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            return {
+                ...rest,
+                begin,
+                einde,
+            };
+        });
+    } catch (error) {
+        console.error('Database query error:', error); // Log the error
+        throw new Error('Database query failed');
+    }
+}
+
+async function getRejectedSpeeddatesByUserId(id) {
+    const pool = getPool('ehbmatchdev');
+    const query = `
+        SELECT s.id, s.id_bedrijf, b.naam AS naam_bedrijf, b.profiel_foto AS profiel_foto_bedrijf, sec.naam AS sector_bedrijf, s.id_student, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student, st.profiel_foto AS profiel_foto_student, s.datum
+        FROM speeddate s
+        LEFT JOIN student st ON s.id_student = st.id
+        LEFT JOIN bedrijf b ON s.id_bedrijf = b.id
+        LEFT JOIN sector sec ON b.id_sector = sec.id
+        WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.akkoord = 0
+    `;
+    try {
+        const [rows] = await pool.query(query, [id, id]);
+        // Map each row to omit datum, add begin/einde
+        return rows.map(speeddate => {
+            const { datum, ...rest } = speeddate;
+            const begin = datum;
+            const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            return {
+                ...rest,
+                begin,
+                einde,
+            };
+        });
+    } catch (error) {
+        console.error('Database query error:', error); // Log the error
+        throw new Error('Database query failed');
+    }
+}
+
 async function isDateAvailable(id_bedrijf, id_student, datum) {
     const pool = getPool('ehbmatchdev');
     // Calculate 10-minute window (±10 minutes)
@@ -142,12 +200,13 @@ async function addSpeeddate(id_bedrijf, id_student, datum) {
 
 async function getSpeeddateInfo(id) {
     const pool = getPool('ehbmatchdev');
-    // Join with users and bedrijven to get names
+    // Join with users and bedrijven to get names, and sector
     const query = `
-        SELECT s.id, s.id_bedrijf, b.naam AS naam_bedrijf, b.profiel_foto AS profiel_foto_bedrijf, s.id_student, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student, st.profiel_foto AS profiel_foto_student, s.datum
+        SELECT s.id, s.id_bedrijf, b.naam AS naam_bedrijf, b.profiel_foto AS profiel_foto_bedrijf, b.id_sector, sec.naam AS naam_sector, s.id_student, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student, st.profiel_foto AS profiel_foto_student, s.datum
         FROM speeddate s
         LEFT JOIN student st ON s.id_student = st.id
         LEFT JOIN bedrijf b ON s.id_bedrijf = b.id
+        LEFT JOIN sector sec ON b.id_sector = sec.id
         WHERE s.id = ?
     `;
     try {
@@ -181,5 +240,7 @@ module.exports = {
     speeddateAfgekeurd,
     addSpeeddate,
     getSpeeddateInfo,
-    isDateAvailable
+    isDateAvailable,
+    getAcceptedSpeeddatesByUserId,
+    getRejectedSpeeddatesByUserId,
 };
