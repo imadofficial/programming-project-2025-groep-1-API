@@ -112,7 +112,7 @@ router.put('/:userID', passport.authenticate('jwt', { session: false }), canEdit
 
 
 // DELETE /:userID
-router.delete('/:userID', [passport.authenticate('jwt', { session: false }), authAdmin], async (req, res) => {
+router.delete('/:userID', [passport.authenticate('jwt', { session: false }), canEdit], async (req, res) => {
     const userId = req.params['userID'];
     if (!userId) {
         return res.status(400).json({ error: 'User ID is required' });
