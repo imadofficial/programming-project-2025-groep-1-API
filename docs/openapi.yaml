@@ -685,6 +685,13 @@ paths:
                         A score representing the match between the company and the student.
                         This is used to order the results by relevance.
                       example: 5
+                    match_percentage:
+                      type: number
+                      format: float
+                      description: >
+                        A percentage representing the match between the company and the student.
+                        This is used to order the results by relevance.
+                      example: 85.5
 
   /discover/studenten:
     description: Discover students
@@ -759,6 +766,13 @@ paths:
                         A score representing the match between the student and the bedrijf.
                         This is used to order the results by relevance.
                       example: 5
+                    match_percentage:
+                      type: number
+                      format: float
+                      description: >
+                        A percentage representing the match between the student and the bedrijf.
+                        This is used to order the results by relevance.
+                      example: 85.5
  
   /bedrijven:
     description: List of companies
