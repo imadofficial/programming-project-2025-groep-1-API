@@ -1,7 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const { getAllStudenten, getStudentById, updateStudent } = require('../sql/studenten.js');
-const { getSkillsByUserId, addSkillsToUser } = require('../sql/skills.js');
+const { getSkillsByUserId, addSkillsToUser, removeSkillFromUser } = require('../sql/skills.js');
 const canEdit = require('../auth/canEdit.js');
 
 require('../auth/passportJWT.js');
@@ -46,7 +46,7 @@ router.get('/:studentID/skills', passport.authenticate('jwt', { session: false }
     }
 });
 
-router.post('/:studentID/skills', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.post('/:studentID/skills', [passport.authenticate('jwt', { session: false }), canEdit], async (req, res) => {
     const studentId = req.params['studentID'];
     if (!studentId) {
         return res.status(400).json({ error: 'Student ID is required' });
@@ -74,7 +74,7 @@ router.post('/:studentID/skills', passport.authenticate('jwt', { session: false 
     }
 });
 
-router.delete('/:studentID/:skillID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.delete('/:studentID/skills/:skillID', [passport.authenticate('jwt', { session: false }), canEdit], async (req, res) => {
     const studentId = req.params['studentID'];
     const skillId = req.params['skillID'];
 

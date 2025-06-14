@@ -28,7 +28,7 @@ router.get('/:skillID', async (req, res) => {
         if (!skill) {
             return res.status(404).json({ error: 'Skill not found' });
         }
-        res.json({ message: 'Skill retrieved successfully', skill: { id: skill.id, naam: skill.naam } });
+        res.json({ message: 'Skill retrieved successfully', skill: { id: skill.id, naam: skill.naam, type: skill.type } });
     } catch (error) {
         console.error('Error fetching skill:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -42,8 +42,8 @@ router.post('/', [passport.authenticate('jwt', { session: false })], async (req,
         return res.status(400).json({ error: 'Skill name is required' });
     }
 
-    if (type && !(type instanceof Boolean)) {
-        return res.status(400).json({ error: 'Invalid skill type. Must be "soft" or "hard".' });
+    if (!type) {
+        return res.status(400).json({ error: 'Skill type is required' });
     }
 
     try {

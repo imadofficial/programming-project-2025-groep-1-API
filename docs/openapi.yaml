@@ -148,6 +148,9 @@ tags:
   - name: Users
     description: >
       Endpoints for managing users.
+  - name: Discover
+    description: >
+      Endpoints for discovering companies and students.
   - name: Bedrijven
     description: >
       Endpoints for managing companies.
@@ -610,6 +613,166 @@ paths:
                     type: string
                     example: 'User not found'
 
+  /discover/bedrijven:
+    description: Discover companies
+    get:
+      summary: Discover bedrijven for a student
+      description: >
+        Returns a list of companies (bedrijven) ordered by most relevant opleiding and skills matches for a given student.
+        If `suggestions` is true (default), results are weighted by opleiding and skills. If false, companies that want the student's opleiding are listed first, then others, both ordered by skill matches.
+      tags:
+        - Discover
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: The id of the student to compare to. If omitted, uses the authenticated user.
+        - name: suggestions
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: >
+            If true (default), results are weighted by opleiding and skills. If false, companies that want the student's opleiding are listed first, then others, both ordered by skill matches.
+      responses:
+        '200':
+          description: List of bedrijven ordered by relevance
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    gebruiker_id:
+                      type: integer
+                    naam:
+                      type: string
+                    plaats:
+                      type: string
+                    contact_email:
+                      type: string
+                      format: email
+                    linkedin:
+                      type: string
+                      format: uri
+                    profiel_foto:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
+                    id_sector:
+                      type: integer
+                      example: 1
+                    same_opleiding:
+                      type: boolean
+                      description: >
+                        Indicates if the company is looking for students from the same opleiding as the authenticated user.
+                        True if the company is looking for students from the same opleiding, false otherwise.
+                      example: 1
+                    skill_matches:
+                      type: integer
+                      description: >
+                        The number of skill matches between the company and the student.
+                        This is used to order the results by relevance.
+                      example: 5
+                    match_score:
+                      type: number
+                      format: float
+                      description: >
+                        A score representing the match between the company and the student.
+                        This is used to order the results by relevance.
+                      example: 5
+                    match_percentage:
+                      type: number
+                      format: float
+                      description: >
+                        A percentage representing the match between the company and the student.
+                        This is used to order the results by relevance.
+                      example: 85.5
+
+  /discover/studenten:
+    description: Discover students
+    get:
+      summary: Discover studenten for a bedrijf
+      description: >
+        Returns a list of students ordered by most relevant opleiding and skills matches for a given bedrijf.
+        If `suggestions` is true (default), results are weighted by opleiding and skills. If false, students with matching opleiding are listed first, then others, both ordered by skill matches.
+      tags:
+        - Discover
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: The id of the bedrijf to compare to. If omitted, uses the authenticated user.
+        - name: suggestions
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: >
+            If true (default), results are weighted by opleiding and skills. If false, students with matching opleiding are listed first, then others, both ordered by skill matches.
+      responses:
+        '200':
+          description: List of studenten ordered by relevance
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    gebruiker_id:
+                      type: integer
+                    voornaam:
+                      type: string
+                    achternaam:
+                      type: string
+                    linkedin:
+                      type: string
+                      format: uri
+                    profiel_foto:
+                      type: string
+                      format: uri
+                    studiejaar:
+                      type: integer
+                    opleiding_id:
+                      type: integer
+                    date_of_birth:
+                      type: string
+                      format: date
+                      example: '2006-05-16'
+                    same_opleiding:
+                      type: boolean
+                      description: >
+                        Indicates if the student is from the same opleiding as the authenticated user.
+                        True if the student is from the same opleiding, false otherwise.
+                      example: 1
+                    skill_matches:
+                      type: integer
+                      description: >
+                        The number of skill matches between the student and the bedrijf.
+                        This is used to order the results by relevance.
+                      example: 5
+                    match_score:
+                      type: number
+                      format: float
+                      description: >
+                        A score representing the match between the student and the bedrijf.
+                        This is used to order the results by relevance.
+                      example: 5
+                    match_percentage:
+                      type: number
+                      format: float
+                      description: >
+                        A percentage representing the match between the student and the bedrijf.
+                        This is used to order the results by relevance.
+                      example: 85.5
  
   /bedrijven:
     description: List of companies
@@ -790,40 +953,6 @@ paths:
                       type: string
                       example: 'Forbidden: You can only update your own company record or must be admin.'
 
-  /bedrijven/goedgekeurd:
-    description: List of approved companies
-    summary: Get all approved companies
-    get:
-      summary: Get all approved companies
-      tags:
-        - Bedrijven
-      responses:
-        '200':
-          description: OK
-          content: 
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    gebruiker_id:
-                      type: integer
-                    naam:
-                      type: string
-                    plaats:
-                      type: string
-                    contact_email:
-                      type: string
-                      format: email
-                    linkedin:
-                      type: string
-                      format: uri
-                    profiel_foto:
-                      type: string
-                      format: uri
-                      example: 'https://example.com/company_logo.jpg'
-
   /bedrijven/keur/{bedrijfID}:
     description: Approve or reject a company by ID
     summary: Approve or reject a company
@@ -869,6 +998,40 @@ paths:
                     type: string
                     example: 'Forbidden: You must be an admin to approve or reject companies'
 
+  /bedrijven/goedgekeurd:
+    description: List of approved companies
+    summary: Get all approved companies
+    get:
+      summary: Get all approved companies
+      tags:
+        - Bedrijven
+      responses:
+        '200':
+          description: OK
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    gebruiker_id:
+                      type: integer
+                    naam:
+                      type: string
+                    plaats:
+                      type: string
+                    contact_email:
+                      type: string
+                      format: email
+                    linkedin:
+                      type: string
+                      format: uri
+                    profiel_foto:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
+
   /bedrijven/nietgoedgekeurd:
     description: List of non-approved companies
     summary: Get all non-approved companies
@@ -903,13 +1066,13 @@ paths:
                       format: uri
                       example: 'https://example.com/company_logo.jpg'
 
-  /studenten:
-    description: List of students
-    summary: Get all students
+  /bedrijven/{bedrijfID}/skills:
+    description: Get all skills for a specific company
+    summary: Get skills by company ID
     get:
-      summary: Get all students
+      summary: Get all skills for a specific company
       tags:
-        - Studenten
+        - Bedrijven
       responses:
         '200':
           description: OK
@@ -920,24 +1083,16 @@ paths:
                 items:
                   type: object
                   properties:
-                    gebruiker_id:
+                    id:
                       type: integer
-                    voornaam:
+                    naam:
                       type: string
-                      example: 'Jan'
-                    achternaam:
-                      type: string
-                      example: 'Jansen'
-                    linkedin:
-                      type: string
-                      format: uri
-                    profiel_foto:
-                      type: string
-                      format: uri
-                    studiejaar:
+                      example: 'JavaScript'
+                    type:
                       type: integer
-                    opleiding_id:
-                      type: integer
+                      description: >
+                        The type of skill (0 for skills, 1 for languages)
+                      example: 0
         '403':
           description: Forbidden
           content:
@@ -958,6 +1113,100 @@ paths:
                   message:
                     type: string
                     example: 'No students found'
+    post:
+      summary: Add skills to a company
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: >
+          List of skill IDs to add to the company
+        content:
+          application/json:
+            schema:
+              example: [1, 2, 3]
+              type: array
+              items:
+                type: integer
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Skills added successfully'
+                  skills:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        naam:
+                          type: string
+                          example: 'JavaScript'
+                        type:
+                          type: integer
+                          description: >
+                            The type of skill (0 for skills, 1 for languages)
+                          example: 0
+
+  /bedrijven/{bedrijfID}/skills/{skillID}:
+    description: Remove a skill from a specific company
+    summary: Remove a skill from a company
+    delete:
+      summary: Remove a skill from a company
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: skillID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Skill removed successfully'
+                  skills:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        naam:
+                          type: string
+                          example: 'JavaScript'
+                        type:
+                          type: integer
+                          description: >
+                            The type of skill (0 for skills, 1 for languages)
+                          example: 0
+
 
   /studenten/{studentID}:
     description: Get a specific student by ID
@@ -1109,7 +1358,6 @@ paths:
                       example: 'Student not found'
 
   /studenten/{studentID}/skills:
-    description: List of skills for a specific student
     get:
       summary: Get all skills of a student
       tags:
@@ -1140,9 +1388,6 @@ paths:
                       description: >
                         The type of skill (0 for skills, 1 for languages)
                       example: 0
-
-  /studenten/{studentID}/skills/{skillID}:
-    description: Add or remove a skill for a specific student
     post:
       summary: Add a skill to a student
       tags:
@@ -1153,11 +1398,17 @@ paths:
           required: true
           schema:
             type: integer
-        - name: skillID
-          in: path
-          required: true
-          schema:
-            type: integer
+      requestBody:
+        required: true
+        description: >
+          List of skill IDs to add to the student
+        content:
+          application/json:
+            schema:
+              example: [1, 2, 3]
+              type: array
+              items:
+                type: integer
       responses:
         '200':
           description: OK
@@ -1194,6 +1445,8 @@ paths:
                   message:
                     type: string
                     example: 'Student or skill not found'
+
+  /studenten/{studentID}/skills/{skillID}:
     delete:
       summary: Remove a skill from a student
       tags:
@@ -1303,31 +1556,6 @@ paths:
 
   /skills:
     description: List of available skills
-    get:
-      security: []
-      tags:
-        - Skills
-      summary: Get all available skills
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                    naam:
-                      type: string
-                      example: 'JavaScript'
-                    type:
-                      type: integer
-                      description: >
-                        The type of skill (0 for skills, 1 for languages)
-                      example: 0
     post:
       tags:
         - Skills
@@ -1372,8 +1600,73 @@ paths:
                         description: >
                           The type of skill (0 for skills, 1 for languages)
                         example: 0
+    get:
+      security: []
+      tags:
+        - Skills
+      summary: Get all available skills
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    naam:
+                      type: string
+                      example: 'JavaScript'
+                    type:
+                      type: integer
+                      description: >
+                        The type of skill (0 for skills, 1 for languages)
+                      example: 0
+                    
 
   /skills/{skillID}:
+    get:
+      summary: Get a specific skill by ID
+      tags:
+        - Skills
+      parameters:
+        - name: skillID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  naam:
+                    type: string
+                    example: 'JavaScript'
+                  type:
+                    type: integer
+                    description: >
+                      The type of skill (0 for skills, 1 for languages)
+                    example: 0
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Skill not found'
     delete:
       tags:
         - Skills
@@ -1420,7 +1713,7 @@ paths:
                     example: 'An error occurred while deleting the skill'
 
   /speeddates:
-    description: List of available speed dates
+    description: List of the user's speeddates
     get:
       tags:
         - Speeddates
@@ -1438,6 +1731,55 @@ paths:
                     id:
                       type: integer
                       example: 1
+                    id_bedrijf:
+                      type: integer
+                      example: 24
+                    naam_bedrijf:
+                      type: string
+                      example: 'Techsolutions'
+                    profiel_foto_bedrijf:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
+                    sector_bedrijf:
+                      type: string
+                      example: 'Informatica'
+                    id_student:
+                      type: integer
+                      example: 42
+                    voornaam_student:
+                      type: string
+                      example: 'Jan'
+                    achternaam_student:
+                      type: string
+                      example: 'Jansen'
+                    profiel_foto_student:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/student_profile.jpg'
+                    akkoord:
+                      type: boolean
+                      example: true
+                    begin:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:00:00Z'
+                    einde:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:10:00Z'
+    post:
+      tags:
+        - Speeddates
+      summary: 'Create a new speed date'
+      description: 'Create a new speed date'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
                 id_student:
                   type: integer
                   example: 42
@@ -1447,10 +1789,64 @@ paths:
                 datum:
                   type: string
                   format: date-time
-                  example: '2023-10-01T10:00:00Z'
-                akkoord:
-                  type: boolean
-                  example: true
+                  example: 'YYYY-MM-DD HH:MM:SS'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Speeddate created successfully'
+                  speeddate:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      id_bedrijf:
+                        type: integer
+                        example: 24
+                      naam_bedrijf:
+                        type: string
+                        example: 'Techsolutions'
+                      profiel_foto_bedrijf:
+                        type: string
+                        format: uri
+                        example: 'https://example.com/company_logo.jpg'
+                      sector_bedrijf:
+                        type: string
+                        example: 'Informatica'
+                      id_student:
+                        type: integer
+                        example: 42
+                      voornaam_student:
+                        type: string
+                        example: 'Jan'
+                      achternaam_student:
+                        type: string
+                        example: 'Jansen'
+                      profiel_foto_student:
+                        type: string
+                        format: uri
+                        example: 'https://example.com/student_profile.jpg'
+                      akkoord:
+                        type: boolean
+                        example: false
+                      lokaal:
+                        type: string
+                        example: 'A101'
+                      begin:
+                        type: string
+                        format: date-time
+                        example: '2023-10-01T10:00:00Z'
+                      einde:
+                        type: string
+                        format: date-time
+                        example: '2023-10-01T10:10:00Z'
 
   /speeddates/{speeddateID}:
     get:
@@ -1474,19 +1870,46 @@ paths:
                   id:
                     type: integer
                     example: 1
-                  id_student:
-                    type: integer
-                    example: 42
                   id_bedrijf:
                     type: integer
                     example: 24
-                  datum:
+                  naam_bedrijf:
                     type: string
-                    format: date-time
-                    example: '2023-10-01T10:00:00Z'
+                    example: 'Techsolutions'
+                  profiel_foto_bedrijf:
+                    type: string
+                    format: uri
+                    example: 'https://example.com/company_logo.jpg'
+                  sector_bedrijf:
+                    type: string
+                    example: 'Informatica'
+                  id_student:
+                    type: integer
+                    example: 42
+                  voornaam_student:
+                    type: string
+                    example: 'Jan'
+                  achternaam_student:
+                    type: string
+                    example: 'Jansen'
+                  profiel_foto_student:
+                    type: string
+                    format: uri
+                    example: 'https://example.com/student_profile.jpg'
                   akkoord:
                     type: boolean
                     example: true
+                  lokaal:
+                    type: string
+                    example: 'A101'
+                  begin:
+                    type: string
+                    format: date-time
+                    example: '2023-10-01T10:00:00Z'
+                  einde:
+                    type: string
+                    format: date-time
+                    example: '2023-10-01T10:10:00Z'
         '404':
           description: Not Found
           content:
@@ -1497,6 +1920,320 @@ paths:
                   message:
                     type: string
                     example: 'Speeddate not found'
+
+  /speeddates/accepted:
+    description: List of accepted speed dates
+    get:
+      tags:
+        - Speeddates
+      summary: Get all accepted speed dates
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    id_bedrijf:
+                      type: integer
+                      example: 24
+                    naam_bedrijf:
+                      type: string
+                      example: 'Techsolutions'
+                    profiel_foto_bedrijf:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
+                    sector_bedrijf:
+                      type: string
+                      example: 'Informatica'
+                    id_student:
+                      type: integer
+                      example: 42
+                    voornaam_student:
+                      type: string
+                      example: 'Jan'
+                    achternaam_student:
+                      type: string
+                      example: 'Jansen'
+                    profiel_foto_student:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/student_profile.jpg'
+                    akkoord:
+                      type: boolean
+                      example: true
+                    lokaal:
+                      type: string
+                      example: 'A101'
+                    begin:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:00:00Z'
+                    einde:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:10:00Z'
+
+  /speeddates/pending:
+    description: List of pending speed dates
+    get:
+      tags:
+        - Speeddates
+      summary: Get all pending speed dates
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    id_bedrijf:
+                      type: integer
+                      example: 24
+                    naam_bedrijf:
+                      type: string
+                      example: 'Techsolutions'
+                    profiel_foto_bedrijf:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
+                    sector_bedrijf:
+                      type: string
+                      example: 'Informatica'
+                    id_student:
+                      type: integer
+                      example: 42
+                    voornaam_student:
+                      type: string
+                      example: 'Jan'
+                    achternaam_student:
+                      type: string
+                      example: 'Jansen'
+                    profiel_foto_student:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/student_profile.jpg'
+                    akkoord:
+                      type: boolean
+                      example: false
+                    lokaal:
+                      type: string
+                      example: 'A101'
+                    begin:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:00:00Z'
+                    einde:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:10:00Z'
+                  
+  /speeddates/accept/{speeddateID}:
+    description: Accept a speed date
+    post:
+      tags:
+        - Speeddates
+      summary: Accept a speed date
+      parameters:
+        - name: speeddateID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Speeddate accepted successfully'
+                  speeddate:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      id_bedrijf:
+                        type: integer
+                        example: 24
+                      naam_bedrijf:
+                        type: string
+                        example: 'Techsolutions'
+                      profiel_foto_bedrijf:
+                        type: string
+                        format: uri
+                        example: 'https://example.com/company_logo.jpg'
+                      sector_bedrijf:
+                        type: string
+                        example: 'Informatica'
+                      id_student:
+                        type: integer
+                        example: 42
+                      voornaam_student:
+                        type: string
+                        example: 'Jan'
+                      achternaam_student:
+                        type: string
+                        example: 'Jansen'
+                      profiel_foto_student:
+                        type: string
+                        format: uri
+                        example: 'https://example.com/student_profile.jpg'
+                      akkoord:
+                        type: boolean
+                        example: true
+                      lokaal:
+                        type: string
+                        example: 'A101'
+                      begin:
+                        type: string
+                        format: date-time
+                        example: '2023-10-01T10:00:00Z'
+                      einde:
+                        type: string
+                        format: date-time
+                        example: '2023-10-01T10:10:00Z'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Speeddate not found'
+
+  /speeddates/reject/{speeddateID}:
+    description: Reject a speed date
+    post:
+      tags:
+        - Speeddates
+      summary: Reject a speed date
+      parameters:
+        - name: speeddateID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Speeddate rejected successfully'
+                  speeddate:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      id_bedrijf:
+                        type: integer
+                        example: 24
+                      naam_bedrijf:
+                        type: string
+                        example: 'Techsolutions'
+                      profiel_foto_bedrijf:
+                        type: string
+                        format: uri
+                        example: 'https://example.com/company_logo.jpg'
+                      sector_bedrijf:
+                        type: string
+                        example: 'Informatica'
+                      id_student:
+                        type: integer
+                        example: 42
+                      voornaam_student:
+                        type: string
+                        example: 'Jan'
+                      achternaam_student:
+                        type: string
+                        example: 'Jansen'
+                      profiel_foto_student:
+                        type: string
+                        format: uri
+                        example: 'https://example.com/student_profile.jpg'
+                      akkoord:
+                        type: boolean
+                        example: true
+                      lokaal:
+                        type: string
+                        example: 'A101'
+                      begin:
+                        type: string
+                        format: date-time
+                        example: '2023-10-01T10:00:00Z'
+                      einde:
+                        type: string
+                        format: date-time
+                        example: '2023-10-01T10:10:00Z'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Speeddate not found'
+
+  /speeddates/user/{userID}/unavailable:
+    description: List of unavailable dates for a user
+    get:
+      tags:
+        - Speeddates
+      summary: Get all unavailable dates for a user
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    begin:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:00:00Z'
+                    einde:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:10:00Z'
 
   /stands:
     description: List of available stands
