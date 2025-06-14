@@ -31,7 +31,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true) {
                     100 * (
                         (COALESCE(opleiding_match.count, 0) * 3 + COALESCE(skill_match.count, 0) + COALESCE(functie_match.count, 0) * 5)
                         /
-                        ( (3 * (br.opleiding_count > 0)) + br.skill_count + (5 * (br.functie_count > 0)) )
+                        ( (CASE WHEN br.opleiding_count > 0 THEN 3 ELSE 0 END) + br.skill_count + (CASE WHEN br.functie_count > 0 THEN 5 ELSE 0 END) )
                     ), 2) AS match_percentage
             FROM bedrijf b
             JOIN bedrijf_reqs br ON br.gebruiker_id = b.gebruiker_id
@@ -80,7 +80,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true) {
                     100 * (
                         (COALESCE(opleiding_match.count, 0) * 3 + COALESCE(skill_match.count, 0) + COALESCE(functie_match.count, 0) * 5)
                         /
-                        ( (3 * (br.opleiding_count > 0)) + br.skill_count + (5 * (br.functie_count > 0)) )
+                        ( (CASE WHEN br.opleiding_count > 0 THEN 3 ELSE 0 END) + br.skill_count + (CASE WHEN br.functie_count > 0 THEN 5 ELSE 0 END) )
                     ), 2) AS match_percentage
             FROM bedrijf b
             JOIN bedrijf_reqs br ON br.gebruiker_id = b.gebruiker_id
@@ -125,7 +125,9 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true) {
     const [bedrijfOplRows] = await pool.query('SELECT id_opleiding FROM bedrijf_opleiding WHERE id_bedrijf = ?', [bedrijfId]);
     const bedrijfOplIds = bedrijfOplRows.map(row => row.id_opleiding);
     // Pre-fetch skill and functie counts for de bedrijf
+    const [[{ skill_count }]] = await pool.query('SELECT COUNT(*) AS skill_count FROM gebruiker_skills WHERE id_gebruiker = ?', [bedrijfId]);
     const [[{ functie_count }]] = await pool.query('SELECT COUNT(*) AS functie_count FROM gebruiker_functie WHERE id_gebruiker = ?', [bedrijfId]);
+    const [[{ opleiding_count }]] = await pool.query('SELECT COUNT(*) AS opleiding_count FROM bedrijf_opleiding WHERE id_bedrijf = ?', [bedrijfId]);
     let query;
     let params;
     if (suggestions) {
@@ -133,9 +135,9 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true) {
             WITH bedrijf_reqs AS (
                 SELECT
                     s.gebruiker_id,
-                    (SELECT COUNT(*) FROM bedrijf_opleiding WHERE id_bedrijf = ?) AS opleiding_count,
-                    (SELECT COUNT(*) FROM gebruiker_skills WHERE id_gebruiker = ?) AS skill_count,
-                    (SELECT COUNT(*) FROM gebruiker_functie WHERE id_gebruiker = ?) AS functie_count
+                    ? AS opleiding_count,
+                    ? AS skill_count,
+                    ? AS functie_count
                 FROM student s
             )
             SELECT
@@ -148,7 +150,7 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true) {
                     100 * (
                         (COALESCE(opleiding_match.count, 0) * 3 + COALESCE(skill_match.count, 0) + COALESCE(functie_match.count, 0) * 5)
                         /
-                        ( (3 * (br.opleiding_count > 0)) + br.skill_count + (5 * (br.functie_count > 0)) )
+                        ( (CASE WHEN br.opleiding_count > 0 THEN 3 ELSE 0 END) + br.skill_count + (CASE WHEN br.functie_count > 0 THEN 5 ELSE 0 END) )
                     ), 2) AS match_percentage
             FROM student s
             JOIN bedrijf_reqs br ON br.gebruiker_id = s.gebruiker_id
@@ -173,16 +175,19 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true) {
             ) AS functie_match ON functie_match.student_id = s.gebruiker_id
             ORDER BY match_percentage DESC, match_score DESC, s.voornaam ASC
         `;
-        // params: [bedrijfId, bedrijfId, bedrijfId, bedrijfId, bedrijfId, bedrijfId]
-        params = [bedrijfId, bedrijfId, bedrijfId, ...bedrijfOplIds, bedrijfId, bedrijfId];
+        // params: [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId]
+        params = [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId];
     } else {
+        const [[{ skill_count }]] = await pool.query('SELECT COUNT(*) AS skill_count FROM gebruiker_skills WHERE id_gebruiker = ?', [bedrijfId]);
+        const [[{ functie_count }]] = await pool.query('SELECT COUNT(*) AS functie_count FROM gebruiker_functie WHERE id_gebruiker = ?', [bedrijfId]);
+        const [[{ opleiding_count }]] = await pool.query('SELECT COUNT(*) AS opleiding_count FROM bedrijf_opleiding WHERE id_bedrijf = ?', [bedrijfId]);
         query = `
             WITH bedrijf_reqs AS (
                 SELECT
                     s.gebruiker_id,
-                    (SELECT COUNT(*) FROM bedrijf_opleiding WHERE id_bedrijf = ?) AS opleiding_count,
-                    (SELECT COUNT(*) FROM gebruiker_skills WHERE id_gebruiker = ?) AS skill_count,
-                    (SELECT COUNT(*) FROM gebruiker_functie WHERE id_gebruiker = ?) AS functie_count
+                    ? AS opleiding_count,
+                    ? AS skill_count,
+                    ? AS functie_count
                 FROM student s
             )
             SELECT
@@ -195,7 +200,7 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true) {
                     100 * (
                         (COALESCE(opleiding_match.count, 0) * 3 + COALESCE(skill_match.count, 0) + COALESCE(functie_match.count, 0) * 5)
                         /
-                        ( (3 * (br.opleiding_count > 0)) + br.skill_count + (5 * (br.functie_count > 0)) )
+                        ( (CASE WHEN br.opleiding_count > 0 THEN 3 ELSE 0 END) + br.skill_count + (CASE WHEN br.functie_count > 0 THEN 5 ELSE 0 END) )
                     ), 2) AS match_percentage
             FROM student s
             JOIN bedrijf_reqs br ON br.gebruiker_id = s.gebruiker_id
@@ -220,8 +225,8 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true) {
             ) AS functie_match ON functie_match.student_id = s.gebruiker_id
             ORDER BY functie_matches DESC, opleiding_matches DESC, match_percentage DESC, match_score DESC, s.voornaam ASC
         `;
-        // params: [bedrijfId, ...bedrijfOplIds, bedrijfId, bedrijfId]
-        params = [bedrijfId, bedrijfId, bedrijfId, ...bedrijfOplIds, bedrijfId, bedrijfId];
+        // params: [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId]
+        params = [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId];
     }
     const [rows] = await pool.query(query, params);
     return rows;
