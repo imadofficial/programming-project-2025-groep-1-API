@@ -1836,6 +1836,9 @@ paths:
                       akkoord:
                         type: boolean
                         example: false
+                      lokaal:
+                        type: string
+                        example: 'A101'
                       begin:
                         type: string
                         format: date-time
@@ -1893,13 +1896,20 @@ paths:
                     type: string
                     format: uri
                     example: 'https://example.com/student_profile.jpg'
-                  datum:
-                    type: string
-                    format: date-time
-                    example: '2023-10-01T10:00:00Z'
                   akkoord:
                     type: boolean
                     example: true
+                  lokaal:
+                    type: string
+                    example: 'A101'
+                  begin:
+                    type: string
+                    format: date-time
+                    example: '2023-10-01T10:00:00Z'
+                  einde:
+                    type: string
+                    format: date-time
+                    example: '2023-10-01T10:10:00Z'
         '404':
           description: Not Found
           content:
@@ -1959,6 +1969,9 @@ paths:
                     akkoord:
                       type: boolean
                       example: true
+                    lokaal:
+                      type: string
+                      example: 'A101'
                     begin:
                       type: string
                       format: date-time
@@ -2016,6 +2029,9 @@ paths:
                     akkoord:
                       type: boolean
                       example: false
+                    lokaal:
+                      type: string
+                      example: 'A101'
                     begin:
                       type: string
                       format: date-time
@@ -2083,6 +2099,9 @@ paths:
                       akkoord:
                         type: boolean
                         example: true
+                      lokaal:
+                        type: string
+                        example: 'A101'
                       begin:
                         type: string
                         format: date-time
@@ -2115,7 +2134,7 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        '201':
           description: OK
           content:
             application/json:
@@ -2160,6 +2179,9 @@ paths:
                       akkoord:
                         type: boolean
                         example: true
+                      lokaal:
+                        type: string
+                        example: 'A101'
                       begin:
                         type: string
                         format: date-time
