@@ -665,8 +665,17 @@ paths:
                       example: 'https://example.com/company_logo.jpg'
                     id_sector:
                       type: integer
+                      description: >
+                        The sector ID of the company.
+                        This is used to filter companies by sector.
                       example: 1
-                    same_opleiding:
+                    functie_matches:
+                      type: boolean
+                      description: >
+                        Indicates if the company is looking for students for a functie that matches the authenticated user.
+                        True if the company is looking for a matching functie, false otherwise.
+                      example: 1
+                    opleiding_matches:
                       type: boolean
                       description: >
                         Indicates if the company is looking for students from the same opleiding as the authenticated user.
@@ -747,7 +756,13 @@ paths:
                       type: string
                       format: date
                       example: '2006-05-16'
-                    same_opleiding:
+                    functie_matches:
+                      type: boolean
+                      description: >
+                        Indicates if the student is looking for a functie that matches the bedrijf.
+                        True if the student is looking for a matching functie, false otherwise.
+                      example: 1
+                    opleiding_matches:
                       type: boolean
                       description: >
                         Indicates if the student is from the same opleiding as the authenticated user.
