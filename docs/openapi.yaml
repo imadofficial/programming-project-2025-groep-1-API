@@ -665,8 +665,17 @@ paths:
                       example: 'https://example.com/company_logo.jpg'
                     id_sector:
                       type: integer
+                      description: >
+                        The sector ID of the company.
+                        This is used to filter companies by sector.
                       example: 1
-                    same_opleiding:
+                    functie_matches:
+                      type: boolean
+                      description: >
+                        Indicates if the company is looking for students for a functie that matches the authenticated user.
+                        True if the company is looking for a matching functie, false otherwise.
+                      example: 1
+                    opleiding_matches:
                       type: boolean
                       description: >
                         Indicates if the company is looking for students from the same opleiding as the authenticated user.
@@ -747,7 +756,13 @@ paths:
                       type: string
                       format: date
                       example: '2006-05-16'
-                    same_opleiding:
+                    functie_matches:
+                      type: boolean
+                      description: >
+                        Indicates if the student is looking for a functie that matches the bedrijf.
+                        True if the student is looking for a matching functie, false otherwise.
+                      example: 1
+                    opleiding_matches:
                       type: boolean
                       description: >
                         Indicates if the student is from the same opleiding as the authenticated user.
@@ -1066,6 +1081,151 @@ paths:
                       format: uri
                       example: 'https://example.com/company_logo.jpg'
 
+  /bedrijven/{bedrijfID}/functies:
+    description: Get all functions for a specific company
+    summary: Get functions by company ID
+    get:
+      summary: Get all functions for a specific company
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    naam:
+                      type: string
+                      example: 'Parttime'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Forbidden: You can only update your own user record or must be admin.'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'No functions found'
+    post:
+      summary: Add functions to a company
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: >
+          List of function IDs to add to the company
+        content:
+          application/json:
+            schema:
+              example: [1, 2, 3]
+              type: array
+              items:
+                type: integer
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Functions added successfully'
+                  functies:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        naam:
+                          type: string
+                          example: 'Parttime'
+
+  /bedrijven/{bedrijfID}/functies/{functieID}:
+    description: Remove a function from a specific company
+    summary: Remove a function from a company
+    delete:
+      summary: Remove a function from a company
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: functieID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Function removed successfully'
+                  functies:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        naam:
+                          type: string
+                          example: 'Parttime'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Company or function not found'
+
   /bedrijven/{bedrijfID}/skills:
     description: Get all skills for a specific company
     summary: Get skills by company ID
@@ -1356,6 +1516,126 @@ paths:
                     message:
                       type: string
                       example: 'Student not found'
+
+  /studenten/{studentID}/functies:
+    get:
+      summary: Get all functions of a student
+      tags:
+        - Studenten
+      parameters:
+        - name: studentID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    naam:
+                      type: string
+                      example: 'Parttime'
+    post:
+      summary: Add a function to a student
+      tags:
+        - Studenten
+      parameters:
+        - name: studentID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: >
+          List of function IDs to add to the student
+        content:
+          application/json:
+            schema:
+              example: [1, 2, 3]
+              type: array
+              items:
+                type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Function added successfully'
+                  functies:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        naam:
+                          type: string
+                          example: 'Parttime'
+  
+  /studenten/{studentID}/functies/{functieID}:
+    delete:
+      summary: Remove a function from a student
+      tags:
+        - Studenten
+      parameters:
+        - name: studentID
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: functieID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Function removed successfully'
+                  functies:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        naam:
+                          type: string
+                          example: 'Parttime'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Student or function not found'
 
   /studenten/{studentID}/skills:
     get:
