@@ -9,6 +9,28 @@ const router = express.Router();
 
 router.post('/', (req, res, next) => {
     console.log("Login request received");
+    // Validate request body
+    if (!req.body || !req.body.email || !req.body.password) {
+        return res.status(400).json({ message: 'Bad request: Missing email or password' });
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(req.body.email)) {
+        return res.status(400).json({ message: 'Bad request: Invalid email format' });
+    }
+
+    // Validate password format (string)
+    if (typeof req.body.password !== 'string') {
+        return res.status(400).json({ message: 'Bad request: Password must be a string' });
+    }
+
+    // Validate password length
+    if (req.body.password.length < 8) {
+        return res.status(400).json({ message: 'Bad request: Password must be at least 8 characters long' });
+    }
+
+    // Use passport to authenticate the user
     passport.authenticate('local', { session: false }, async (err, user, info) => {
         if (err) {
             return res.status(500).json({ message: 'Internal server error: ' + err.message });
