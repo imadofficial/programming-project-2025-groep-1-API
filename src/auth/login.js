@@ -17,7 +17,7 @@ router.post('/', (req, res, next) => {
             return res.status(401).json({ message: 'Invalid credentials'});
         }
 
-        const accessMaxAge = 15000; // 15 minutes
+        const accessMaxAge = 15 * 60 * 1000; // 15 minutes
         const refreshMaxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
 
         const accessToken = jwt.sign({ id: user.id, type: user.type }, process.env.JWT_ACCESS_SECRET, { expiresIn: accessMaxAge });
