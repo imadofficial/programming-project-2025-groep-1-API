@@ -107,7 +107,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true) {
                 )
                 GROUP BY bedrijf_functie.id_gebruiker
             ) AS functie_match ON functie_match.bedrijf_id = b.gebruiker_id
-            ORDER BY functie_matches DESC, opleiding_matches DESC, match_score DESC, b.naam ASC
+            ORDER BY functie_matches DESC, opleiding_matches DESC, match_percentage DESC, match_score DESC, b.naam ASC
         `;
         // params: [studentId, opleidingId, studentId, studentId]
         params = [studentId, opleidingId, studentId, studentId];
@@ -220,7 +220,7 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true) {
                 WHERE bedrijf_functie.id_gebruiker = ?
                 GROUP BY student_functie.id_gebruiker
             ) AS functie_match ON functie_match.student_id = s.gebruiker_id
-            ORDER BY functie_matches DESC, opleiding_matches DESC, match_score DESC, s.voornaam ASC
+            ORDER BY functie_matches DESC, opleiding_matches DESC, match_percentage DESC, match_score DESC, s.voornaam ASC
         `;
         // params: [bedrijfId, ...bedrijfOplIds, bedrijfId, bedrijfId]
         params = [bedrijfId, bedrijfId, bedrijfId, ...bedrijfOplIds, bedrijfId, bedrijfId];
