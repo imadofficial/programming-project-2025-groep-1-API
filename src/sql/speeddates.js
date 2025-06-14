@@ -23,7 +23,7 @@ async function getSpeeddateById(id) {
         // Map each row to omit datum, add begin/einde
         return rows.map(speeddate => {
             const { datum, ...rest } = speeddate;
-            const begin = datum;
+            const begin = datum.replace(' ', 'T'); // Convert to ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
             return {
                 ...rest,
