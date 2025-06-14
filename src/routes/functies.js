@@ -68,3 +68,5 @@ router.delete('/:functieID', [passport.authenticate('jwt', { session: false }), 
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+module.exports = router;
