@@ -6,6 +6,13 @@ const bcrypt = require('bcrypt');
 
 require('../auth/passportJWT.js');
 
+// Common regex constants
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const NAME_REGEX = /^[a-zA-Z\s]+$/;
+const LINKEDIN_REGEX = /^(\/in\/[a-zA-Z0-9_-]+|\/company\/[a-zA-Z0-9_-]+)$/;
+const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+const URL_REGEX = /^https?:\/\/[^\s/$.?#].[^\s]*$/;
+
 const router = express.Router();
 
 router.post('/user', async (req, res) => {
@@ -15,8 +22,7 @@ router.post('/user', async (req, res) => {
     const email = req.body.email.toLowerCase();
 
     // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!EMAIL_REGEX.test(email)) {
         return res.status(400).json({ error: 'Invalid email format' });
     }
 
@@ -26,16 +32,13 @@ router.post('/user', async (req, res) => {
         return res.status(400).json({ error: 'Password is required' });
     }
 
+    // Validate password length
     if (wachtwoord.length < 8) {
         return res.status(400).json({ error: 'Password must be at least 8 characters long' });
     }
 
-    const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
-    if (!(await bcrypt.compare(wachtwoord, hashedPassword))) {
-        console.error('Password hashing failed');
-        return res.status(400).json({ error: 'Password hashing failed' });
-    }   
     try {
+        const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
         const userId = await register(email, hashedPassword);
         res.status(201).json({ message: "User registered successfully", Id: userId });
     } catch (error) {
@@ -62,16 +65,13 @@ router.post('/admin', [passport.authenticate('jwt', { session: false }), authAdm
         return res.status(400).json({ error: 'Password is required' });
     }
 
+    // Validate password length
     if (wachtwoord.length < 8) {
         return res.status(400).json({ error: 'Password must be at least 8 characters long' });
     }
 
-    const hashedPassword = await bcrypt.hash(wachtwoord, 14); // Hash the password before storing it
-    if (!(await bcrypt.compare(wachtwoord, hashedPassword))) {
-        console.error('Password hashing failed');
-        return res.status(400).json({ error: 'Password hashing failed' });
-    }   
     try {
+        const hashedPassword = await bcrypt.hash(wachtwoord, 14); // Hash the password before storing it
         const adminId = await registerAdmin(email, hashedPassword);
         res.status(201).json({ message: "Admin registered successfully", Id: adminId });
     } catch (error) {
@@ -90,8 +90,7 @@ router.post('/student', async (req, res) => {
 
     const emailLower = email.toLowerCase();
     // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(emailLower)) {
+    if (!EMAIL_REGEX.test(emailLower)) {
         return res.status(400).json({ error: 'Invalid email format' });
     }
 
@@ -108,21 +107,18 @@ router.post('/student', async (req, res) => {
     }
 
     // Validate voornaam and achternaam format (only letters and spaces)
-    const nameRegex = /^[a-zA-Z\s]+$/;
-    if (!nameRegex.test(voornaam) || !nameRegex.test(achternaam)) {
+    if (!NAME_REGEX.test(voornaam) || !NAME_REGEX.test(achternaam)) {
         return res.status(400).json({ error: 'Voornaam and achternaam must contain only letters and spaces' });
     }
 
     // Validate linkedin URL format if provided (/in/[username] or /company/[companyname], not the full URL)
     const linkedinURL = linkedin ? linkedin.trim() : null; // Trim whitespace
-    const linkedinRegex = /^(\/in\/[a-zA-Z0-9_-]+|\/company\/[a-zA-Z0-9_-]+)$/;
-    if (linkedinURL && !linkedinRegex.test(linkedinURL)) {
+    if (linkedinURL && !LINKEDIN_REGEX.test(linkedinURL)) {
         return res.status(400).json({ error: 'Invalid linkedin URL format' });
     }
 
     // Validate date_of_birth format (YYYY-MM-DD)
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (!dateRegex.test(date_of_birth)) {
+    if (!DATE_REGEX.test(date_of_birth)) {
         return res.status(400).json({ error: 'Invalid date_of_birth format. Use YYYY-MM-DD.' });
     }
 
@@ -155,17 +151,11 @@ router.post('/student', async (req, res) => {
     }
 
     // Validate profiel_foto URL if provided
-    if (profiel_foto && !/^https?:\/\/[^\s/$.?#].[^\s]*$/.test(profiel_foto)) {
+    if (profiel_foto && !URL_REGEX.test(profiel_foto)) {
         return res.status(400).json({ error: 'Invalid profiel_foto URL format' });
     }
-
-
-    const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
-    if (!(await bcrypt.compare(wachtwoord, hashedPassword))) {
-        console.error('Password hashing failed');
-        return res.status(400).json({ error: 'Password hashing failed' });
-    }   
     try {
+        const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
         const studentId = await registerStudent(emailLower, hashedPassword, voornaam, achternaam, linkedinURL, profiel_foto, studiejaarParsed, opleidingId, date_of_birth);
         res.status(201).json({ message: "Student registered successfully", Id: studentId });
     } catch (error) {
@@ -194,18 +184,16 @@ router.post('/bedrijf', async (req, res) => {
     }
 
     // Validate naam and plaats format (only letters and spaces)
-    const nameRegex = /^[a-zA-Z\s]+$/;
-    if (!nameRegex.test(naam)) {
+    if (!NAME_REGEX.test(naam)) {
         return res.status(400).json({ error: 'Naam must only contain letters and spaces' });
     }
-    if (!nameRegex.test(plaats)) {
+    if (!NAME_REGEX.test(plaats)) {
         return res.status(400).json({ error: 'Plaats must only contain letters and spaces' });
     }
 
     // Validate contact_email format
     const contactEmail = contact_email.toLowerCase();
-    const contactEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!contactEmailRegex.test(contactEmail)) {
+    if (!EMAIL_REGEX.test(contactEmail)) {
         return res.status(400).json({ error: 'Invalid contact_email format' });
     }
 
@@ -224,12 +212,8 @@ router.post('/bedrijf', async (req, res) => {
         return res.status(400).json({ error: 'Password must be at least 8 characters long' });
     }
 
-    const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
-    if (!(await bcrypt.compare(wachtwoord, hashedPassword))) {
-        console.error('Password hashing failed');
-        return res.status(400).json({ error: 'Password hashing failed' });
-    }   
     try {
+        const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
         const bedrijfId = await registerBedrijf(emailLower, hashedPassword, naam, plaats, contactEmail, linkedinURL, profiel_foto);
         res.status(201).json({ message: "Company registered successfully", Id: bedrijfId });
     } catch (error) {
