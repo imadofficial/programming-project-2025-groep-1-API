@@ -173,8 +173,7 @@ router.post('/bedrijf', async (req, res) => {
 
     const emailLower = email.toLowerCase();
     // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(emailLower)) {
+    if (!EMAIL_REGEX.test(emailLower)) {
         return res.status(400).json({ error: 'Invalid email format' });
     }
 
@@ -198,11 +197,9 @@ router.post('/bedrijf', async (req, res) => {
 
     // Validate linkedin URL format if provided (/in/[username] or /company/[companyname], not the full URL)
     const linkedinURL = linkedin ? linkedin.trim() : null; // Trim whitespace
-    const linkedinRegex = /^(\/in\/[a-zA-Z0-9_-]+|\/company\/[a-zA-Z0-9_-]+)$/;
-    if (linkedinURL && !linkedinRegex.test(linkedinURL)) {
+    if (linkedinURL && !LINKEDIN_REGEX.test(linkedinURL)) {
         return res.status(400).json({ error: 'Invalid linkedin URL format' });
     }
-
     if (!wachtwoord) {
         return res.status(400).json({ error: 'Password is required' });
     }
