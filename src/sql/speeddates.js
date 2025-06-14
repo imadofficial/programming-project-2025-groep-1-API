@@ -23,7 +23,7 @@ async function getSpeeddateById(id) {
         // Map each row to omit datum, add begin/einde
         return rows.map(speeddate => {
             const { datum, ...rest } = speeddate;
-            const begin = datum.replace(' ', 'T'); // Convert to ISO format
+            const begin = datum; // Already returned in ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
             return {
                 ...rest,
@@ -54,7 +54,7 @@ async function getSpeeddateHistoryByUserId(id) {
         // Map each row to omit datum, add begin/einde
         return rows.map(speeddate => {
             const { datum, ...rest } = speeddate;
-            const begin = datum.replace(' ', 'T'); // Convert to ISO format
+            const begin = datum; // Already returned in ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
             return {
                 ...rest,
@@ -146,7 +146,7 @@ async function getRejectedSpeeddatesByUserId(id) {
         // Map each row to omit datum, add begin/einde
         return rows.map(speeddate => {
             const { datum, ...rest } = speeddate;
-            const begin = datum.replace(' ', 'T'); // Convert to ISO format
+            const begin = datum; // Already returned in ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
             return {
                 ...rest,
@@ -275,8 +275,7 @@ async function getSpeeddateInfo(id) {
             const speeddate = rows[0];
             // Rename datum to begin and add einde (10 minutes later), omit datum
             const { datum, ...rest } = speeddate;
-            console.log('datum:', datum);
-            const begin = datum.replace(' ', 'T'); // Convert to ISO format
+            const begin = datum; // Already returned in ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
             return {
                 ...rest,
