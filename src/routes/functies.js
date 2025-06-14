@@ -38,14 +38,14 @@ router.get('/:functieID', passport.authenticate('jwt', { session: false }), asyn
 
 // POST /
 router.post('/', [passport.authenticate('jwt', { session: false }), authAdmin], async (req, res) => {
-    const { naam, omschrijving } = req.body;
+    const { naam } = req.body;
 
-    if (!naam || !omschrijving) {
-        return res.status(400).json({ error: 'Naam and omschrijving are required' });
+    if (!naam) {
+        return res.status(400).json({ error: 'Naam is required' });
     }
 
     try {
-        const functieId = await addFunctie(naam, omschrijving);
+        const functieId = await addFunctie(naam);
         res.status(201).json({ message: 'Functie added successfully', functieId });
     } catch (error) {
         console.error('Error adding functie:', error);
