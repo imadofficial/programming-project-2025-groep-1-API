@@ -125,7 +125,7 @@ router.post('/accept/:speeddateID', passport.authenticate('jwt', { session: fals
             return res.status(404).json({ error: 'Speeddate not found' });
         }
         const info = await getSpeeddateInfo(speeddateId);
-        await sendNotification([info.id_bedrijf, info.id_student], 'Speeddate geaccepteerd', `Jouw speeddate met ${info.naam_bedrijf} om ${info.begin} is geaccepteerd.`);
+        await sendNotification([info.id_bedrijf, info.id_student], 'Speeddate geaccepteerd', [`Uw speeddate met ${info.voornaam_student} ${info.naam_student} om ${info.begin} is geaccepteerd.`, `Jouw speeddate met ${info.naam_bedrijf} om ${info.begin} is geaccepteerd.`]);
         res.json({ message: 'Speeddate accepted', speeddate: info });
     } catch (error) {
         console.error('Error accepting speeddate:', error);
