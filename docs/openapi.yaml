@@ -1994,60 +1994,6 @@ paths:
 
   /speeddates:
     description: List of the user's speeddates
-    get:
-      tags:
-        - Speeddates
-      summary: Get all speeddates of user
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      example: 1
-                    id_bedrijf:
-                      type: integer
-                      example: 24
-                    naam_bedrijf:
-                      type: string
-                      example: 'Techsolutions'
-                    profiel_foto_bedrijf:
-                      type: string
-                      format: uri
-                      example: 'https://example.com/company_logo.jpg'
-                    sector_bedrijf:
-                      type: string
-                      example: 'Informatica'
-                    id_student:
-                      type: integer
-                      example: 42
-                    voornaam_student:
-                      type: string
-                      example: 'Jan'
-                    achternaam_student:
-                      type: string
-                      example: 'Jansen'
-                    profiel_foto_student:
-                      type: string
-                      format: uri
-                      example: 'https://example.com/student_profile.jpg'
-                    akkoord:
-                      type: boolean
-                      example: true
-                    begin:
-                      type: string
-                      format: date-time
-                      example: '2023-10-01T10:00:00Z'
-                    einde:
-                      type: string
-                      format: date-time
-                      example: '2023-10-01T10:10:00Z'
     post:
       tags:
         - Speeddates
@@ -2127,6 +2073,135 @@ paths:
                         type: string
                         format: date-time
                         example: '2023-10-01T10:10:00Z'
+    get:
+      tags:
+        - Speeddates
+      summary: Get all speeddates of user
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Optional user ID to fetch speeddates for. If omitted, uses the authenticated user.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    id_bedrijf:
+                      type: integer
+                      example: 24
+                    naam_bedrijf:
+                      type: string
+                      example: 'Techsolutions'
+                    profiel_foto_bedrijf:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
+                    sector_bedrijf:
+                      type: string
+                      example: 'Informatica'
+                    id_student:
+                      type: integer
+                      example: 42
+                    voornaam_student:
+                      type: string
+                      example: 'Jan'
+                    achternaam_student:
+                      type: string
+                      example: 'Jansen'
+                    profiel_foto_student:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/student_profile.jpg'
+                    akkoord:
+                      type: boolean
+                      example: true
+                    begin:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:00:00Z'
+                    einde:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:10:00Z'
+
+  /speeddates/history:
+    description: List of the user's speed date history
+    get:
+      tags:
+        - Speeddates
+      summary: Get all speed date history of user
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Optional user ID to fetch speed date history for. If omitted, uses the authenticated user.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    id_bedrijf:
+                      type: integer
+                      example: 24
+                    naam_bedrijf:
+                      type: string
+                      example: 'Techsolutions'
+                    profiel_foto_bedrijf:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
+                    sector_bedrijf:
+                      type: string
+                      example: 'Informatica'
+                    id_student:
+                      type: integer
+                      example: 42
+                    voornaam_student:
+                      type: string
+                      example: 'Jan'
+                    achternaam_student:
+                      type: string
+                      example: 'Jansen'
+                    profiel_foto_student:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/student_profile.jpg'
+                    akkoord:
+                      type: boolean
+                      example: true
+                    lokaal:
+                      type: string
+                      example: 'A101'
+                    begin:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:00:00Z'
+                    einde:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:10:00Z'
+
 
   /speeddates/{speeddateID}:
     get:
@@ -2207,6 +2282,13 @@ paths:
       tags:
         - Speeddates
       summary: Get all accepted speed dates
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Optional user ID to fetch accepted speeddates for. If omitted, uses the authenticated user.
       responses:
         '200':
           description: OK
@@ -2267,6 +2349,13 @@ paths:
       tags:
         - Speeddates
       summary: Get all pending speed dates
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Optional user ID to fetch pending speeddates for. If omitted, uses the authenticated user.
       responses:
         '200':
           description: OK
