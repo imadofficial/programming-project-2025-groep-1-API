@@ -57,7 +57,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true) {
         query = `
             SELECT b.*, 
                 CASE WHEN functie_matches.count > 0 THEN 1 ELSE 0 END AS has_functie_match,
-                CASE WHEN bo.id_bedrijf IS NOT NULL THEN 1 ELSE 0 END AS same_opleiding,
+                CASE WHEN bo.id_bedrijf IS NOT NULL THEN 1 ELSE 0 END AS opleiding_matches,
                 COALESCE(skill_matches.count, 0) AS skill_matches,
                 COALESCE(functie_matches.count, 0) AS functie_matches,
                 ROUND(
@@ -86,7 +86,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true) {
                 )
                 GROUP BY id_gebruiker
             ) AS functie_matches ON functie_matches.bedrijf_id = b.gebruiker_id
-            ORDER BY has_functie_match DESC, same_opleiding DESC, skill_matches DESC, b.naam ASC
+            ORDER BY has_functie_match DESC, opleiding_matches DESC, skill_matches DESC, b.naam ASC
         `;
         params = [studentId, opleidingId, studentId, studentId, studentId];
     }
@@ -146,7 +146,7 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true) {
         query = `
             SELECT s.*, 
                 CASE WHEN functie_match.count > 0 THEN 1 ELSE 0 END AS has_functie_match,
-                CASE WHEN opleiding_match.count > 0 THEN 1 ELSE 0 END AS same_opleiding,
+                CASE WHEN opleiding_match.count > 0 THEN 1 ELSE 0 END AS opleiding_matches,
                 COALESCE(skill_match.count, 0) AS skill_matches,
                 COALESCE(functie_match.count, 0) AS functie_matches,
                 ROUND(
@@ -177,7 +177,7 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true) {
                 )
                 GROUP BY id_gebruiker
             ) AS functie_match ON functie_match.student_id = s.gebruiker_id
-            ORDER BY has_functie_match DESC, same_opleiding DESC, skill_matches DESC, s.voornaam ASC
+            ORDER BY has_functie_match DESC, opleiding_matches DESC, skill_matches DESC, s.voornaam ASC
         `;
         params = [bedrijfId, ...bedrijfOplIds, bedrijfId, bedrijfId];
     }
