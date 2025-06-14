@@ -7,7 +7,7 @@ require('./passportLocal.js');
 
 const router = express.Router();
 
-router.post('/', async (req, res, next) => {
+router.post('/', (req, res, next) => {
     console.log("Login request received");
     passport.authenticate('local', { session: false }, async (err, user, info) => {
         if (err) {
