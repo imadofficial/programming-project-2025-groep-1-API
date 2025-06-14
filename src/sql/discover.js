@@ -88,7 +88,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true) {
             ) AS functie_matches ON functie_matches.bedrijf_id = b.gebruiker_id
             ORDER BY has_functie_match DESC, opleiding_matches DESC, skill_matches DESC, b.naam ASC
         `;
-        params = [studentId, opleidingId, studentId, studentId, studentId];
+        params = [studentId, opleidingId, studentId, studentId];
     }
     const [rows] = await pool.query(query, params);
     return rows;
