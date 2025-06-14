@@ -2,6 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const { getAllStudenten, getStudentById, updateStudent } = require('../sql/studenten.js');
 const { getSkillsByUserId, addSkillsToUser, removeSkillFromUser } = require('../sql/skills.js');
+const { getFunctiesByUserId, addFunctiesToUser, removeFunctieFromUser } = require('../sql/functie.js');
 const canEdit = require('../auth/canEdit.js');
 
 require('../auth/passportJWT.js');
@@ -91,6 +92,71 @@ router.delete('/:studentID/skills/:skillID', [passport.authenticate('jwt', { ses
         }
     } catch (error) {
         console.error('Error removing skill:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// GET /:studentID/functies
+router.get('/:studentID/functies', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const studentId = req.params['studentID'];
+    if (!studentId) {
+        return res.status(400).json({ error: 'Student ID is required' });
+    }
+
+    try {
+        const functies = await getFunctiesByUserId(studentId);
+        if (!functies) {
+            return res.status(404).json({ message: 'Student not found' });
+        }
+        res.json(functies || []);
+    } catch (error) {
+        console.error('Error fetching functies:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// POST /:studentID/functies
+router.post('/:studentID/functies', [passport.authenticate('jwt', { session: false }), canEdit], async (req, res) => {
+    const studentId = req.params['studentID'];
+    const { functies } = req.body;
+    if (!studentId) {
+        return res.status(400).json({ error: 'Student ID is required' });
+    }
+    if (!functies || !Array.isArray(functies)) {
+        return res.status(400).json({ error: 'Functies must be an array' });
+    }
+
+    try {
+        const success = await addFunctiesToUser(studentId, functies);
+        if (success) {
+            res.status(201).json({ message: 'Functies added successfully', functies: await getFunctiesByUserId(studentId) });
+        } else {
+            res.status(404).json({ message: 'Student not found or functies not added' });
+        }
+    } catch (error) {
+        console.error('Error adding functies:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// DELETE /:studentID/functies/:functieID
+router.delete('/:studentID/functies/:functieID', [passport.authenticate('jwt', { session: false }), canEdit], async (req, res) => {
+    const studentId = req.params['studentID'];
+    const functieId = req.params['functieID'];
+
+    if (!studentId || !functieId) {
+        return res.status(400).json({ error: 'Student ID and Functie ID are required' });
+    }
+
+    try {
+        const success = await removeFunctieFromUser(studentId, functieId);
+        if (success) {
+            res.json({ message: 'Functie removed successfully', functies: await getFunctiesByUserId(studentId) });
+        } else {
+            res.status(404).json({ message: 'Functie not found for this student' });
+        }
+    } catch (error) {
+        console.error('Error removing functie:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
