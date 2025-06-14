@@ -83,16 +83,65 @@ async function getFunctieById(id_functie) {
     }
 }
 
-async function addFunctieToBedrijf(id_bedrijf, id_functie) {
+async function getFunctiesByUserId(id_gebruiker) {
     const pool = getPool('ehbmatchdev');
-    const query = 'INSERT INTO bedrijf_functie (id_bedrijf, id_functie) VALUES (?, ?)';
+    const query = `
+        SELECT f.*
+        FROM functie f
+        JOIN gebruiker_functie gf ON gf.id_functie = f.id
+        WHERE gf.id_gebruiker = ?
+    `;
 
     try {
-        const [result] = await pool.query(query, [id_bedrijf, id_functie]);
+        const [rows] = await pool.query(query, [id_gebruiker]);
+        if (rows.length > 0) {
+            return rows; // Return all functies for the user
+        } else {
+            return []; // Return an empty array if no functies are found
+        }
+    } catch (error) {
+        console.error('Database query error in getFunctieByUserId:', error.message, error.stack);
+        throw new Error('Getting functie by user ID failed');
+    }
+}
+
+async function addFunctieToUser(id_gebruiker, id_functie) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'INSERT INTO gebruiker_functie (id_gebruiker, id_functie) VALUES (?, ?)';
+
+    try {
+        const [result] = await pool.query(query, [id_gebruiker, id_functie]);
         return result.affectedRows > 0; // Return true if the record was inserted
     } catch (error) {
-        console.error('Database query error in addFunctieToBedrijf:', error.message, error.stack);
-        throw new Error('Adding functie to bedrijf failed');
+        console.error('Database query error in addFunctieToUser:', error.message, error.stack);
+        throw new Error('Adding functie to user failed');
+    }
+}
+
+async function addFunctiesToUser(id_gebruiker, functies) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'INSERT INTO gebruiker_functie (id_gebruiker, id_functie) VALUES ?';
+    const values = functies.map(functie => [id_gebruiker, functie.id]);
+
+    try {
+        const [result] = await pool.query(query, [values]);
+        return result.affectedRows > 0; // Return true if at least one record was inserted
+    } catch (error) {
+        console.error('Database query error in addFunctiesToUser:', error.message, error.stack);
+        throw new Error('Adding functies to user failed');
+    }
+}
+
+async function removeFunctieFromUser(id_gebruiker, id_functie) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'DELETE FROM gebruiker_functie WHERE id_gebruiker = ? AND id_functie = ?';
+
+    try {
+        const [result] = await pool.query(query, [id_gebruiker, id_functie]);
+        return result.affectedRows > 0; // Return true if a row was deleted
+    } catch (error) {
+        console.error('Database query error in removeFunctieFromUser:', error.message, error.stack);
+        throw new Error('Removing functie from user failed');
     }
 }
 
@@ -102,5 +151,8 @@ module.exports = {
     removeFunctie,
     modifyFunctie,
     getFunctieById,
-    addFunctieToBedrijf
+    addFunctieToUser,
+    addFunctiesToUser,
+    getFunctiesByUserId,
+    removeFunctieFromUser
 };
