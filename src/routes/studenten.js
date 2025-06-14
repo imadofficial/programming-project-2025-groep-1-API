@@ -105,10 +105,7 @@ router.get('/:studentID/functies', passport.authenticate('jwt', { session: false
 
     try {
         const functies = await getFunctiesByUserId(studentId);
-        if (!functies) {
-            return res.status(404).json({ message: 'Student not found' });
-        }
-        res.json(functies || []);
+        res.json(functies);
     } catch (error) {
         console.error('Error fetching functies:', error);
         res.status(500).json({ message: 'Internal server error' });
