@@ -54,8 +54,7 @@ router.post('/admin', [passport.authenticate('jwt', { session: false }), authAdm
     const email = req.body.email.toLowerCase();
 
     // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!EMAIL_REGEX.test(email)) {
         return res.status(400).json({ error: 'Invalid email format' });
     }
 
@@ -129,8 +128,8 @@ router.post('/student', async (req, res) => {
     if (dob >= today) {
         return res.status(400).json({ error: 'date_of_birth must be in the past' });
     }
-    const age = today.getFullYear() - dob.getFullYear();
     const monthDiff = today.getMonth() - dob.getMonth();
+    let age = today.getFullYear() - dob.getFullYear();
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
         age--;
     }
