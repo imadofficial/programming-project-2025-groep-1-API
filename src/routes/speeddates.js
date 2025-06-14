@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const { getAllSpeeddates, getSpeeddateById, getSpeeddatesByUserId, addSpeeddate, isDateAvailable, getSpeeddateInfo, speeddateAkkoord, speeddateAfgekeurd, getAcceptedSpeeddatesByUserId, getRejectedSpeeddatesByUserId } = require('../sql/speeddates.js');
+const { getAllSpeeddates, getSpeeddateById, getSpeeddatesByUserId, addSpeeddate, isDateAvailable, getSpeeddateInfo, speeddateAkkoord, speeddateAfgekeurd, getAcceptedSpeeddatesByUserId, getRejectedSpeeddatesByUserId, getSpeeddateHistoryByUserId } = require('../sql/speeddates.js');
 
 require('../auth/passportJWT.js');
 
@@ -11,6 +11,11 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
         console.log(param, value);
     }
     const speeddates = await getSpeeddatesByUserId(req.user.id);
+    res.json(speeddates);
+});
+
+router.get('/history', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const speeddates = await getSpeeddateHistoryByUserId(req.user.id);
     res.json(speeddates);
 });
 

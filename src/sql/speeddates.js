@@ -37,6 +37,37 @@ async function getSpeeddateById(id) {
     }
 }
 
+async function getSpeeddateHistoryByUserId(id) {
+    const pool = getPool('ehbmatchdev');
+    const query = `
+        SELECT s.id, s.id_bedrijf, b.naam AS naam_bedrijf, b.profiel_foto AS profiel_foto_bedrijf, sec.naam AS sector_bedrijf, s.id_student, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student, st.profiel_foto AS profiel_foto_student, s.akkoord, stand.lokaal, s.datum
+        FROM speeddate s
+        LEFT JOIN student st ON s.id_student = st.gebruiker_id
+        LEFT JOIN bedrijf b ON s.id_bedrijf = b.gebruiker_id
+        LEFT JOIN sector sec ON b.id_sector = sec.id
+        LEFT JOIN stand ON s.id_bedrijf = stand.id_bedrijf
+        WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.datum < NOW() - INTERVAL 10 MINUTE
+        ORDER BY s.datum DESC
+    `;
+    try {
+        const [rows] = await pool.query(query, [id, id]);
+        // Map each row to omit datum, add begin/einde
+        return rows.map(speeddate => {
+            const { datum, ...rest } = speeddate;
+            const begin = datum.replace(' ', 'T'); // Convert to ISO format
+            const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            return {
+                ...rest,
+                begin,
+                einde,
+            };
+        });
+    } catch (error) {
+        console.error('Database query error:', error); // Log the error
+        throw new Error('Database query failed');
+    }
+}
+
 // function to get all speeddates by user ID (id_bedrijf or id_student)
 async function getSpeeddatesByUserId(id) {
     const pool = getPool('ehbmatchdev');
@@ -272,4 +303,5 @@ module.exports = {
     isDateAvailable,
     getAcceptedSpeeddatesByUserId,
     getRejectedSpeeddatesByUserId,
+    getSpeeddateHistoryByUserId,
 };
