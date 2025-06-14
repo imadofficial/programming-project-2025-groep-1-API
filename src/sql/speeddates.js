@@ -47,7 +47,8 @@ async function getSpeeddatesByUserId(id) {
         LEFT JOIN bedrijf b ON s.id_bedrijf = b.gebruiker_id
         LEFT JOIN sector sec ON b.id_sector = sec.id
         LEFT JOIN stand ON s.id_bedrijf = stand.id_bedrijf
-        WHERE (s.id_bedrijf = ? OR s.id_student = ?)
+        WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.datum >= NOW() - INTERVAL 10 MINUTE
+        ORDER BY s.datum ASC
     `;
     try {
         const [rows] = await pool.query(query, [id, id]);
@@ -77,7 +78,7 @@ async function getAcceptedSpeeddatesByUserId(id) {
         LEFT JOIN bedrijf b ON s.id_bedrijf = b.gebruiker_id
         LEFT JOIN sector sec ON b.id_sector = sec.id
         LEFT JOIN stand ON s.id_bedrijf = stand.id_bedrijf
-        WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.akkoord = 1
+        WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.akkoord = 1 AND s.datum >= NOW() - INTERVAL 10 MINUTE
     `;
     try {
         const [rows] = await pool.query(query, [id, id]);
@@ -107,7 +108,7 @@ async function getRejectedSpeeddatesByUserId(id) {
         LEFT JOIN bedrijf b ON s.id_bedrijf = b.gebruiker_id
         LEFT JOIN sector sec ON b.id_sector = sec.id
         LEFT JOIN stand ON s.id_bedrijf = stand.id_bedrijf
-        WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.akkoord = 0
+        WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.akkoord = 0 AND s.datum >= NOW() - INTERVAL 10 MINUTE
     `;
     try {
         const [rows] = await pool.query(query, [id, id]);
