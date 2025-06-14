@@ -20,11 +20,13 @@ router.get('/bedrijven', passport.authenticate('jwt', { session: false }), async
     // Check if suggestion parameter is provided
     const suggestions = req.query.suggestions === undefined ? true : req.query.suggestions === 'true';
 
+    const onlyNew = req.query.onlyNew === undefined ? false : req.query.onlyNew === 'true';
+
     if (!studentId) {
         return res.status(400).json({ error: 'Student ID is required' });
     }
     try {
-        const rows = await getDiscoverBedrijven(studentId, suggestions);
+        const rows = await getDiscoverBedrijven(studentId, suggestions, onlyNew);
         res.json(rows);
     } catch (error) {
         console.error('Error in /discover/bedrijven:', error);
@@ -46,11 +48,13 @@ router.get('/studenten', passport.authenticate('jwt', { session: false }), async
     // Check if suggestion parameter is provided
     const suggestions = req.query.suggestions === undefined ? true : req.query.suggestions === 'true';
 
+    const onlyNew = req.query.onlyNew === undefined ? false : req.query.onlyNew === 'true';
+
     if (!bedrijfId) {
         return res.status(400).json({ error: 'Bedrijf ID is required' });
     }
     try {
-        const rows = await getDiscoverStudenten(bedrijfId, suggestions);
+        const rows = await getDiscoverStudenten(bedrijfId, suggestions, onlyNew);
         res.json(rows);
     } catch (error) {
         console.error('Error in /discover/studenten:', error);
