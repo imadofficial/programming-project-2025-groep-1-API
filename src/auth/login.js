@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.post('/', async (req, res, next) => {
     console.log("Login request received");
-    await passport.authenticate('local', { session: false }, (err, user, info) => {
+    passport.authenticate('local', { session: false }, async (err, user, info) => {
         if (err) {
             return res.status(500).json({ message: 'Internal server error: ' + err.message });
         }
@@ -35,8 +35,8 @@ router.post('/', async (req, res, next) => {
         const accessTokenExpiresAt = new Date(Date.now() + accessMaxAge).toISOString();
         const refreshTokenExpiresAt = new Date(Date.now() + refreshMaxAge).toISOString();
 
-        if (res.locals.ua == 'EhBMatch/Mobile') return res.json({ message: 'Login successful', accessToken: accessToken, refreshToken: refreshToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt, user: getUserInfo(user.id) });
-        return res.json({ message: 'Login successful', accessToken: accessToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt, user: getUserInfo(user.id) });
+        if (res.locals.ua == 'EhBMatch/Mobile') return res.json({ message: 'Login successful', accessToken: accessToken, refreshToken: refreshToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt, user: await getUserInfo(user.id) });
+        return res.json({ message: 'Login successful', accessToken: accessToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt, user: await getUserInfo(user.id) });
     })(req, res, next);
 });
 
