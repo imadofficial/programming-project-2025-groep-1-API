@@ -637,6 +637,15 @@ paths:
             default: true
           description: >
             If true (default), results are weighted by functie, opleiding and skills. If false, companies that want the student's functie are listed first, then opleiding, then others, all ordered by skill matches.
+        - name: onlyNew
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: >
+            If true, only returns companies that have not been matched with the student before.
+            This is used to avoid showing the same companies multiple times.
       responses:
         '200':
           description: List of bedrijven ordered by relevance
@@ -726,6 +735,15 @@ paths:
             default: true
           description: >
             If true (default), results are weighted by functie, opleiding and skills. If false, students with matching functie are listed first, then opleiding, then others, all ordered by skill matches.
+        - name: onlyNew
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: >
+            If true, only returns students that have not been matched with the bedrijf before.
+            This is used to avoid showing the same students multiple times.
       responses:
         '200':
           description: List of studenten ordered by relevance
