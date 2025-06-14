@@ -7,10 +7,8 @@ const { getPool } = require('../globalEntries.js');
 async function getDiscoverBedrijven(studentId, suggestions = true) {
     const pool = getPool('ehbmatchdev');
     // Pre-fetch opleiding_id for the student to avoid subquery in every row
-    const [[student]] = await pool.query('SELECT opleiding_id FROM student JOIN  WHERE gebruiker_id = ?', [studentId]);
+    const [[student]] = await pool.query('SELECT opleiding_id FROM student WHERE gebruiker_id = ?', [studentId]);
     const opleidingId = student ? student.opleiding_id : null;
-    // Pre-fetch skill and functie counts for the student
-    const [[{ functie_count }]] = await pool.query('SELECT COUNT(*) AS functie_count FROM gebruiker_functie WHERE id_gebruiker = ?', [studentId]);
     let query;
     let params;
     if (suggestions) {
@@ -109,8 +107,8 @@ async function getDiscoverBedrijven(studentId, suggestions = true) {
             ) AS functie_match ON functie_match.bedrijf_id = b.gebruiker_id
             ORDER BY functie_matches DESC, opleiding_matches DESC, match_percentage DESC, match_score DESC, b.naam ASC
         `;
-        // params: [studentId, opleidingId, studentId, studentId]
-        params = [studentId, opleidingId, studentId, studentId];
+        // params: [opleidingId, studentId, studentId]
+        params = [opleidingId, studentId, studentId];
     }
     const [rows] = await pool.query(query, params);
     return rows;
