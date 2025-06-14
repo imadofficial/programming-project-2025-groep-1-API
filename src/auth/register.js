@@ -124,7 +124,16 @@ router.post('/student', async (req, res) => {
     // Validate date_of_birth is not in the future and user is at least 16 years old
     const minAge = 16; // Minimum age requirement
     const today = new Date();
+    // Strict date validation to prevent invalid dates like '2023-02-30'
+    const [year, month, day] = date_of_birth.split('-').map(Number);
     const dob = new Date(date_of_birth);
+    if (
+        dob.getFullYear() !== year ||
+        dob.getMonth() + 1 !== month ||
+        dob.getDate() !== day
+    ) {
+        return res.status(400).json({ error: 'Invalid date_of_birth: not a real date.' });
+    }
     if (dob >= today) {
         return res.status(400).json({ error: 'date_of_birth must be in the past' });
     }
