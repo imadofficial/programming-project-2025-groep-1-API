@@ -1588,7 +1588,7 @@ paths:
                           type: string
                           example: 'Parttime'
   
-  /studenten/{studentID}/funcites/{functieID}:
+  /studenten/{studentID}/functies/{functieID}:
     delete:
       summary: Remove a function from a student
       tags:
