@@ -1,6 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const { getAllSpeeddates, getSpeeddateById, getSpeeddatesByUserId, addSpeeddate, isDateAvailable, getSpeeddateInfo, speeddateAkkoord, speeddateAfgekeurd, getAcceptedSpeeddatesByUserId, getRejectedSpeeddatesByUserId, getSpeeddateHistoryByUserId } = require('../sql/speeddates.js');
+const { sendNotification } = require('../modules/notifications.js');
 
 require('../auth/passportJWT.js');
 
