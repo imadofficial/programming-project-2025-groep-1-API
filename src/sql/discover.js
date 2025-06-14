@@ -52,7 +52,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true) {
             ) AS functie_match ON functie_match.bedrijf_id = b.gebruiker_id
             ORDER BY match_score DESC, b.naam ASC
         `;
-        params = [studentId, opleidingId, studentId, studentId, studentId];
+        params = [studentId, opleidingId, studentId, studentId];
     } else {
         query = `
             SELECT b.*, 
