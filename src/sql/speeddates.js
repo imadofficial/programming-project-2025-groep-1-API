@@ -275,6 +275,7 @@ async function getSpeeddateInfo(id) {
             const speeddate = rows[0];
             // Rename datum to begin and add einde (10 minutes later), omit datum
             const { datum, ...rest } = speeddate;
+            console.log('datum:', datum);
             const begin = datum.replace(' ', 'T'); // Convert to ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
             return {
