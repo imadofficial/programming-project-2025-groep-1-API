@@ -15,6 +15,7 @@ router.post('/', (req, res, next) => {
     }
 
     // Validate email format
+    req.body.email = req.body.email.toLowerCase(); // Normalize email to lowercase
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(req.body.email)) {
         return res.status(400).json({ message: 'Bad request: Invalid email format' });
@@ -39,9 +40,13 @@ router.post('/', (req, res, next) => {
             return res.status(401).json({ message: 'Invalid credentials'});
         }
 
-        const accessMaxAge = 15 * 60 * 1000; // 15 minutes
-        const refreshMaxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
+        const accessMaxAge = 15 * 60; // 15 minutes in seconds
+        const refreshMaxAge = 7 * 24 * 60 * 60; // 7 days in seconds
 
+        // Generate JWT tokens
+        if (!process.env.JWT_ACCESS_SECRET || !process.env.JWT_REFRESH_SECRET) {
+            return res.status(500).json({ message: 'Internal server error: JWT secrets are not set' });
+        }
         const accessToken = jwt.sign({ id: user.id, type: user.type }, process.env.JWT_ACCESS_SECRET, { expiresIn: accessMaxAge });
         const refreshToken = jwt.sign({ id: user.id, type: user.type }, process.env.JWT_REFRESH_SECRET, { expiresIn: refreshMaxAge });
 
@@ -51,11 +56,11 @@ router.post('/', (req, res, next) => {
             sameSite: 'none', // Adjust as necessary
             path: "/auth/refresh", // Ensure the cookie is only sent to the refresh endpoint
             domain: "api.ehb-match.me",
-            maxAge: refreshMaxAge,
+            maxAge: refreshMaxAge * 1000 // Convert seconds to milliseconds
         });
 
-        const accessTokenExpiresAt = new Date(Date.now() + accessMaxAge).toISOString();
-        const refreshTokenExpiresAt = new Date(Date.now() + refreshMaxAge).toISOString();
+        const accessTokenExpiresAt = new Date(Date.now() + accessMaxAge * 1000).toISOString();
+        const refreshTokenExpiresAt = new Date(Date.now() + refreshMaxAge * 1000).toISOString();
 
         if (res.locals.ua == 'EhBMatch/Mobile') return res.json({ message: 'Login successful', accessToken: accessToken, refreshToken: refreshToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt, user: await getUserInfo(user.id) });
         return res.json({ message: 'Login successful', accessToken: accessToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt, user: await getUserInfo(user.id) });
