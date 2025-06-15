@@ -3,6 +3,7 @@ const passport = require('passport');
 const { register, registerAdmin, registerStudent, registerBedrijf } = require('../sql/register.js');
 const authAdmin = require('./authAdmin.js');
 const bcrypt = require('bcrypt');
+const { deleteProfielFoto, addTempProfielFoto, cleanupTempProfielFoto } = require('../sql/profielFoto.js');
 
 require('../auth/passportJWT.js');
 
@@ -11,7 +12,6 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const NAME_REGEX = /^[a-zA-Z\s]+$/;
 const LINKEDIN_REGEX = /^(\/in\/[a-zA-Z0-9_-]+|\/company\/[a-zA-Z0-9_-]+)$/;
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
-const URL_REGEX = /^https?:\/\/[^\s/$.?#].[^\s]*$/;
 
 const router = express.Router();
 
@@ -158,13 +158,18 @@ router.post('/student', async (req, res) => {
         return res.status(400).json({ error: 'Studiejaar must be between 1 and 4' });
     }
 
-    // Validate profiel_foto URL if provided
-    if (profiel_foto && !URL_REGEX.test(profiel_foto)) {
-        return res.status(400).json({ error: 'Invalid profiel_foto URL format' });
-    }
+    // Validate profiel_foto key if provided (no URL check needed)
     try {
         const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
         const studentId = await registerStudent(emailLower, hashedPassword, voornaam, achternaam, linkedinURL, profiel_foto, studiejaarParsed, opleidingId, date_of_birth);
+        // Clean up temp profiel foto if provided
+        if (profiel_foto) {
+            try {
+                await cleanupTempProfielFoto(profiel_foto); // This will clean up temp_uploaded_profiel_fotos for the new student
+            } catch (cleanupError) {
+                console.error('Error cleaning up temp profiel foto after student registration:', cleanupError);
+            }
+        }
         res.status(201).json({ message: "Student registered successfully", Id: studentId });
     } catch (error) {
         console.error('Error registering student:', error);
@@ -220,6 +225,14 @@ router.post('/bedrijf', async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
         const bedrijfId = await registerBedrijf(emailLower, hashedPassword, naam, plaats, contactEmail, linkedinURL, profiel_foto);
+        // Clean up temp profiel foto if provided
+        if (profiel_foto) {
+            try {
+                await cleanupTempProfielFoto(profiel_foto); // This will clean up temp_uploaded_profiel_fotos for the new bedrijf
+            } catch (cleanupError) {
+                console.error('Error cleaning up temp profiel foto after bedrijf registration:', cleanupError);
+            }
+        }
         res.status(201).json({ message: "Company registered successfully", Id: bedrijfId });
     } catch (error) {
         console.error('Error registering company:', error);

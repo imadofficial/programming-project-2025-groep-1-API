@@ -28,11 +28,21 @@ async function getAllBedrijven() {
 async function getBedrijfById(id) {
     const pool = getPool('ehbmatchdev');
     const query = 'SELECT * FROM bedrijf WHERE gebruiker_id = ?';
+    const baseUrl = "https://gt0kk4fbet.ufs.sh/f/";
 
     try {
         const [rows] = await pool.query(query, [id]);
         if (rows.length > 0) {
-            return rows[0]; // Return the first bedrijf found
+            const bedrijf = rows[0];
+            if (bedrijf.profiel_foto) {
+                bedrijf.profiel_foto_key = bedrijf.profiel_foto;
+                bedrijf.profiel_foto_url = baseUrl + bedrijf.profiel_foto;
+            } else {
+                bedrijf.profiel_foto_key = null;
+                bedrijf.profiel_foto_url = null;
+            }
+            delete bedrijf.profiel_foto; // Remove the original profiel_foto field
+            return bedrijf; // Return the first bedrijf found with extra fields
         } else {
             return null; // Return null if no bedrijf is found
         }   

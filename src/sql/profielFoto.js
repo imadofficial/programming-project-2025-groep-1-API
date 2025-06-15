@@ -1,0 +1,110 @@
+const mysql = require('mysql2');
+
+const dotenv = require('dotenv');
+
+const { getPool } = require('../globalEntries.js');
+
+const { UTApi } = require('uploadthing/server');
+const utapi = new UTApi();
+
+dotenv.config();
+
+async function addTempProfielFoto(fotoKey) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'INSERT INTO temp_uploaded_profiel_fotos (file_key) VALUES (?)';
+    try {
+        const [result] = await pool.query(query, [fotoKey]);
+        return result.affectedRows > 0; // Return true if the insert was successful
+    } catch (error) {
+        console.error('Database query error in addTempProfielFoto:', error.message, error.stack);
+        throw new Error('Saving profiel foto failed');
+    }
+}
+
+async function cleanupTempProfielFoto(fotoKey) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'DELETE FROM temp_uploaded_profiel_fotos WHERE file_key = ?';
+    try {
+        const [result] = await pool.query(query, [fotoKey]);
+        return result.affectedRows > 0; // Return true if the delete was successful
+    } catch (error) {
+        console.error('Database query error in cleanupTempProfielFoto:', error.message, error.stack);
+        throw new Error('Cleaning up temp profiel foto failed');
+    }
+}
+
+async function updateProfielFoto(gebruikerId, fotoKey) {
+    const pool = getPool('ehbmatchdev');
+
+    const oldFotoQuery = 'SELECT profiel_foto FROM student WHERE gebruiker_id = ? UNION SELECT profiel_foto FROM bedrijf WHERE gebruiker_id = ? ORDER BY created_at ASC LIMIT 1';
+
+    const queryStudent = 'UPDATE student SET profiel_foto = ? WHERE gebruiker_id = ?';
+    const queryBedrijf = 'UPDATE bedrijf SET profiel_foto = ? WHERE gebruiker_id = ?';
+    try {
+        const [resultOldFoto] = await pool.query(oldFotoQuery, [gebruikerId, gebruikerId]);
+        if (resultOldFoto.length > 0 && resultOldFoto[0].profiel_foto) {
+            const oldFotoKey = resultOldFoto[0].profiel_foto;
+            try {
+                await utapi.deleteFiles([oldFotoKey]); // Delete the old file from Uploadthing
+            } catch (error) {
+                console.error('Error deleting old file from Uploadthing:', error);
+                throw new Error('Failed to delete old profiel foto from storage');
+            }
+            try {
+                await cleanupTempProfielFoto(oldFotoKey); // Clean up temp uploaded profiel fotos
+            } catch (error) {
+                console.error('Database cleanup error (updateProfielFoto):', error);
+                throw new Error('Failed to clean up temp profiel foto');
+            }
+        }
+
+        const [resultStudent] = await pool.query(queryStudent, [fotoKey, gebruikerId]);
+        const [resultBedrijf] = await pool.query(queryBedrijf, [fotoKey, gebruikerId]);
+
+        return resultStudent.affectedRows > 0 || resultBedrijf.affectedRows > 0; // Return true if either update was successful
+    } catch (error) {
+        console.error('Database query error in changeProfielFoto:', error.message, error.stack);
+        throw new Error('Changing profiel foto failed');
+    }
+}
+
+async function deleteProfielFoto(gebruikerId) {
+    const pool = getPool('ehbmatchdev');
+
+    const getProfielFotoQuery = 'SELECT profiel_foto FROM student WHERE gebruiker_id = ? UNION SELECT profiel_foto FROM bedrijf WHERE gebruiker_id = ?';
+    const [resultKey] = await pool.query(getProfielFotoQuery, [gebruikerId, gebruikerId]);
+    if (resultKey.length > 0 && resultKey[0].profiel_foto) {
+        const fotoKey = resultKey[0].profiel_foto;
+        try {
+            await utapi.deleteFiles([fotoKey]); // Delete the file from Uploadthing
+        } catch (error) {
+            console.error('Error deleting file from Uploadthing:', error);
+            throw new Error('Failed to delete profiel foto from storage');
+        }
+        try {
+            await pool.query('DELETE FROM temp_uploaded_profiel_fotos WHERE file_key = ?', [fotoKey]); // Clean up temp uploaded profiel fotos
+        } catch (error) {
+            console.error('Database cleanup error (deleteProfielFoto):', error);
+            throw new Error('Failed to clean up temp profiel foto');
+        }
+    }
+
+
+    const queryStudent = 'UPDATE student SET profiel_foto = NULL WHERE gebruiker_id = ?';
+    const queryBedrijf = 'UPDATE bedrijf SET profiel_foto = NULL WHERE gebruiker_id = ?';
+    try {
+        const [resultStudent] = await pool.query(queryStudent, [gebruikerId]);
+        const [resultBedrijf] = await pool.query(queryBedrijf, [gebruikerId]);
+        return resultStudent.affectedRows > 0 || resultBedrijf.affectedRows > 0;
+    } catch (error) {
+        console.error('Database update error (deleteProfielFoto):', error);
+        throw new Error('Failed to delete profiel foto');
+    }
+}
+
+module.exports = {
+    addTempProfielFoto,
+    cleanupTempProfielFoto,
+    updateProfielFoto,
+    deleteProfielFoto
+};
