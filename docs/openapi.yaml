@@ -2419,7 +2419,7 @@ paths:
                       profiel_foto_bedrijf:
                         type: string
                         format: uri
-                        example: 'https://example.com/company_logo.jpg'
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                       sector_bedrijf:
                         type: string
                         example: 'Informatica'
@@ -2435,7 +2435,7 @@ paths:
                       profiel_foto_student:
                         type: string
                         format: uri
-                        example: 'https://example.com/student_profile.jpg'
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                       akkoord:
                         type: boolean
                         example: false
@@ -2483,7 +2483,7 @@ paths:
                     profiel_foto_bedrijf:
                       type: string
                       format: uri
-                      example: 'https://example.com/company_logo.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     sector_bedrijf:
                       type: string
                       example: 'Informatica'
@@ -2499,7 +2499,7 @@ paths:
                     profiel_foto_student:
                       type: string
                       format: uri
-                      example: 'https://example.com/student_profile.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     akkoord:
                       type: boolean
                       example: true
@@ -2547,7 +2547,7 @@ paths:
                     profiel_foto_bedrijf:
                       type: string
                       format: uri
-                      example: 'https://example.com/company_logo.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     sector_bedrijf:
                       type: string
                       example: 'Informatica'
@@ -2563,7 +2563,7 @@ paths:
                     profiel_foto_student:
                       type: string
                       format: uri
-                      example: 'https://example.com/student_profile.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     akkoord:
                       type: boolean
                       example: true
@@ -2611,7 +2611,7 @@ paths:
                   profiel_foto_bedrijf:
                     type: string
                     format: uri
-                    example: 'https://example.com/company_logo.jpg'
+                    example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                   sector_bedrijf:
                     type: string
                     example: 'Informatica'
@@ -2627,7 +2627,7 @@ paths:
                   profiel_foto_student:
                     type: string
                     format: uri
-                    example: 'https://example.com/student_profile.jpg'
+                    example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                   akkoord:
                     type: boolean
                     example: true
@@ -2688,7 +2688,7 @@ paths:
                     profiel_foto_bedrijf:
                       type: string
                       format: uri
-                      example: 'https://example.com/company_logo.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     sector_bedrijf:
                       type: string
                       example: 'Informatica'
@@ -2704,7 +2704,7 @@ paths:
                     profiel_foto_student:
                       type: string
                       format: uri
-                      example: 'https://example.com/student_profile.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     akkoord:
                       type: boolean
                       example: true
@@ -2755,7 +2755,7 @@ paths:
                     profiel_foto_bedrijf:
                       type: string
                       format: uri
-                      example: 'https://example.com/company_logo.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     sector_bedrijf:
                       type: string
                       example: 'Informatica'
@@ -2771,7 +2771,7 @@ paths:
                     profiel_foto_student:
                       type: string
                       format: uri
-                      example: 'https://example.com/student_profile.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     akkoord:
                       type: boolean
                       example: false
@@ -2825,7 +2825,7 @@ paths:
                       profiel_foto_bedrijf:
                         type: string
                         format: uri
-                        example: 'https://example.com/company_logo.jpg'
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                       sector_bedrijf:
                         type: string
                         example: 'Informatica'
@@ -2841,7 +2841,7 @@ paths:
                       profiel_foto_student:
                         type: string
                         format: uri
-                        example: 'https://example.com/student_profile.jpg'
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                       akkoord:
                         type: boolean
                         example: true
@@ -2905,7 +2905,7 @@ paths:
                       profiel_foto_bedrijf:
                         type: string
                         format: uri
-                        example: 'https://example.com/company_logo.jpg'
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                       sector_bedrijf:
                         type: string
                         example: 'Informatica'
@@ -2921,7 +2921,7 @@ paths:
                       profiel_foto_student:
                         type: string
                         format: uri
-                        example: 'https://example.com/student_profile.jpg'
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                       akkoord:
                         type: boolean
                         example: true
