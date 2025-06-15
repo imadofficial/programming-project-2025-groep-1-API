@@ -20,13 +20,17 @@ async function getSpeeddateById(id) {
     `;
     try {
         const [rows] = await pool.query(query, [id]);
-        // Map each row to omit datum, add begin/einde
+        // Map each row to omit datum, add begin/einde, and construct profiel_foto URLs
         return rows.map(speeddate => {
-            const { datum, ...rest } = speeddate;
+            const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
             const begin = datum; // Already returned in ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            const profiel_foto_bedrijf_url = profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_bedrijf}` : null;
+            const profiel_foto_student_url = profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_student}` : null;
             return {
                 ...rest,
+                profiel_foto_bedrijf: profiel_foto_bedrijf_url,
+                profiel_foto_student: profiel_foto_student_url,
                 begin,
                 einde,
             };
@@ -51,13 +55,17 @@ async function getSpeeddateHistoryByUserId(id) {
     `;
     try {
         const [rows] = await pool.query(query, [id, id]);
-        // Map each row to omit datum, add begin/einde
+        // Map each row to omit datum, add begin/einde, and construct profiel_foto URLs
         return rows.map(speeddate => {
-            const { datum, ...rest } = speeddate;
+            const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
             const begin = datum; // Already returned in ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            const profiel_foto_bedrijf_url = profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_bedrijf}` : null;
+            const profiel_foto_student_url = profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_student}` : null;
             return {
                 ...rest,
+                profiel_foto_bedrijf: profiel_foto_bedrijf_url,
+                profiel_foto_student: profiel_foto_student_url,
                 begin,
                 einde,
             };
@@ -83,13 +91,17 @@ async function getSpeeddatesByUserId(id) {
     `;
     try {
         const [rows] = await pool.query(query, [id, id]);
-        // Map each row to omit datum, add begin/einde
+        // Map each row to omit datum, add begin/einde, and construct profiel_foto URLs
         return rows.map(speeddate => {
-            const { datum, ...rest } = speeddate;
+            const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
             const begin = datum;
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            const profiel_foto_bedrijf_url = profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_bedrijf}` : null;
+            const profiel_foto_student_url = profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_student}` : null;
             return {
                 ...rest,
+                profiel_foto_bedrijf: profiel_foto_bedrijf_url,
+                profiel_foto_student: profiel_foto_student_url,
                 begin,
                 einde,
             };
@@ -113,13 +125,17 @@ async function getAcceptedSpeeddatesByUserId(id) {
     `;
     try {
         const [rows] = await pool.query(query, [id, id]);
-        // Map each row to omit datum, add begin/einde
+        // Map each row to omit datum, add begin/einde, and construct profiel_foto URLs
         return rows.map(speeddate => {
-            const { datum, ...rest } = speeddate;
+            const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
             const begin = datum.replace(' ', 'T'); // Convert to ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            const profiel_foto_bedrijf_url = profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_bedrijf}` : null;
+            const profiel_foto_student_url = profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_student}` : null;
             return {
                 ...rest,
+                profiel_foto_bedrijf: profiel_foto_bedrijf_url,
+                profiel_foto_student: profiel_foto_student_url,
                 begin,
                 einde,
             };
@@ -143,13 +159,17 @@ async function getRejectedSpeeddatesByUserId(id) {
     `;
     try {
         const [rows] = await pool.query(query, [id, id]);
-        // Map each row to omit datum, add begin/einde
+        // Map each row to omit datum, add begin/einde, and construct profiel_foto URLs
         return rows.map(speeddate => {
-            const { datum, ...rest } = speeddate;
+            const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
             const begin = datum; // Already returned in ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            const profiel_foto_bedrijf_url = profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_bedrijf}` : null;
+            const profiel_foto_student_url = profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_student}` : null;
             return {
                 ...rest,
+                profiel_foto_bedrijf: profiel_foto_bedrijf_url,
+                profiel_foto_student: profiel_foto_student_url,
                 begin,
                 einde,
             };
@@ -273,12 +293,16 @@ async function getSpeeddateInfo(id) {
         const [rows] = await pool.query(query, [id]);
         if (rows.length > 0) {
             const speeddate = rows[0];
-            // Rename datum to begin and add einde (10 minutes later), omit datum
-            const { datum, ...rest } = speeddate;
+            // Rename datum to begin and add einde (10 minutes later), omit datum, and construct profiel_foto URLs
+            const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
             const begin = datum; // Already returned in ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            const profiel_foto_bedrijf_url = profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_bedrijf}` : null;
+            const profiel_foto_student_url = profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_student}` : null;
             return {
                 ...rest,
+                profiel_foto_bedrijf: profiel_foto_bedrijf_url,
+                profiel_foto_student: profiel_foto_student_url,
                 begin,
                 einde,
             };
