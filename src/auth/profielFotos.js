@@ -6,7 +6,17 @@ const { UTApi } = require('uploadthing/server');
 require('./passportJWT.js');
 
 const router = express.Router();
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 2 * 1024 * 1024 }, // Limit file size to 2MB
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  }
+});
 const utapi = new UTApi();
 
 const { addTempProfielFoto } = require('../sql/profielFoto.js'); // Adjust the path as necessary
@@ -32,7 +42,10 @@ router.post('/', upload.single('file'), async (req, res) => {
         return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const file = new File([req.file.buffer], req.file.originalname, {
+    const ext = req.file.originalname.split('.').pop();
+    const uniqueName = `profile_${Date.now()}_${Math.round(Math.random() * 1e9)}.${ext}`;
+
+    const file = new File([req.file.buffer], uniqueName, {
         type: req.file.mimetype,
     });
 
