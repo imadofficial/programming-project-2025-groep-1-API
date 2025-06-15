@@ -28,8 +28,12 @@ async function cleanupTempProfielFotos() {
         console.error('Error deleting files from Uploadthing:', err);
     }
     // Remove from temp_uploaded_profiel_fotos table
-    await pool.query('DELETE FROM temp_uploaded_profiel_fotos WHERE file_key IN (?)', [keys]);
-    console.log(`Cleaned up ${keys.length} unused temp profile photos.`);
+    try {
+        await pool.query('DELETE FROM temp_uploaded_profiel_fotos WHERE file_key IN (?)', [keys]);
+        console.log(`Cleaned up ${keys.length} unused temp profile photos.`);
+    } catch (err) {
+        console.error('Error deleting records from temp_uploaded_profiel_fotos:', err);
+    }
 }
 
 // Run cleanup every hour if this script is run directly
