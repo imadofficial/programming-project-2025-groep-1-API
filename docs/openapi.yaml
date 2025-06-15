@@ -40,16 +40,25 @@ components:
           type: string
           format: uri
           description: The student's LinkedIn profile URL.
-        profiel_foto:
+        profiel_foto_key:
+          type: string
+          description: The key for the student's profile photo.
+          example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+        profiel_foto_url:
           type: string
           format: uri
           description: The student's profile photo URL.
+          example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
         studiejaar:
           type: integer
           description: The student's year of study.
         opleiding_id:
           type: integer
           description: The ID of the student's opleiding (program).
+        date_of_birth:
+          type: string
+          format: date
+          description: The student's date of birth.
       example:
         type: 2
         gebruiker_id: 1
@@ -59,6 +68,7 @@ components:
         profiel_foto: /profile.jpg
         studiejaar: 2
         opleiding_id: 1
+        date_of_birth: '2000-01-01'
     Bedrijf:
       type: object
       description: A company (bedrijf) user object.
@@ -92,10 +102,15 @@ components:
           type: string
           format: uri
           description: The company's LinkedIn profile URL.
-        profiel_foto:
+        profiel_foto_key:
+          type: string
+          description: The key for the company's profile photo.
+          example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+        profiel_foto_url:
           type: string
           format: uri
           description: The company's profile photo URL.
+          example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
       example:
         type: 3
         gebruiker_id: 2
@@ -142,6 +157,9 @@ tags:
   - name: Auth
     description: >
       Authentication endpoints for the API.
+  - name: Profielfotos
+    description: >
+      Endpoints for managing user profile photos.
   - name: Registration
     description: >
       Endpoints for user registration and management.
@@ -308,6 +326,307 @@ paths:
                     type: string
                     example: 'Logout successful'
 
+  /profielfotos:
+    post:
+      tags:
+        - Profielfotos
+      operationId: uploadProfilePhoto
+      summary: Upload a profile photo
+      description: >
+        This endpoint allows users to upload a profile photo.
+        The photo will be stored and associated with the user's account.
+        Please use the profiel_foto_key returned in the response to register the profile photo with a user.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: The profile photo file to upload
+                  required: true
+      responses:
+        '200':
+          description: Successful upload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Profile photo uploaded successfully'
+                  profiel_foto_key:
+                    type: string
+                    example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                  profiel_foto_url:
+                    type: string
+                    format: uri
+                    example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+
+  /bedrijven/{bedrijfID}/profielfoto:
+    put:
+      tags:
+        - Profielfotos
+      operationId: updateCompanyProfilePhoto
+      summary: Update a company's profile photo
+      description: >
+        This endpoint allows companies to update their profile photo.
+        The photo will be stored and associated with the company's account.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profiel_foto:
+                  type: string
+                  description: >
+                    The profile photo key. This key was obtained from https://api.ehb-match.me/profielfotos.
+                    If not provided, no profile photo will be used.
+                  example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+      responses:
+        '200':
+          description: Successful update
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Company profile photo updated successfully'
+                  bedrijf:
+                    type: object
+                    properties:
+                      gebruiker_id:
+                        type: integer
+                        example: 42
+                      naam:
+                        type: string
+                        example: 'Tech Solutions'
+                      plaats:
+                        type: string
+                        example: 'Brussel'
+                      contact_email:
+                        type: string
+                        format: email
+                        example: 'info@techsolutions.com'
+                      linkedin:
+                        type: string
+                        format: uri
+                        example: 'https://www.linkedin.com/company/techsolutions'
+                      profiel_foto_key:
+                        type: string
+                        example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      profiel_foto_url:
+                        type: string
+                        format: uri
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+    delete:
+      tags:
+        - Profielfotos
+      operationId: deleteCompanyProfilePhoto
+      summary: Delete a company's profile photo
+      description: >
+        This endpoint allows companies to delete their profile photo.
+        The photo will be removed from the company's account.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful deletion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Company profile photo deleted successfully'
+                  bedrijf:
+                    type: object
+                    properties:
+                      gebruiker_id:
+                        type: integer
+                        example: 42
+                      naam:
+                        type: string
+                        example: 'Tech Solutions'
+                      plaats:
+                        type: string
+                        example: 'Brussel'
+                      contact_email:
+                        type: string
+                        format: email
+                        example: 'info@techsolutions.com'
+                      linkedin:
+                        type: string
+                        format: uri
+                        example: 'https://www.linkedin.com/company/techsolutions'
+                      profiel_foto_key:
+                        type: string
+                        example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      profiel_foto_url:
+                        type: string
+                        format: uri
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+
+  /studenten/{studentID}/profielfoto:
+    put:
+      tags:
+        - Profielfotos
+      operationId: updateStudentProfilePhoto
+      summary: Update a student's profile photo
+      description: >
+        This endpoint allows students to update their profile photo.
+        The photo will be stored and associated with the student's account.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profiel_foto:
+                  type: string
+                  description: >
+                    The profile photo key. This key was obtained from https://api.ehb-match.me/profielfotos.
+                    If not provided, no profile photo will be used.
+                  example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+      responses:
+        '200':
+          description: Successful update
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Student profile photo updated successfully'
+                  student:
+                    type: object
+                    properties:
+                      gebruiker_id:
+                        type: integer
+                        example: 42
+                      voornaam:
+                        type: string
+                        example: 'Jan'
+                      achternaam:
+                        type: string
+                        example: 'Jansen'
+                      linkedin:
+                        type: string
+                        format: uri
+                        example: '/in/janjansen'
+                      profiel_foto_key:
+                        type: string
+                        example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      profiel_foto_url:
+                        type: string
+                        format: uri
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      studiejaar:
+                        type: integer
+                        example: 2
+                      opleiding_id:
+                        type: integer
+                        example: 1
+                      date_of_birth:
+                        type: string
+                        format: date
+                        example: '1970-01-01'
+    delete:
+      tags:
+        - Profielfotos
+      operationId: deleteStudentProfilePhoto
+      summary: Delete a student's profile photo
+      description: >
+        This endpoint allows students to delete their profile photo.
+        The photo will be removed from the student's account.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful deletion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Student profile photo deleted successfully'
+                  student:
+                    type: object
+                    properties:
+                      gebruiker_id:
+                        type: integer
+                        example: 42
+                      voornaam:
+                        type: string
+                        example: 'Jan'
+                      achternaam:
+                        type: string
+                        example: 'Jansen'
+                      linkedin:
+                        type: string
+                        format: uri
+                        example: '/in/janjansen'
+                      profiel_foto_key:
+                        type: string
+                        example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      profiel_foto_url:
+                        type: string
+                        format: uri
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      studiejaar:
+                        type: integer
+                        example: 2
+                      opleiding_id:
+                        type: integer
+                        example: 1
+                      date_of_birth:
+                        type: string
+                        format: date
+                        example: '1970-01-01'
+
   /auth/register/user:
     post:
       tags:
@@ -390,6 +709,7 @@ paths:
         This endpoint allows the registration of a new student account.
         The student must provide their email, password, first name, last name,
         LinkedIn profile, profile photo, study year, and opleiding ID.
+        Please use the profiel_foto_key returned in the response of the profile photo upload endpoint to register the profile photo with a user.
       requestBody:
         required: true
         content:
@@ -424,8 +744,10 @@ paths:
                   example: '/in/janjansen'
                 profiel_foto:
                   type: string
-                  format: uri
-                  example: '/profile.jpg'
+                  description: >
+                    The profile photo key. This key was obtained from https://api.ehb-match.me/profielfotos.
+                    If not provided, no profile photo will be used.
+                  example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
                 studiejaar:
                   type: integer
                   example: 2
@@ -456,6 +778,11 @@ paths:
       tags:
         - Registration
       summary: Register a new company
+      description: >
+        This endpoint allows the registration of a new company account.
+        The company must provide their email, password, name, location,
+        contact email, LinkedIn profile, and profile photo.
+        Please use the profiel_foto_key returned in the response of the profile photo upload endpoint to register the profile photo with a user.
       requestBody:
         required: true
         content:
@@ -492,8 +819,10 @@ paths:
                   example: '/company/techsolutions'
                 profiel_foto:
                   type: string
-                  format: uri
-                  example: '/company_logo.jpg'
+                  description: >
+                    The profile photo key. This key was obtained from https://api.ehb-match.me/profielfotos.
+                    If not provided, no profile photo will be used.
+                  example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
       responses:
         '201':
           description: Created
@@ -668,7 +997,10 @@ paths:
                     linkedin:
                       type: string
                       format: uri
-                    profiel_foto:
+                    profiel_foto_key:
+                      type: string
+                      example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                    profiel_foto_url:
                       type: string
                       format: uri
                       example: 'https://example.com/company_logo.jpg'
@@ -763,7 +1095,10 @@ paths:
                     linkedin:
                       type: string
                       format: uri
-                    profiel_foto:
+                    profiel_foto_key:
+                      type: string
+                      example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                    profiel_foto_url:
                       type: string
                       format: uri
                     studiejaar:
@@ -835,7 +1170,10 @@ paths:
                     linkedin:
                       type: string
                       format: uri
-                    profiel_foto:
+                    profiel_foto_key:
+                      type: string
+                      example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                    profiel_foto_url:
                       type: string
                       format: uri
                       example: 'https://example.com/company_logo.jpg'
@@ -876,7 +1214,10 @@ paths:
                     type: string
                     format: uri
                     example: 'https://www.linkedin.com/company/techsolutions'
-                  profiel_foto:
+                  profiel_foto_key:
+                    type: string
+                    example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                  profiel_foto_url:
                     type: string
                     format: uri
                     example: 'https://example.com/company_logo.jpg'
@@ -961,7 +1302,10 @@ paths:
                           type: string
                           format: uri
                           example: 'https://www.linkedin.com/company/techsolutions'
-                        profiel_foto:
+                        profiel_foto_key:
+                          type: string
+                          example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                        profiel_foto_url:
                           type: string
                           format: uri
                           example: 'https://example.com/company_logo.jpg'
@@ -1060,7 +1404,10 @@ paths:
                     linkedin:
                       type: string
                       format: uri
-                    profiel_foto:
+                    profiel_foto_key:
+                      type: string
+                      example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                    profiel_foto_url:
                       type: string
                       format: uri
                       example: 'https://example.com/company_logo.jpg'
@@ -1094,7 +1441,10 @@ paths:
                     linkedin:
                       type: string
                       format: uri
-                    profiel_foto:
+                    profiel_foto_key:
+                      type: string
+                      example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                    profiel_foto_url:
                       type: string
                       format: uri
                       example: 'https://example.com/company_logo.jpg'
@@ -1417,9 +1767,13 @@ paths:
                   linkedin:
                     type: string
                     format: uri
-                  profiel_foto:
+                  profiel_foto_key:
+                    type: string
+                    example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                  profiel_foto_url:
                     type: string
                     format: uri
+                    example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
                   studiejaar:
                     type: integer
                   opleiding_id:
@@ -1513,9 +1867,13 @@ paths:
                       linkedin:
                         type: string
                         format: uri
-                      profiel_foto:
+                      profiel_foto_key:
+                        type: string
+                        example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      profiel_foto_url:
                         type: string
                         format: uri
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
                       studiejaar:
                         type: integer
                       opleiding_id:
