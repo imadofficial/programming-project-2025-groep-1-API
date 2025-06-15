@@ -9,7 +9,7 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 const utapi = new UTApi();
 
-const { saveProfielFoto, addTempProfielFoto } = require('../sql/profielFoto.js'); // Adjust the path as necessary
+const { addTempProfielFoto } = require('../sql/profielFoto.js'); // Adjust the path as necessary
 // TODO: implement Uploadthing using https://docs.uploadthing.com/api-reference/ut-api
 
 

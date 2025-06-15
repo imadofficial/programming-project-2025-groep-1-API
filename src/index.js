@@ -58,7 +58,7 @@ app.use('/user', require('./routes/user.js'));
 // Authentication routes
 app.use('/auth/info', require('./auth/info.js'));
 
-app.use('/auth/profielfoto', require('./auth/profielFoto.js')); // TODO: implement Uploadthing using https://docs.uploadthing.com/api-reference/ut-api
+app.use('/profielfotos', require('./auth/profielFotos.js')); // TODO: implement Uploadthing using https://docs.uploadthing.com/api-reference/ut-api
 
 app.use('/auth/login', require('./auth/login.js'));
 app.use('/auth/refresh', require('./auth/refresh.js'));
