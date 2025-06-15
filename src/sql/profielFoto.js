@@ -36,7 +36,7 @@ async function cleanupTempProfielFoto(fotoKey) {
 async function updateProfielFoto(gebruikerId, fotoKey) {
     const pool = getPool('ehbmatchdev');
 
-    const oldFotoQuery = 'SELECT profiel_foto FROM student WHERE gebruiker_id = ? UNION SELECT profiel_foto FROM bedrijf WHERE gebruiker_id = ? ORDER BY created_at ASC LIMIT 1';
+    const oldFotoQuery = 'SELECT profiel_foto FROM student WHERE gebruiker_id = ? UNION SELECT profiel_foto FROM bedrijf WHERE gebruiker_id = ? ORDER BY uploaded_at ASC LIMIT 1';
 
     const queryStudent = 'UPDATE student SET profiel_foto = ? WHERE gebruiker_id = ?';
     const queryBedrijf = 'UPDATE bedrijf SET profiel_foto = ? WHERE gebruiker_id = ?';
