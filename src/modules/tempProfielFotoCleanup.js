@@ -10,10 +10,14 @@ async function cleanupTempProfielFotos() {
     // Find temp photos older than 1 hour and not linked to any bedrijf or student
     const [rows] = await pool.query(`
         SELECT file_key
-        FROM temp_uploaded_profiel_fotos
+        FROM temp_uploaded_profiel_fotos t
         WHERE uploaded_at < NOW() - INTERVAL 1 HOUR
-        AND file_key NOT IN (SELECT profiel_foto FROM bedrijf WHERE profiel_foto IS NOT NULL)
-        AND file_key NOT IN (SELECT profiel_foto FROM student WHERE profiel_foto IS NOT NULL)
+        AND NOT EXISTS (
+            SELECT 1 FROM bedrijf b WHERE b.profiel_foto = t.file_key
+        )
+        AND NOT EXISTS (
+            SELECT 1 FROM student s WHERE s.profiel_foto = t.file_key
+        )
     `);
     if (rows.length === 0) return;
     const keys = rows.map(r => r.file_key);
