@@ -59,6 +59,10 @@ components:
           type: string
           format: date
           description: The student's date of birth.
+        contact_email:
+          type: string
+          format: email
+          description: The student's contact email.
       example:
         type: 2
         gebruiker_id: 1
@@ -69,6 +73,7 @@ components:
         studiejaar: 2
         opleiding_id: 1
         date_of_birth: '2000-01-01'
+        contact_email: 'jan.jansen@example.com'
     Bedrijf:
       type: object
       description: A company (bedrijf) user object.
@@ -567,6 +572,10 @@ paths:
                         type: string
                         format: date
                         example: '1970-01-01'
+                      contact_email:
+                        type: string
+                        format: email
+                        example: 'jan.jansen@example.com'
     delete:
       tags:
         - Profielfotos
@@ -627,6 +636,10 @@ paths:
                         type: string
                         format: date
                         example: '1970-01-01'
+                      contact_email:
+                        type: string
+                        format: email
+                        example: 'jan.jansen@example.com'
 
   /auth/register/user:
     post:
@@ -1110,6 +1123,10 @@ paths:
                       type: string
                       format: date
                       example: '2006-05-16'
+                    contact_email:
+                      type: string
+                      format: email
+                      example: 'jan.jansen@example.com'
                     functie_matches:
                       type: boolean
                       description: >
@@ -1845,6 +1862,10 @@ paths:
                   type: string
                   format: date
                   example: '1970-01-01'
+                contact_email:
+                  type: string
+                  format: email
+                  example: 'jan.jansen@example.com'
       responses:
         '200':
           description: OK
