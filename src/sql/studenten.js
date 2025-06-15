@@ -27,7 +27,7 @@ async function getAllStudenten() {
 }
 async function getStudentById(id) {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT s.*, g.email AS contact_email FROM student s JOIN gebruiker g ON s.gebruiker_id = g.id WHERE s.gebruiker_id = ?';
+    const query = 'SELECT g.type, s.*, g.email AS contact_email FROM student s JOIN gebruiker g ON s.gebruiker_id = g.id WHERE s.gebruiker_id = ?';
     const baseUrl = "https://gt0kk4fbet.ufs.sh/f/";
 
     try {
