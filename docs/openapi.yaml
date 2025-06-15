@@ -148,6 +148,9 @@ tags:
   - name: Users
     description: >
       Endpoints for managing users.
+  - name: Discover
+    description: >
+      Endpoints for discovering companies and students.
   - name: Bedrijven
     description: >
       Endpoints for managing companies.
@@ -610,6 +613,199 @@ paths:
                     type: string
                     example: 'User not found'
 
+  /discover/bedrijven:
+    description: Discover companies
+    get:
+      summary: Discover bedrijven for a student
+      description: >
+        Returns a list of companies (bedrijven) ordered by most relevant functie, opleiding and skills matches for a given student.
+        If `suggestions` is true (default), results are weighted by functie, opleiding and skills. If false, companies that want the student's functie are listed first, then opleiding, then others, all ordered by skill matches.
+      tags:
+        - Discover
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: The id of the student to compare to. If omitted, uses the authenticated user.
+        - name: suggestions
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: >
+            If true (default), results are weighted by functie, opleiding and skills. If false, companies that want the student's functie are listed first, then opleiding, then others, all ordered by skill matches.
+        - name: onlyNew
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: >
+            If true, only returns companies that have not been matched with the student before.
+            This is used to avoid showing the same companies multiple times.
+      responses:
+        '200':
+          description: List of bedrijven ordered by relevance
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    gebruiker_id:
+                      type: integer
+                    naam:
+                      type: string
+                    plaats:
+                      type: string
+                    contact_email:
+                      type: string
+                      format: email
+                    linkedin:
+                      type: string
+                      format: uri
+                    profiel_foto:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
+                    id_sector:
+                      type: integer
+                      description: >
+                        The sector ID of the company.
+                        This is used to filter companies by sector.
+                      example: 1
+                    functie_matches:
+                      type: boolean
+                      description: >
+                        Indicates if the company is looking for students for a functie that matches the authenticated user.
+                        True if the company is looking for a matching functie, false otherwise.
+                      example: 1
+                    opleiding_matches:
+                      type: boolean
+                      description: >
+                        Indicates if the company is looking for students from the same opleiding as the authenticated user.
+                        True if the company is looking for students from the same opleiding, false otherwise.
+                      example: 1
+                    skill_matches:
+                      type: integer
+                      description: >
+                        The number of skill matches between the company and the student.
+                        This is used to order the results by relevance.
+                      example: 5
+                    match_score:
+                      type: number
+                      format: float
+                      description: >
+                        A score representing the match between the company and the student.
+                        This is used to order the results by relevance.
+                      example: 5
+                    match_percentage:
+                      type: number
+                      format: float
+                      description: >
+                        A percentage representing the match between the company and the student.
+                        This is used to order the results by relevance.
+                      example: 85.5
+
+  /discover/studenten:
+    description: Discover students
+    get:
+      summary: Discover studenten for a bedrijf
+      description: >
+        Returns a list of students ordered by most relevant functie, opleiding and skills matches for a given bedrijf.
+        If `suggestions` is true (default), results are weighted by functie, opleiding and skills. If false, students with matching functie are listed first, then opleiding, then others, all ordered by skill matches.
+      tags:
+        - Discover
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: The id of the bedrijf to compare to. If omitted, uses the authenticated user.
+        - name: suggestions
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: true
+          description: >
+            If true (default), results are weighted by functie, opleiding and skills. If false, students with matching functie are listed first, then opleiding, then others, all ordered by skill matches.
+        - name: onlyNew
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: >
+            If true, only returns students that have not been matched with the bedrijf before.
+            This is used to avoid showing the same students multiple times.
+      responses:
+        '200':
+          description: List of studenten ordered by relevance
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    gebruiker_id:
+                      type: integer
+                    voornaam:
+                      type: string
+                    achternaam:
+                      type: string
+                    linkedin:
+                      type: string
+                      format: uri
+                    profiel_foto:
+                      type: string
+                      format: uri
+                    studiejaar:
+                      type: integer
+                    opleiding_id:
+                      type: integer
+                    date_of_birth:
+                      type: string
+                      format: date
+                      example: '2006-05-16'
+                    functie_matches:
+                      type: boolean
+                      description: >
+                        Indicates if the student is looking for a functie that matches the bedrijf.
+                        True if the student is looking for a matching functie, false otherwise.
+                      example: 1
+                    opleiding_matches:
+                      type: boolean
+                      description: >
+                        Indicates if the student is from the same opleiding as the authenticated user.
+                        True if the student is from the same opleiding, false otherwise.
+                      example: 1
+                    skill_matches:
+                      type: integer
+                      description: >
+                        The number of skill matches between the student and the bedrijf.
+                        This is used to order the results by relevance.
+                      example: 5
+                    match_score:
+                      type: number
+                      format: float
+                      description: >
+                        A score representing the match between the student and the bedrijf.
+                        This is used to order the results by relevance.
+                      example: 5
+                    match_percentage:
+                      type: number
+                      format: float
+                      description: >
+                        A percentage representing the match between the student and the bedrijf.
+                        This is used to order the results by relevance.
+                      example: 85.5
  
   /bedrijven:
     description: List of companies
@@ -790,40 +986,6 @@ paths:
                       type: string
                       example: 'Forbidden: You can only update your own company record or must be admin.'
 
-  /bedrijven/goedgekeurd:
-    description: List of approved companies
-    summary: Get all approved companies
-    get:
-      summary: Get all approved companies
-      tags:
-        - Bedrijven
-      responses:
-        '200':
-          description: OK
-          content: 
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    gebruiker_id:
-                      type: integer
-                    naam:
-                      type: string
-                    plaats:
-                      type: string
-                    contact_email:
-                      type: string
-                      format: email
-                    linkedin:
-                      type: string
-                      format: uri
-                    profiel_foto:
-                      type: string
-                      format: uri
-                      example: 'https://example.com/company_logo.jpg'
-
   /bedrijven/keur/{bedrijfID}:
     description: Approve or reject a company by ID
     summary: Approve or reject a company
@@ -869,6 +1031,40 @@ paths:
                     type: string
                     example: 'Forbidden: You must be an admin to approve or reject companies'
 
+  /bedrijven/goedgekeurd:
+    description: List of approved companies
+    summary: Get all approved companies
+    get:
+      summary: Get all approved companies
+      tags:
+        - Bedrijven
+      responses:
+        '200':
+          description: OK
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    gebruiker_id:
+                      type: integer
+                    naam:
+                      type: string
+                    plaats:
+                      type: string
+                    contact_email:
+                      type: string
+                      format: email
+                    linkedin:
+                      type: string
+                      format: uri
+                    profiel_foto:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
+
   /bedrijven/nietgoedgekeurd:
     description: List of non-approved companies
     summary: Get all non-approved companies
@@ -903,13 +1099,19 @@ paths:
                       format: uri
                       example: 'https://example.com/company_logo.jpg'
 
-  /studenten:
-    description: List of students
-    summary: Get all students
+  /bedrijven/{bedrijfID}/functies:
+    description: Get all functions for a specific company
+    summary: Get functions by company ID
     get:
-      summary: Get all students
+      summary: Get all functions for a specific company
       tags:
-        - Studenten
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: OK
@@ -920,24 +1122,155 @@ paths:
                 items:
                   type: object
                   properties:
-                    gebruiker_id:
+                    id:
                       type: integer
-                    voornaam:
+                      example: 1
+                    naam:
                       type: string
-                      example: 'Jan'
-                    achternaam:
-                      type: string
-                      example: 'Jansen'
-                    linkedin:
-                      type: string
-                      format: uri
-                    profiel_foto:
-                      type: string
-                      format: uri
-                    studiejaar:
+                      example: 'Parttime'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Forbidden: You can only update your own user record or must be admin.'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'No functions found'
+    post:
+      summary: Add functions to a company
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: >
+          List of function IDs to add to the company
+        content:
+          application/json:
+            schema:
+              example: [1, 2, 3]
+              type: array
+              items:
+                type: integer
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Functions added successfully'
+                  functies:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        naam:
+                          type: string
+                          example: 'Parttime'
+
+  /bedrijven/{bedrijfID}/functies/{functieID}:
+    description: Remove a function from a specific company
+    summary: Remove a function from a company
+    delete:
+      summary: Remove a function from a company
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: functieID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Function removed successfully'
+                  functies:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        naam:
+                          type: string
+                          example: 'Parttime'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Company or function not found'
+
+  /bedrijven/{bedrijfID}/skills:
+    description: Get all skills for a specific company
+    summary: Get skills by company ID
+    get:
+      summary: Get all skills for a specific company
+      tags:
+        - Bedrijven
+      responses:
+        '200':
+          description: OK
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
                       type: integer
-                    opleiding_id:
+                    naam:
+                      type: string
+                      example: 'JavaScript'
+                    type:
                       type: integer
+                      description: >
+                        The type of skill (0 for skills, 1 for languages)
+                      example: 0
         '403':
           description: Forbidden
           content:
@@ -958,6 +1291,100 @@ paths:
                   message:
                     type: string
                     example: 'No students found'
+    post:
+      summary: Add skills to a company
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: >
+          List of skill IDs to add to the company
+        content:
+          application/json:
+            schema:
+              example: [1, 2, 3]
+              type: array
+              items:
+                type: integer
+
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Skills added successfully'
+                  skills:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        naam:
+                          type: string
+                          example: 'JavaScript'
+                        type:
+                          type: integer
+                          description: >
+                            The type of skill (0 for skills, 1 for languages)
+                          example: 0
+
+  /bedrijven/{bedrijfID}/skills/{skillID}:
+    description: Remove a skill from a specific company
+    summary: Remove a skill from a company
+    delete:
+      summary: Remove a skill from a company
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: skillID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Skill removed successfully'
+                  skills:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        naam:
+                          type: string
+                          example: 'JavaScript'
+                        type:
+                          type: integer
+                          description: >
+                            The type of skill (0 for skills, 1 for languages)
+                          example: 0
+
 
   /studenten/{studentID}:
     description: Get a specific student by ID
@@ -1108,8 +1535,127 @@ paths:
                       type: string
                       example: 'Student not found'
 
+  /studenten/{studentID}/functies:
+    get:
+      summary: Get all functions of a student
+      tags:
+        - Studenten
+      parameters:
+        - name: studentID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    naam:
+                      type: string
+                      example: 'Parttime'
+    post:
+      summary: Add a function to a student
+      tags:
+        - Studenten
+      parameters:
+        - name: studentID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: >
+          List of function IDs to add to the student
+        content:
+          application/json:
+            schema:
+              example: [1, 2, 3]
+              type: array
+              items:
+                type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Function added successfully'
+                  functies:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        naam:
+                          type: string
+                          example: 'Parttime'
+  
+  /studenten/{studentID}/functies/{functieID}:
+    delete:
+      summary: Remove a function from a student
+      tags:
+        - Studenten
+      parameters:
+        - name: studentID
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: functieID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Function removed successfully'
+                  functies:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        naam:
+                          type: string
+                          example: 'Parttime'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Student or function not found'
+
   /studenten/{studentID}/skills:
-    description: List of skills for a specific student
     get:
       summary: Get all skills of a student
       tags:
@@ -1140,9 +1686,6 @@ paths:
                       description: >
                         The type of skill (0 for skills, 1 for languages)
                       example: 0
-
-  /studenten/{studentID}/skills/{skillID}:
-    description: Add or remove a skill for a specific student
     post:
       summary: Add a skill to a student
       tags:
@@ -1153,11 +1696,17 @@ paths:
           required: true
           schema:
             type: integer
-        - name: skillID
-          in: path
-          required: true
-          schema:
-            type: integer
+      requestBody:
+        required: true
+        description: >
+          List of skill IDs to add to the student
+        content:
+          application/json:
+            schema:
+              example: [1, 2, 3]
+              type: array
+              items:
+                type: integer
       responses:
         '200':
           description: OK
@@ -1194,6 +1743,8 @@ paths:
                   message:
                     type: string
                     example: 'Student or skill not found'
+
+  /studenten/{studentID}/skills/{skillID}:
     delete:
       summary: Remove a skill from a student
       tags:
@@ -1372,6 +1923,7 @@ paths:
                       description: >
                         The type of skill (0 for skills, 1 for languages)
                       example: 0
+                    
 
   /skills/{skillID}:
     get:
@@ -1460,60 +2012,6 @@ paths:
 
   /speeddates:
     description: List of the user's speeddates
-    get:
-      tags:
-        - Speeddates
-      summary: Get all speeddates of user
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      example: 1
-                    id_bedrijf:
-                      type: integer
-                      example: 24
-                    naam_bedrijf:
-                      type: string
-                      example: 'Techsolutions'
-                    profiel_foto_bedrijf:
-                      type: string
-                      format: uri
-                      example: 'https://example.com/company_logo.jpg'
-                    sector_bedrijf:
-                      type: string
-                      example: 'Informatica'
-                    id_student:
-                      type: integer
-                      example: 42
-                    voornaam_student:
-                      type: string
-                      example: 'Jan'
-                    achternaam_student:
-                      type: string
-                      example: 'Jansen'
-                    profiel_foto_student:
-                      type: string
-                      format: uri
-                      example: 'https://example.com/student_profile.jpg'
-                    akkoord:
-                      type: boolean
-                      example: true
-                    begin:
-                      type: string
-                      format: date-time
-                      example: '2023-10-01T10:00:00Z'
-                    einde:
-                      type: string
-                      format: date-time
-                      example: '2023-10-01T10:10:00Z'
     post:
       tags:
         - Speeddates
@@ -1582,6 +2080,9 @@ paths:
                       akkoord:
                         type: boolean
                         example: false
+                      lokaal:
+                        type: string
+                        example: 'A101'
                       begin:
                         type: string
                         format: date-time
@@ -1590,79 +2091,17 @@ paths:
                         type: string
                         format: date-time
                         example: '2023-10-01T10:10:00Z'
-
-  /speeddates/{speeddateID}:
     get:
-      summary: Get a specific speed date by ID
       tags:
         - Speeddates
+      summary: Get all speeddates of user
       parameters:
-        - name: speeddateID
-          in: path
-          required: true
+        - name: id
+          in: query
+          required: false
           schema:
             type: integer
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    example: 1
-                  id_bedrijf:
-                    type: integer
-                    example: 24
-                  naam_bedrijf:
-                    type: string
-                    example: 'Techsolutions'
-                  profiel_foto_bedrijf:
-                    type: string
-                    format: uri
-                    example: 'https://example.com/company_logo.jpg'
-                  sector_bedrijf:
-                    type: string
-                    example: 'Informatica'
-                  id_student:
-                    type: integer
-                    example: 42
-                  voornaam_student:
-                    type: string
-                    example: 'Jan'
-                  achternaam_student:
-                    type: string
-                    example: 'Jansen'
-                  profiel_foto_student:
-                    type: string
-                    format: uri
-                    example: 'https://example.com/student_profile.jpg'
-                  datum:
-                    type: string
-                    format: date-time
-                    example: '2023-10-01T10:00:00Z'
-                  akkoord:
-                    type: boolean
-                    example: true
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Speeddate not found'
-
-  /speeddates/accepted:
-    description: List of accepted speed dates
-    get:
-      tags:
-        - Speeddates
-      summary: Get all accepted speed dates
+          description: Optional user ID to fetch speeddates for. If omitted, uses the authenticated user.
       responses:
         '200':
           description: OK
@@ -1714,12 +2153,227 @@ paths:
                       format: date-time
                       example: '2023-10-01T10:10:00Z'
 
+  /speeddates/history:
+    description: List of the user's speed date history
+    get:
+      tags:
+        - Speeddates
+      summary: Get all speed date history of user
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Optional user ID to fetch speed date history for. If omitted, uses the authenticated user.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    id_bedrijf:
+                      type: integer
+                      example: 24
+                    naam_bedrijf:
+                      type: string
+                      example: 'Techsolutions'
+                    profiel_foto_bedrijf:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
+                    sector_bedrijf:
+                      type: string
+                      example: 'Informatica'
+                    id_student:
+                      type: integer
+                      example: 42
+                    voornaam_student:
+                      type: string
+                      example: 'Jan'
+                    achternaam_student:
+                      type: string
+                      example: 'Jansen'
+                    profiel_foto_student:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/student_profile.jpg'
+                    akkoord:
+                      type: boolean
+                      example: true
+                    lokaal:
+                      type: string
+                      example: 'A101'
+                    begin:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:00:00Z'
+                    einde:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:10:00Z'
+
+
+  /speeddates/{speeddateID}:
+    get:
+      summary: Get a specific speed date by ID
+      tags:
+        - Speeddates
+      parameters:
+        - name: speeddateID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  id_bedrijf:
+                    type: integer
+                    example: 24
+                  naam_bedrijf:
+                    type: string
+                    example: 'Techsolutions'
+                  profiel_foto_bedrijf:
+                    type: string
+                    format: uri
+                    example: 'https://example.com/company_logo.jpg'
+                  sector_bedrijf:
+                    type: string
+                    example: 'Informatica'
+                  id_student:
+                    type: integer
+                    example: 42
+                  voornaam_student:
+                    type: string
+                    example: 'Jan'
+                  achternaam_student:
+                    type: string
+                    example: 'Jansen'
+                  profiel_foto_student:
+                    type: string
+                    format: uri
+                    example: 'https://example.com/student_profile.jpg'
+                  akkoord:
+                    type: boolean
+                    example: true
+                  lokaal:
+                    type: string
+                    example: 'A101'
+                  begin:
+                    type: string
+                    format: date-time
+                    example: '2023-10-01T10:00:00Z'
+                  einde:
+                    type: string
+                    format: date-time
+                    example: '2023-10-01T10:10:00Z'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Speeddate not found'
+
+  /speeddates/accepted:
+    description: List of accepted speed dates
+    get:
+      tags:
+        - Speeddates
+      summary: Get all accepted speed dates
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Optional user ID to fetch accepted speeddates for. If omitted, uses the authenticated user.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    id_bedrijf:
+                      type: integer
+                      example: 24
+                    naam_bedrijf:
+                      type: string
+                      example: 'Techsolutions'
+                    profiel_foto_bedrijf:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/company_logo.jpg'
+                    sector_bedrijf:
+                      type: string
+                      example: 'Informatica'
+                    id_student:
+                      type: integer
+                      example: 42
+                    voornaam_student:
+                      type: string
+                      example: 'Jan'
+                    achternaam_student:
+                      type: string
+                      example: 'Jansen'
+                    profiel_foto_student:
+                      type: string
+                      format: uri
+                      example: 'https://example.com/student_profile.jpg'
+                    akkoord:
+                      type: boolean
+                      example: true
+                    lokaal:
+                      type: string
+                      example: 'A101'
+                    begin:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:00:00Z'
+                    einde:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:10:00Z'
+
   /speeddates/pending:
     description: List of pending speed dates
     get:
       tags:
         - Speeddates
       summary: Get all pending speed dates
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Optional user ID to fetch pending speeddates for. If omitted, uses the authenticated user.
       responses:
         '200':
           description: OK
@@ -1762,6 +2416,9 @@ paths:
                     akkoord:
                       type: boolean
                       example: false
+                    lokaal:
+                      type: string
+                      example: 'A101'
                     begin:
                       type: string
                       format: date-time
@@ -1829,6 +2486,9 @@ paths:
                       akkoord:
                         type: boolean
                         example: true
+                      lokaal:
+                        type: string
+                        example: 'A101'
                       begin:
                         type: string
                         format: date-time
@@ -1861,7 +2521,7 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        '201':
           description: OK
           content:
             application/json:
@@ -1906,6 +2566,9 @@ paths:
                       akkoord:
                         type: boolean
                         example: true
+                      lokaal:
+                        type: string
+                        example: 'A101'
                       begin:
                         type: string
                         format: date-time

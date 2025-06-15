@@ -43,6 +43,8 @@ require('./auth/passportJWT.js');
 app.use('/bedrijven', require('./routes/bedrijven.js'));
 app.use('/studenten', require('./routes/studenten.js'));
 
+app.use('/functies', require('./routes/functies.js'));
+app.use('/discover', require('./routes/discover.js'));
 app.use('/skills', require('./routes/skills.js'));
 app.use('/opleidingen', require('./routes/opleidingen.js'));
 app.use('/stands', require('./routes/stands.js'));

@@ -6,7 +6,8 @@ require('dotenv').config();
 const router = express.Router();
 
 router.post('/', (req, res, next) => {
-    const refreshToken = req.body.refreshToken || req.cookies.refreshToken;
+    // Check if request has a refresh token in the body, if not, check cookies
+    const refreshToken = req.body && typeof req.body.refreshToken !== 'undefined' ? req.body.refreshToken : req.cookies.refreshToken;
 
     console.log('Received refresh token:', refreshToken);
 
