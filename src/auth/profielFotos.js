@@ -37,7 +37,7 @@ async function uploadServerSideFile(file) {
 
 
 
-router.post('/', upload.single('file'), async (req, res) => {
+router.post('/', upload.single('image'), async (req, res) => {
     console.log('File upload request received:', req.file);
     if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
