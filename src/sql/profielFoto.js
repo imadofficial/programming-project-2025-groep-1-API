@@ -36,34 +36,15 @@ async function cleanupTempProfielFoto(fotoKey) {
 async function updateProfielFoto(gebruikerId, fotoKey) {
     const pool = getPool('ehbmatchdev');
 
-    const oldFotoQuery = 'SELECT profiel_foto FROM student WHERE gebruiker_id = ? UNION SELECT profiel_foto FROM bedrijf WHERE gebruiker_id = ? ORDER BY created_at ASC LIMIT 1';
-
     const queryStudent = 'UPDATE student SET profiel_foto = ? WHERE gebruiker_id = ?';
     const queryBedrijf = 'UPDATE bedrijf SET profiel_foto = ? WHERE gebruiker_id = ?';
     try {
-        const [resultOldFoto] = await pool.query(oldFotoQuery, [gebruikerId, gebruikerId]);
-        if (resultOldFoto.length > 0 && resultOldFoto[0].profiel_foto) {
-            const oldFotoKey = resultOldFoto[0].profiel_foto;
-            try {
-                await utapi.deleteFiles([oldFotoKey]); // Delete the old file from Uploadthing
-            } catch (error) {
-                console.error('Error deleting old file from Uploadthing:', error);
-                throw new Error('Failed to delete old profiel foto from storage');
-            }
-            try {
-                await cleanupTempProfielFoto(oldFotoKey); // Clean up temp uploaded profiel fotos
-            } catch (error) {
-                console.error('Database cleanup error (updateProfielFoto):', error);
-                throw new Error('Failed to clean up temp profiel foto');
-            }
-        }
-
         const [resultStudent] = await pool.query(queryStudent, [fotoKey, gebruikerId]);
         const [resultBedrijf] = await pool.query(queryBedrijf, [fotoKey, gebruikerId]);
 
         return resultStudent.affectedRows > 0 || resultBedrijf.affectedRows > 0; // Return true if either update was successful
     } catch (error) {
-        console.error('Database query error in changeProfielFoto:', error.message, error.stack);
+        console.error('Database query error in updateProfielFoto:', error.message, error.stack);
         throw new Error('Changing profiel foto failed');
     }
 }
