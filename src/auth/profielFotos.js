@@ -52,7 +52,7 @@ router.post('/', upload.single('image'), async (req, res) => {
 
     try {
         const uploadResult = await uploadServerSideFile(file);
-        if (!uploadResult || uploadResult.length === 0) {
+        if (!uploadResult || !uploadResult.key || !uploadResult.ufUrl) {
             return res.status(500).json({ message: 'File upload failed' });
         }
         const fileKey = uploadResult.key;
