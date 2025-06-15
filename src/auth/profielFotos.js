@@ -48,7 +48,7 @@ router.post('/', upload.single('file'), async (req, res) => {
         if (!saveResult) {
             return res.status(500).json({ message: 'Failed to save profile picture' });
         }
-        res.status(201).json({ message: 'File uploaded successfully', key: fileKey, url: fileUrl });
+        res.status(201).json({ message: 'File uploaded successfully', profiel_foto_key: fileKey, profiel_foto_url: fileUrl });
     } catch (error) {
         console.error('Error uploading file:', error);
         res.status(500).json({ message: 'Internal server error' });
