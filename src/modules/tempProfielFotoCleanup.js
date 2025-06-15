@@ -10,7 +10,7 @@ async function cleanupTempProfielFotos() {
     // Find temp photos older than 1 hour and not linked to any bedrijf or student
     const [rows] = await pool.query(`
         SELECT file_key
-        FROM temp_uploaded_profiel_foto
+        FROM temp_uploaded_profiel_fotos
         WHERE uploaded_at < NOW() - INTERVAL 1 HOUR
         AND file_key NOT IN (SELECT profiel_foto FROM bedrijf WHERE profiel_foto IS NOT NULL)
         AND file_key NOT IN (SELECT profiel_foto FROM student WHERE profiel_foto IS NOT NULL)
@@ -23,8 +23,8 @@ async function cleanupTempProfielFotos() {
     } catch (err) {
         console.error('Error deleting files from Uploadthing:', err);
     }
-    // Remove from temp_profiel_foto table
-    await pool.query('DELETE FROM temp_profiel_foto WHERE key IN (?)', [keys]);
+    // Remove from temp_uploaded_profiel_fotos table
+    await pool.query('DELETE FROM temp_uploaded_profiel_foto WHERE file_key IN (?)', [keys]);
     console.log(`Cleaned up ${keys.length} unused temp profile photos.`);
 }
 
