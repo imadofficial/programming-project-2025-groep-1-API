@@ -333,7 +333,8 @@ paths:
       operationId: uploadProfilePhoto
       summary: Upload a profile photo
       description: >
-        This endpoint allows users to upload a profile photo.
+        This endpoint allows users to upload a profile photo (Maximum 2MB).
+        Allowed file types are: jpg, jpeg, png, gif. Other file types will be rejected for security reasons.
         The photo will be stored and associated with the user's account.
         Please use the profiel_foto_key returned in the response to register the profile photo with a user.
       security:
