@@ -158,6 +158,7 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = fal
             )
             SELECT
                 s.*, 
+                g.email AS contact_email,
                 COALESCE(opleiding_match.count, 0) AS opleiding_matches,
                 COALESCE(skill_match.count, 0) AS skill_matches,
                 COALESCE(functie_match.count, 0) AS functie_matches,
@@ -173,6 +174,7 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = fal
                 ) AS match_percentage
             FROM student s
             JOIN bedrijf_reqs br ON br.gebruiker_id = s.gebruiker_id
+            JOIN gebruiker g ON g.id = s.gebruiker_id
             LEFT JOIN (
                 SELECT s2.gebruiker_id AS id_student, 1 AS count
                 FROM student s2
@@ -209,6 +211,7 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = fal
             )
             SELECT
                 s.*, 
+                g.email AS contact_email,
                 COALESCE(opleiding_match.count, 0) AS opleiding_matches,
                 COALESCE(skill_match.count, 0) AS skill_matches,
                 COALESCE(functie_match.count, 0) AS functie_matches,
@@ -224,6 +227,7 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = fal
                 ) AS match_percentage
             FROM student s
             JOIN bedrijf_reqs br ON br.gebruiker_id = s.gebruiker_id
+            JOIN gebruiker g ON g.id = s.gebruiker_id
             LEFT JOIN (
                 SELECT s2.gebruiker_id AS id_student, 1 AS count
                 FROM student s2
