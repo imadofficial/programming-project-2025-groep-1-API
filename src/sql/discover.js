@@ -128,16 +128,19 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
     try {
         const [rows] = await pool.query(query, params);
         if (rows.length > 0) {
-            const student = rows[0];
-            if (student.profiel_foto) {
-                student.profiel_foto_key = student.profiel_foto;
-                student.profiel_foto_url = baseUrl + student.profiel_foto;
-            } else {
-                student.profiel_foto_key = null;
-                student.profiel_foto_url = null;
-            }
-            delete student.profiel_foto; // Remove the original profiel_foto field
-            return student; // Return the first student found with extra fields
+            const bedrijven = rows.map(bedrijf => {
+                if (bedrijf.profiel_foto) {
+                    bedrijf.profiel_foto_key = bedrijf.profiel_foto;
+                    bedrijf.profiel_foto_url = baseUrl + bedrijf.profiel_foto;
+                } else {
+                    bedrijf.profiel_foto_key = null;
+                    bedrijf.profiel_foto_url = null;
+                }
+                delete bedrijf.profiel_foto; // Remove the original profiel_foto field
+                return bedrijf; // Return the modified bedrijf object
+            });
+
+            return bedrijven; // Return the modified bedrijven array
         }
         return rows;
     } catch (error) {
@@ -275,16 +278,19 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = fal
     try {
         const [rows] = await pool.query(query, params);
         if (rows.length > 0) {
-            const student = rows[0];
-            if (student.profiel_foto) {
-                student.profiel_foto_key = student.profiel_foto;
-                student.profiel_foto_url = baseUrl + student.profiel_foto;
-            } else {
-                student.profiel_foto_key = null;
-                student.profiel_foto_url = null;
-            }
-            delete student.profiel_foto; // Remove the original profiel_foto field
-            return student; // Return the first student found with extra fields
+            const studenten = rows.map(student => {
+                if (student.profiel_foto) {
+                    student.profiel_foto_key = student.profiel_foto;
+                    student.profiel_foto_url = baseUrl + student.profiel_foto;
+                } else {
+                    student.profiel_foto_key = null;
+                    student.profiel_foto_url = null;
+                }
+                delete student.profiel_foto; // Remove the original profiel_foto field
+                return student; // Return the modified student object
+            });
+
+            return studenten; // Return the modified studenten array
         }
         return rows; // Return all rows if no specific student is found
     } catch (error) {
