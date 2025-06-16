@@ -385,6 +385,56 @@ paths:
                     format: uri
                     example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
 
+  /profielfotos/{profielFotoKey}:
+    delete:
+      tags:
+        - Profielfotos
+      operationId: deleteProfilePhoto
+      summary: Delete a profile photo
+      description: >
+        This endpoint allows users to delete their profile photo.
+        The photo will be removed from the user's account.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: profielFotoKey
+          in: path
+          required: true
+          schema:
+            type: string
+            description: The key of the profile photo to delete
+      responses:
+        '200':
+          description: Successful deletion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Temporary profile picture deleted successfully'
+        '404':
+          description: Profile photo not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Profile photo not found'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Internal server error: Could not delete profile picture'
+
   /bedrijven/{bedrijfID}/profielfoto:
     put:
       tags:
