@@ -76,8 +76,10 @@ router.get('/:speeddateID', passport.authenticate('jwt', { session: false }), as
 });
 
 router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const { id_bedrijf, id_student, datum } = req.body;
-    if (!datum || !id_bedrijf || !id_student) {
+    const { id_student, id_bedrijf, datum } = req.body;
+    const studentId = id_student ? Number(id_student) : Number(req.user.id); // Use id_student if provided, otherwise use authenticated user ID
+    const bedrijfId = id_bedrijf ? Number(id_bedrijf) : null; // Use id_bedrijf if provided, otherwise null
+    if (!datum || !id_bedrijf || !studentId) {
         return res.status(400).json({ error: 'Datum (datetime), id_bedrijf, and id_student are required' });
     }
 
@@ -88,18 +90,18 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
         return res.status(400).json({ error: 'Invalid datetime format. Use MySQL DATETIME (e.g., 2025-06-13 15:30:00)' });
     }
 
-    if (isNaN(id_bedrijf) || isNaN(id_student)) {
+    if (isNaN(bedrijfId) || isNaN(studentId)) {
         return res.status(400).json({ error: 'id_bedrijf and id_student must be valid numbers' });
     }
 
-    const isAvailable = await isDateAvailable(id_bedrijf, id_student, datum);
+    const isAvailable = await isDateAvailable(bedrijfId, studentId, datum);
 
     if (!isAvailable) {
         return res.status(400).json({ error: 'The selected date and time is not available for the student or company' });
     }
 
     try {
-        const newSpeeddate = await addSpeeddate(id_bedrijf, id_student, datum);
+        const newSpeeddate = await addSpeeddate(bedrijfId, studentId, datum);
         if (newSpeeddate) {
             const info = await getSpeeddateInfo(newSpeeddate);
             res.status(201).json({ message: 'Speeddate created successfully', speeddate: info });
