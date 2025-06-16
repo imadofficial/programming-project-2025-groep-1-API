@@ -18,17 +18,17 @@ function canEdit(req, res, next) {
     return res.status(403).json({ message: 'Forbidden: You can only update your own user record or must be admin.' });
 }
 
-function canEditProfilePicture(req, res, next) {
+async function canEditProfilePicture(req, res, next) {
     const user = req.user;
     if (!user) {
         return res.status(401).json({ message: 'Unauthorized: User information is missing.' });
     }
-    const linkedUser = getLinkedUser(req.params.fotoKey);
-    if (!linkedUser) {
+    const linkedUserId = await getLinkedUser(req.params.fotoKey);
+    if (!linkedUserId) {
         return res.status(404).json({ message: 'Profile picture not found or not linked to any user.' });
     }
     
-    if (user.id === linkedUser.id || user.type === 1) {
+    if (user.id === linkedUserId || user.type === 1) {
         return next();
     }
     
