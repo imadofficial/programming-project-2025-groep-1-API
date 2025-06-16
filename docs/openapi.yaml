@@ -108,6 +108,10 @@ components:
           type: string
           format: uri
           description: The company's LinkedIn profile URL.
+        sector_bedrijf:
+          type: string
+          description: The sector of the company.
+          example: 'Informatica'
         profiel_foto_key:
           type: string
           description: The key for the company's profile photo.
@@ -438,6 +442,9 @@ paths:
                         type: string
                         format: uri
                         example: 'https://www.linkedin.com/company/techsolutions'
+                      sector_bedrijf:
+                        type: string
+                        example: 'Informatica'
                       profiel_foto_key:
                         type: string
                         example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
@@ -492,6 +499,9 @@ paths:
                         type: string
                         format: uri
                         example: 'https://www.linkedin.com/company/techsolutions'
+                      sector_bedrijf:
+                        type: string
+                        example: 'Informatica'
                       profiel_foto_key:
                         type: string
                         example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
@@ -1013,6 +1023,12 @@ paths:
                     linkedin:
                       type: string
                       format: uri
+                    sector_bedrijf:
+                      type: string
+                      description: >
+                        The sector of the company.
+                        This is used to filter companies by sector.
+                      example: 'Informatica'
                     profiel_foto_key:
                       type: string
                       example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
@@ -1234,6 +1250,9 @@ paths:
                     type: string
                     format: uri
                     example: 'https://www.linkedin.com/company/techsolutions'
+                  sector_bedrijf:
+                    type: string
+                    example: 'Informatica'
                   profiel_foto_key:
                     type: string
                     example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
@@ -1290,65 +1309,68 @@ paths:
                 profiel_foto:
                   type: string
                   format: uri
-                  example: 'https://example.com/company_logo.jpg'
-        responses:
-          '200':
-            description: OK
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                      example: 'Company updated successfully'
-                    bedrijf:
-                      type: object
-                      properties:
-                        gebruiker_id:
-                          type: integer
-                          example: 42
-                        naam:
-                          type: string
-                          example: 'Tech Solutions'
-                        plaats:
-                          type: string
-                          example: 'Brussel'
-                        contact_email:
-                          type: string
-                          format: email
-                          example: 'contact@techsolutions.com'
-                        linkedin:
-                          type: string
-                          format: uri
-                          example: 'https://www.linkedin.com/company/techsolutions'
-                        profiel_foto_key:
-                          type: string
-                          example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
-                        profiel_foto_url:
-                          type: string
-                          format: uri
-                          example: 'https://example.com/company_logo.jpg'
-          '404':
-            description: Not Found
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                      example: 'Company not found'
-          '403':
-            description: Forbidden
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                      example: 'Forbidden: You can only update your own company record or must be admin.'
+                  example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Company updated successfully'
+                  bedrijf:
+                    type: object
+                    properties:
+                      gebruiker_id:
+                        type: integer
+                        example: 42
+                      naam:
+                        type: string
+                        example: 'Tech Solutions'
+                      plaats:
+                        type: string
+                        example: 'Brussel'
+                      contact_email:
+                        type: string
+                        format: email
+                        example: 'contact@techsolutions.com'
+                      linkedin:
+                        type: string
+                        format: uri
+                        example: 'https://www.linkedin.com/company/techsolutions'
+                      sector_bedrijf:
+                        type: string
+                        example: 'Informatica'
+                      profiel_foto_key:
+                        type: string
+                        example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      profiel_foto_url:
+                        type: string
+                        format: uri
+                        example: 'https://example.com/company_logo.jpg'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Company not found'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Forbidden: You can only update your own company record or must be admin.'
 
   /bedrijven/keur/{bedrijfID}:
     description: Approve or reject a company by ID
@@ -1424,6 +1446,9 @@ paths:
                     linkedin:
                       type: string
                       format: uri
+                    sector_bedrijf:
+                      type: string
+                      example: 'Informatica'
                     profiel_foto_key:
                       type: string
                       example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
@@ -1461,6 +1486,9 @@ paths:
                     linkedin:
                       type: string
                       format: uri
+                    sector_bedrijf:
+                      type: string
+                      example: 'Informatica'
                     profiel_foto_key:
                       type: string
                       example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
@@ -1787,6 +1815,7 @@ paths:
                   linkedin:
                     type: string
                     format: uri
+                    example: '/in/janjansen'
                   profiel_foto_key:
                     type: string
                     example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
