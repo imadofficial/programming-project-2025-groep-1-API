@@ -83,6 +83,8 @@ router.post('/student', async (req, res) => {
     // The frontend should upload the file to /auth/profielfoto first and send the returned URL as 'profiel_foto'
     const { email, password: wachtwoord, voornaam, achternaam, linkedin, profiel_foto, studiejaar, opleiding_id, date_of_birth } = req.body;
 
+    console.log('Registering student with data:', req.body);
+
     if (!email) {
         return res.status(400).json({ error: 'Email is required' });
     }
