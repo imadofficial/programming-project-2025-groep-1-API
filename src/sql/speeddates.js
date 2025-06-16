@@ -308,7 +308,7 @@ async function getSpeeddateInfo(id) {
     const pool = getPool('ehbmatchdev');
     // Join with users and bedrijven to get names, and sector
     const query = `
-        SELECT s.id, s.id_bedrijf, b.naam AS naam_bedrijf, b.profiel_foto AS profiel_foto_bedrijf, b.id_sector, sec.naam AS naam_sector, s.id_student, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student, st.profiel_foto AS profiel_foto_student, s.datum
+        SELECT s.id, s.id_bedrijf, b.naam AS naam_bedrijf, b.profiel_foto AS profiel_foto_bedrijf, b.id_sector, sec.naam AS sector_bedrijf, s.id_student, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student, st.profiel_foto AS profiel_foto_student, s.datum
         FROM speeddate s
         LEFT JOIN student st ON s.id_student = st.gebruiker_id
         LEFT JOIN bedrijf b ON s.id_bedrijf = b.gebruiker_id
