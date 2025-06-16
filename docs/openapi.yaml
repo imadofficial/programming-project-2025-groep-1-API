@@ -27,7 +27,7 @@ components:
           type: integer
           enum: [2]
           description: The type of user (always "student" for this schema).
-        gebruiker_id:
+        id:
           type: integer
           description: The unique user ID.
         voornaam:
@@ -65,7 +65,7 @@ components:
           description: The student's contact email.
       example:
         type: 2
-        gebruiker_id: 1
+        id: 1
         voornaam: Jan
         achternaam: Jansen
         linkedin: /in/janjansen
@@ -80,7 +80,7 @@ components:
       description: A company (bedrijf) user object.
       required:
         - type
-        - gebruiker_id
+        - id
         - naam
         - plaats
         - contact_email
@@ -91,7 +91,7 @@ components:
           type: integer
           enum: [3]
           description: The type of user (always "bedrijf" for this schema).
-        gebruiker_id:
+        id:
           type: integer
           description: The unique user ID.
         naam:
@@ -119,7 +119,7 @@ components:
           example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
       example:
         type: 3
-        gebruiker_id: 2
+        id: 2
         naam: Tech Solutions
         plaats: Brussel
         contact_email: contact@techsolutions.com
@@ -131,14 +131,14 @@ components:
       description: An admin user object.
       required:
         - type
-        - gebruiker_id
+        - id
         - email
       properties:
         type:
           type: integer
           enum: [1]
           description: The type of user (always "admin" for this schema).
-        gebruiker_id:
+        id:
           type: integer
           description: The unique user ID.
         email:
@@ -148,7 +148,7 @@ components:
           description: The admin's email address.
       example:
         type: 1
-        gebruiker_id: 3
+        id: 3
         email: admin@example.com
 
 
