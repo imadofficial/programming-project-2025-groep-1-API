@@ -156,7 +156,7 @@ security:
 
 info:
   title: EHB Match API
-  version: '0.2'
+  version: '0.4'
 
 tags:
   - name: Auth
@@ -1265,7 +1265,7 @@ paths:
             type: integer
       requestBody:
         required: true
-        description: Company data to update [Note: At least one field must be provided]
+        description: 'Company data to update [Note: At least one field must be provided]'
         content:
           application/json:
             schema:
