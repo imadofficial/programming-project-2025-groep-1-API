@@ -248,6 +248,46 @@ async function getUnavailableDates(id1, id2) {
     }
 }
 
+async function getAvailableDates(id_bedrijf, id_student, evenementId) {  
+    const pool = getPool('ehbmatchdev');
+    // Query for overlapping speeddates for the same student or company
+    const query = `
+        SELECT * FROM speeddate 
+        WHERE (id_bedrijf = ? OR id_student = ?) OR (id_student = ? OR id_bedrijf = ?)
+        `;
+    const timeQuery = `SELECT * FROM evenement WHERE id = ?`;
+    try {
+        const [timeRows] = await pool.query(timeQuery, [evenementId]);
+        if (timeRows.length === 0) {
+            throw new Error('Event not found');
+        }
+        const { begin, einde } = timeRows[0];
+        const [rows] = await pool.query(query, [id_bedrijf, id_student]);
+        const startDate = new Date(begin);
+        const stopDate = new Date(einde);
+        const windows = rows.map(row => {
+            const id = row.id;
+            const begin = new Date(row.datum); // Already in ISO format
+            const einde = new Date(begin.getTime() + 10 * 60 * 1000);
+            return { id, begin, einde };
+        })
+        // Exclude windows that overlap with [start, stop]
+        .filter(({ begin, einde }) => {
+            // No overlap if window ends before start or begins after stop
+            return einde <= startDate || begin >= stopDate;
+        })
+        // Convert back to ISO string for output, exclude id
+        .map(({ begin, einde }) => ({
+            begin: begin.toISOString(),
+            einde: einde.toISOString()
+        }));
+        return windows;
+    } catch (error) {
+        console.error('Database query error in getAvailableDates:', error.message, error.stack);
+        throw new Error('Checking available dates failed');
+    }
+}
+
 async function isDateAvailable(id_bedrijf, id_student, datum) {
     const pool = getPool('ehbmatchdev');
     // Calculate 10-minute window (+10 minutes)
@@ -399,5 +439,6 @@ module.exports = {
     getAcceptedSpeeddatesByUserId,
     getRejectedSpeeddatesByUserId,
     getSpeeddateHistoryByUserId,
-    getUnavailableDates
+    getUnavailableDates,
+    getAvailableDates
 };

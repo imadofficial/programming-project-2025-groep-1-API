@@ -3038,6 +3038,43 @@ paths:
                       format: date-time
                       example: '2023-10-01T10:10:00Z'
 
+  /speeddates/user/{userID}/available:
+    description: List of available dates for a user and the authenticated user
+    get:
+      tags:
+        - Speeddates
+      summary: Get all available dates for a user
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: eventID
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Optional event ID to filter available dates for a specific event.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    begin:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:00:00Z'
+                    einde:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:10:00Z'
+
   /stands:
     description: List of available stands
     post:

@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const { getAllSpeeddates, getSpeeddateById, getUnavailableDates, getSpeeddatesByUserId, addSpeeddate, isDateAvailable, getSpeeddateInfo, speeddateAkkoord, speeddateAfgekeurd, getAcceptedSpeeddatesByUserId, getRejectedSpeeddatesByUserId, getSpeeddateHistoryByUserId } = require('../sql/speeddates.js');
+const { getAllSpeeddates, getSpeeddateById, getUnavailableDates, getSpeeddatesByUserId, addSpeeddate, isDateAvailable, getSpeeddateInfo, speeddateAkkoord, speeddateAfgekeurd, getAcceptedSpeeddatesByUserId, getRejectedSpeeddatesByUserId, getSpeeddateHistoryByUserId, getAvailableDates } = require('../sql/speeddates.js');
 const { sendNotification } = require('../modules/notifications.js');
 
 require('../auth/passportJWT.js');
@@ -180,6 +180,24 @@ router.get('/user/:userID/unavailable', passport.authenticate('jwt', { session: 
         res.json(unavailableDates);
     } catch (error) {
         console.error('Error fetching unavailable time windows:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+router.get('/user/:userID/available', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const userId = req.params['userID'];
+    const ownId = req.user.id;
+    const eventId = req.query.eventId ? req.query.eventId : 1; // Optional event ID for filtering
+    if (!userId) {
+        return res.status(400).json({ error: 'userID is required' });
+    }
+    try {
+        // Get all speeddates for the given id (bedrijf or student)
+        const availableDates = await getAvailableDates(ownId, userId, eventId);
+        res.json(availableDates);
+    } catch (error) {
+        console.error('Error fetching available time windows:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
