@@ -1,6 +1,7 @@
 const express = require('express');
 const QRCode = require('qrcode');
 const passport = require('passport');
+const { getUserById } = require('../sql/users.js');
 require('../auth/passportJWT.js');
 
 const router = express.Router();
@@ -9,9 +10,10 @@ const router = express.Router();
 router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const baseUrl = 'https://ehb-match.me/'
     const userId = req.query.id ? req.query.id : req.user.id;
-    if (req.user.type === 2) {
+    const userType = req.query.id ? (await getUserById(userId)).type : req.user.type;
+    if (userType === 2) {
         url = baseUrl + 'student/' + userId;
-    } else if (req.user.type === 3) {
+    } else if (userType === 3) {
         url = baseUrl + 'bedrijf/' + userId;
     }
     if (!url) {
