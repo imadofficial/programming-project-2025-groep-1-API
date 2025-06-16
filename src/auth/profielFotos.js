@@ -58,7 +58,6 @@ router.post('/', upload.single('image'), async (req, res) => {
         }
         const fileKey = uploadResult.key;
         const fileUrl = uploadResult.ufsUrl; // Assuming the URL is returned in the response
-        const gebruikerId = req.user.id; // Get the user ID from the request
         const saveResult = await addTempProfielFoto(fileKey);
         if (!saveResult) {
             return res.status(500).json({ message: 'Failed to save profile picture' });
