@@ -3,6 +3,7 @@ const mysql = require('mysql2');
 const dotenv = require('dotenv');
 
 const { getPool } = require('../globalEntries.js');
+const { get } = require('../auth/profielFotos.js');
 
 
 dotenv.config();
@@ -182,6 +183,28 @@ async function getRejectedSpeeddatesByUserId(id) {
     }
 }
 
+async function getUnavailableDates(id1, id2) {
+    const pool = getPool('ehbmatchdev');
+    // Query for overlapping speeddates for the same student or company
+    const query = `
+        SELECT * FROM speeddate 
+        WHERE (id_bedrijf = ? OR id_student = ?) OR (id_student = ? OR id_bedrijf = ?)
+        `;
+    try {
+        const [rows] = await pool.query(query, [id1, id2, id1, id2]);
+        const windows = rows.map(row => {
+            const id = row.id;
+            const begin = row.datum; // Already in ISO format
+            const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            return { id, begin, einde };
+        });
+        return windows;
+    } catch (error) {
+        console.error('Database query error in getUnavailableDates:', error.message, error.stack);
+        throw new Error('Checking unavailable dates failed');
+    }
+}
+
 async function isDateAvailable(id_bedrijf, id_student, datum) {
     const pool = getPool('ehbmatchdev');
     // Calculate 10-minute window (+10 minutes)
@@ -192,7 +215,8 @@ async function isDateAvailable(id_bedrijf, id_student, datum) {
     const startWindow = new Date(dateObj.getTime());
     const endWindow = new Date(dateObj.getTime() + 10 * 60 * 1000); // 10 min after
     // Query for overlapping speeddates for the same student or company
-    const query = `SELECT * FROM speeddate 
+    const query = `
+        SELECT * FROM speeddate 
         WHERE (id_bedrijf = ? OR id_student = ?)
         AND datum >= ?
         AND datum < ?`;
@@ -330,4 +354,5 @@ module.exports = {
     getAcceptedSpeeddatesByUserId,
     getRejectedSpeeddatesByUserId,
     getSpeeddateHistoryByUserId,
+    getUnavailableDates
 };

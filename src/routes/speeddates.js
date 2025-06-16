@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const { getAllSpeeddates, getSpeeddateById, getSpeeddatesByUserId, addSpeeddate, isDateAvailable, getSpeeddateInfo, speeddateAkkoord, speeddateAfgekeurd, getAcceptedSpeeddatesByUserId, getRejectedSpeeddatesByUserId, getSpeeddateHistoryByUserId } = require('../sql/speeddates.js');
+const { getAllSpeeddates, getSpeeddateById, getUnavailableDates, getSpeeddatesByUserId, addSpeeddate, isDateAvailable, getSpeeddateInfo, speeddateAkkoord, speeddateAfgekeurd, getAcceptedSpeeddatesByUserId, getRejectedSpeeddatesByUserId, getSpeeddateHistoryByUserId } = require('../sql/speeddates.js');
 const { sendNotification } = require('../modules/notifications.js');
 
 require('../auth/passportJWT.js');
@@ -156,20 +156,14 @@ router.post('/reject/:speeddateID', passport.authenticate('jwt', { session: fals
 // GET /user/:userID/unavailable
 router.get('/user/:userID/unavailable', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const userId = req.params['userID'];
+    const ownId = req.user.id;
     if (!userId) {
         return res.status(400).json({ error: 'userID is required' });
     }
     try {
         // Get all speeddates for the given id (bedrijf or student)
-        const speeddates = await getSpeeddatesByUserId(userId);
-        // Map to time windows
-        const windows = speeddates.map(sd => {
-            const id = sd.id;
-            const begin = sd.datum;
-            const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
-            return { id, begin, einde };
-        });
-        res.json(windows);
+        const unavailableDates = await getUnavailableDates(ownId, userId);
+        res.json(unavailableDates);
     } catch (error) {
         console.error('Error fetching unavailable time windows:', error);
         res.status(500).json({ message: 'Internal server error' });
