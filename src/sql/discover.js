@@ -47,7 +47,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
                 ) AS match_percentage
             FROM bedrijf b
             JOIN bedrijf_reqs br ON br.gebruiker_id = b.gebruiker_id
-            JOIN sector sr ON b.id_sector = sr.id
+            LEFT JOIN sector sr ON b.id_sector = sr.id
             LEFT JOIN (
                 SELECT bo.id_bedrijf, 1 AS count
                 FROM bedrijf_opleiding bo
@@ -101,7 +101,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
                     ), 0
                 ) AS match_percentage
             FROM bedrijf b
-            JOIN sector sr ON b.id_sector = sr.id
+            LEFT JOIN sector sr ON b.id_sector = sr.id
             JOIN bedrijf_reqs br ON br.gebruiker_id = b.gebruiker_id
             LEFT JOIN (
                 SELECT bo.id_bedrijf, 1 AS count
