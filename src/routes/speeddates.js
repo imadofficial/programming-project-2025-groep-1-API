@@ -49,6 +49,7 @@ router.get('/accepted', passport.authenticate('jwt', { session: false }), async 
         return res.status(400).json({ error: 'Invalid User ID' });
     }
     const speeddates = await getAcceptedSpeeddatesByUserId(userId);
+    console.log('Accepted speeddates for user ID', userId, ':', speeddates);
     res.json(speeddates);
 });
 
