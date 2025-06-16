@@ -100,5 +100,6 @@ module.exports = {
     addTempProfielFoto,
     cleanupTempProfielFoto,
     updateProfielFoto,
-    deleteProfielFoto
+    deleteProfielFoto,
+    isLinkedToUser
 };
