@@ -247,7 +247,7 @@ async function getUnavailableDates(id1, id2) {
     }
 }
 
-async function getAvailableDates(id_bedrijf, id_student, evenementId) {  
+async function getAvailableDates(id1, id2, evenementId) {  
     const pool = getPool('ehbmatchdev');
     // Query for overlapping speeddates for the same student or company
     const query = `
@@ -261,7 +261,7 @@ async function getAvailableDates(id_bedrijf, id_student, evenementId) {
             throw new Error('Event not found');
         }
         const { begin, einde } = timeRows[0];
-        const [rows] = await pool.query(query, [id_bedrijf, id_student, id_bedrijf, id_student]);
+        const [rows] = await pool.query(query, [id1, id2, id1, id2]);
         const startDate = new Date(begin);
         const stopDate = new Date(einde);
         // Get all taken windows for this company/student
