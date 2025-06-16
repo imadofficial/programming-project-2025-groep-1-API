@@ -3,7 +3,6 @@ const mysql = require('mysql2');
 const dotenv = require('dotenv');
 
 const { getPool } = require('../globalEntries.js');
-const { get } = require('../auth/profielFotos.js');
 
 
 dotenv.config();
