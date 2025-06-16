@@ -3,6 +3,8 @@ const passport = require('passport');
 const multer = require('multer');
 const { UTApi } = require('uploadthing/server');
 
+const { canEditProfilePicture } = require('../auth/canEdit.js');
+
 require('./passportJWT.js');
 
 const router = express.Router();
@@ -20,7 +22,7 @@ const upload = multer({
 });
 const utapi = new UTApi();
 
-const { addTempProfielFoto, deleteProfielFoto, cleanupTempProfielFoto } = require('../sql/profielFoto.js'); // Adjust the path as necessary
+const { addTempProfielFoto, deleteProfielFoto, cleanupTempProfielFoto, isLinkedToUser } = require('../sql/profielFoto.js'); // Adjust the path as necessary
 // TODO: implement Uploadthing using https://docs.uploadthing.com/api-reference/ut-api
 
 
@@ -71,18 +73,40 @@ router.post('/', upload.single('image'), async (req, res) => {
 
 
 // DELETE /:fotoKey
-router.delete('/:fotoKey', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.delete('/:fotoKey', async (req, res, next) => {
     const fotoKey = req.params.fotoKey;
     if (!fotoKey) {
         return res.status(400).json({ message: 'Foto key is required' });
     }
 
     try {
-        const cleanupResult = await cleanupTempProfielFoto(fotoKey);
-        if (!cleanupResult) {
-            return res.status(404).json({ message: 'Temporary profile picture not found' });
+        const linked = await isLinkedToUser(fotoKey);
+        if (linked) {
+            // Require authentication and canEdit for linked files
+            passport.authenticate('jwt', { session: false })(req, res, function (authErr) {
+                if (authErr) return next(authErr);
+                canEditProfilePicture(req, res, async function (editErr) {
+                    if (editErr) return next(editErr);
+                    try {
+                        const cleanupResult = await cleanupTempProfielFoto(fotoKey);
+                        if (!cleanupResult) {
+                            return res.status(404).json({ message: 'Temporary profile picture not found' });
+                        }
+                        res.json({ message: 'Temporary profile picture deleted successfully' });
+                    } catch (error) {
+                        console.error('Error deleting temporary profile picture:', error);
+                        res.status(500).json({ error: 'Internal server error: Could not delete profile picture' });
+                    }
+                });
+            });
+        } else {
+            // Not linked, just cleanup (no auth required)
+            const cleanupResult = await cleanupTempProfielFoto(fotoKey);
+            if (!cleanupResult) {
+                return res.status(404).json({ message: 'Temporary profile picture not found' });
+            }
+            res.json({ message: 'Temporary profile picture deleted successfully' });
         }
-        res.json({ message: 'Temporary profile picture deleted successfully' });
     } catch (error) {
         console.error('Error deleting temporary profile picture:', error);
         res.status(500).json({ error: 'Internal server error: Could not delete profile picture' });
