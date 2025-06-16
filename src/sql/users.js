@@ -26,7 +26,7 @@ async function getUserInfo(id) {
         SELECT 
             g.id, g.email, g.type,
             s.voornaam AS student_voornaam, s.achternaam AS student_achternaam, s.date_of_birth, s.linkedin AS student_linkedin, s.profiel_foto, s.studiejaar, o.naam AS opleiding,
-            b.naam AS bedrijf_naam, b.plaats, b.contact_email, b.linkedin AS bedrijf_linkedin, b.profiel_foto AS bedrijf_profiel_foto
+            b.naam AS bedrijf_naam, b.plaats, b.contact_email, b.linkedin AS bedrijf_linkedin, b.profiel_foto
         FROM gebruiker g
         LEFT JOIN student s ON g.id = s.gebruiker_id
         LEFT JOIN bedrijf b ON g.id = b.gebruiker_id
