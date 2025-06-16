@@ -134,13 +134,15 @@ async function getAcceptedSpeeddatesByUserId(id) {
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
             const profiel_foto_bedrijf_url = profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_bedrijf}` : null;
             const profiel_foto_student_url = profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_student}` : null;
-            return {
+            const returnObject = {
                 ...rest,
                 profiel_foto_bedrijf: profiel_foto_bedrijf_url,
                 profiel_foto_student: profiel_foto_student_url,
                 begin,
                 einde,
             };
+            console.log('Returning speeddate:', returnObject); // Log the returned speeddate
+            return returnObject;
         });
     } catch (error) {
         console.error('Database query error:', error); // Log the error
