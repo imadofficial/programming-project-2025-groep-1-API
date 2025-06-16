@@ -25,7 +25,10 @@ async function cleanupTempProfielFoto(fotoKey) {
     const pool = getPool('ehbmatchdev');
     const query = 'DELETE FROM temp_uploaded_profiel_fotos WHERE file_key = ?';
     try {
-        utapi.deleteFiles([fotoKey]); // Delete the file from Uploadthing
+        const deletedResponse = await utapi.deleteFiles([fotoKey]); // Delete the file from Uploadthing
+        if (!deletedResponse.success) {
+            console.error('Error deleting file from Uploadthing:', deletedResponse.error);
+        }
         const [result] = await pool.query(query, [fotoKey]);
         return result.affectedRows > 0; // Return true if the delete was successful
     } catch (error) {
@@ -43,6 +46,21 @@ async function isLinkedToUser(fotoKey) {
     } catch (error) {
         console.error('Database query error in isLinkedToUser:', error.message, error.stack);
         throw new Error('Checking if profiel foto is linked to user failed');
+    }
+}
+
+async function getLinkedUser(fotoKey) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'SELECT gebruiker_id FROM student WHERE profiel_foto = ? UNION SELECT gebruiker_id FROM bedrijf WHERE profiel_foto = ?';
+    try {
+        const [result] = await pool.query(query, [fotoKey, fotoKey]);
+        if (result.length > 0) {
+            return result[0].gebruiker_id; // Return the first linked user ID
+        }
+        return null; // Return null if no user is linked
+    } catch (error) {
+        console.error('Database query error in getLinkedUser:', error.message, error.stack);
+        throw new Error('Getting linked user for profiel foto failed');
     }
 }
 
@@ -101,5 +119,6 @@ module.exports = {
     cleanupTempProfielFoto,
     updateProfielFoto,
     deleteProfielFoto,
-    isLinkedToUser
+    isLinkedToUser,
+    getLinkedUser
 };
