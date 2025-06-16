@@ -9,7 +9,7 @@ dotenv.config();
 
 async function getAllBedrijven() {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT b.*, s.naam AS sector_naam FROM bedrijf b JOIN sector s ON b.sector_id = s.id'; // Corrected table name
+    const query = 'SELECT b.*, s.naam AS sector_bedrijf FROM bedrijf b JOIN sector s ON b.sector_id = s.id'; // Corrected table name
 
     try {
         const [rows] = await pool.query(query);
@@ -27,7 +27,7 @@ async function getAllBedrijven() {
 }
 async function getBedrijfById(id) {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT b.*, s.naam AS sector_naam FROM bedrijf b JOIN sector s ON b.sector_id = s.id WHERE b.gebruiker_id = ?';
+    const query = 'SELECT b.*, s.naam AS sector_bedrijf FROM bedrijf b JOIN sector s ON b.sector_id = s.id WHERE b.gebruiker_id = ?';
     const baseUrl = "https://gt0kk4fbet.ufs.sh/f/";
 
     try {
@@ -55,7 +55,7 @@ async function getBedrijfById(id) {
 
 async function getGoedgekeurdeBedrijven() {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT b.*, s.naam AS sector_naam FROM bedrijf b JOIN sector s ON b.sector_id = s.id WHERE b.goedkeuring = 1';
+    const query = 'SELECT b.*, s.naam AS sector_bedrijf FROM bedrijf b JOIN sector s ON b.sector_id = s.id WHERE b.goedkeuring = 1';
 
     try {
         const [rows] = await pool.query(query);
@@ -73,7 +73,7 @@ async function getGoedgekeurdeBedrijven() {
 
 async function getNietGoedgekeurdeBedrijven() {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT b.*, s.naam AS sector_naam FROM bedrijf b JOIN sector s ON b.sector_id = s.id WHERE b.goedkeuring = 0';
+    const query = 'SELECT b.*, s.naam AS sector_bedrijf FROM bedrijf b JOIN sector s ON b.sector_id = s.id WHERE b.goedkeuring = 0';
 
     try {
         const [rows] = await pool.query(query);

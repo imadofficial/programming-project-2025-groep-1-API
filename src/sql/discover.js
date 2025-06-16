@@ -31,7 +31,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
             )
             SELECT
                 b.*,
-                sr.naam AS sector_naam,
+                sr.naam AS sector_bedrijf,
                 COALESCE(opleiding_match.count, 0) AS opleiding_matches,
                 COALESCE(skill_match.count, 0) AS skill_matches,
                 COALESCE(functie_match.count, 0) AS functie_matches,
