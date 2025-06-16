@@ -52,6 +52,8 @@ app.use('/sectoren', require('./routes/sectoren.js'));
 
 app.use('/speeddates', require('./routes/speeddates.js'));
 
+app.use('/contact', require('./routes/contact.js'));
+
 // User routes
 app.use('/user', require('./routes/user.js'));
 

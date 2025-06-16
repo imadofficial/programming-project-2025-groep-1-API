@@ -3146,7 +3146,147 @@ paths:
                   error:
                     type: string
                     example: 'Stand not found'
-  
+
+  /contact:
+    post:
+      tags:
+        - Contact
+      summary: 'Send a contact message'
+      description: 'Send a contact message to the support team'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'john.doe@example.com'
+                onderwerp:
+                  type: string
+                  example: 'Question about my order'
+                bericht:
+                  type: string
+                  example: 'I would like to know the status of my order.'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Contact message sent successfully'
+                  id:
+                    type: integer
+                    example: 42
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Invalid input data'
+    get:
+      tags:
+        - Contact
+      summary: Get all contact messages
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 42
+                    email:
+                      type: string
+                      format: email
+                      example: 'john.doe@example.com'
+                    onderwerp:
+                      type: string
+                      example: 'Question about my order'
+                    bericht:
+                      type: string
+                      example: 'I would like to know the status of my order.'
+  /contact/{messageID}:
+    get:
+      tags:
+        - Contact
+      summary: Get a specific contact message by ID
+      parameters:
+        - name: messageID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 42
+                  email:
+                    type: string
+                    format: email
+                    example: 'john.doe@example.com'
+                  onderwerp:
+                    type: string
+                    example: 'Question about my order'
+                  bericht:
+                    type: string
+                    example: 'I would like to know the status of my order.'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Contact message not found'
+    delete:
+      tags:
+        - Contact
+      summary: Delete a contact message by ID
+      parameters:
+        - name: messageID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Contact message not found'
+
   /qr:
     get:
       description: |
