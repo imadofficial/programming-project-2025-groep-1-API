@@ -8,7 +8,7 @@ const router = express.Router();
 // GET /qr
 router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const baseUrl = 'https://ehb-match.me/'
-    const userId = req.user.id;
+    const userId = req.query.id ? req.query.id : req.user.id;
     if (req.user.type === 2) {
         url = baseUrl + 'student/' + userId;
     } else if (req.user.type === 3) {
