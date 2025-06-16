@@ -265,23 +265,31 @@ async function getAvailableDates(id_bedrijf, id_student, evenementId) {
         const [rows] = await pool.query(query, [id_bedrijf, id_student]);
         const startDate = new Date(begin);
         const stopDate = new Date(einde);
-        const windows = rows.map(row => {
-            const id = row.id;
-            const begin = new Date(row.datum); // Already in ISO format
-            const einde = new Date(begin.getTime() + 10 * 60 * 1000);
-            return { id, begin, einde };
-        })
-        // Exclude windows that overlap with [start, stop]
-        .filter(({ begin, einde }) => {
-            // No overlap if window ends before start or begins after stop
-            return einde <= startDate || begin >= stopDate;
-        })
-        // Convert back to ISO string for output, exclude id
-        .map(({ begin, einde }) => ({
+        // Get all taken windows for this company/student
+        const takenWindows = rows.map(row => {
+            const takenBegin = new Date(row.datum);
+            const takenEnd = new Date(takenBegin.getTime() + 10 * 60 * 1000);
+            return { begin: takenBegin, einde: takenEnd };
+        });
+        // Generate all possible 10-min windows between startDate and stopDate
+        const allWindows = [];
+        let windowStart = new Date(startDate);
+        while (windowStart.getTime() + 10 * 60 * 1000 <= stopDate.getTime()) {
+            const windowEnd = new Date(windowStart.getTime() + 10 * 60 * 1000);
+            allWindows.push({ begin: new Date(windowStart), einde: new Date(windowEnd) });
+            windowStart = new Date(windowStart.getTime() + 10 * 60 * 1000);
+        }
+        // Exclude windows that overlap with any taken window
+        const availableWindows = allWindows.filter(({ begin, einde }) => {
+            return !takenWindows.some(taken =>
+                (begin < taken.einde && einde > taken.begin)
+            );
+        });
+        // Return as ISO strings
+        return availableWindows.map(({ begin, einde }) => ({
             begin: begin.toISOString(),
             einde: einde.toISOString()
         }));
-        return windows;
     } catch (error) {
         console.error('Database query error in getAvailableDates:', error.message, error.stack);
         throw new Error('Checking available dates failed');
