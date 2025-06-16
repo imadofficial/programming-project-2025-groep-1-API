@@ -4,12 +4,12 @@ const { getAllBedrijven, getBedrijfById, getGoedgekeurdeBedrijven, getNietGoedge
 const { addSkillToUser, removeSkillFromUser, getSkillsByUserId, addSkillsToUser } = require('../sql/skills.js');
 const { getFunctiesByUserId, addFunctiesToUser, removeFunctieFromUser } = require('../sql/functie.js');
 const authAdmin = require('../auth/authAdmin.js');
-const canEdit = require('../auth/canEdit.js');
+const { canEdit } = require('../auth/canEdit.js');
 const { updateProfielFoto, deleteProfielFoto } = require('../sql/profielFoto.js');
 
 require('../auth/passportJWT.js');
 
-const router = express.Router()
+const router = express.Router();
 
 
 // GET /

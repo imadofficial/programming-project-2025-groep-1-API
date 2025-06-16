@@ -4,11 +4,11 @@ const { getAllStudenten, getStudentById, updateStudent } = require('../sql/stude
 const { getSkillsByUserId, addSkillsToUser, removeSkillFromUser } = require('../sql/skills.js');
 const { getFunctiesByUserId, addFunctiesToUser, removeFunctieFromUser } = require('../sql/functie.js');
 const { updateProfielFoto, deleteProfielFoto } = require('../sql/profielFoto.js');
-const canEdit = require('../auth/canEdit.js');
+const { canEdit } = require('../auth/canEdit.js');
 
 require('../auth/passportJWT.js');
 
-const router = express.Router()
+const router = express.Router();
 
 
 // GET /

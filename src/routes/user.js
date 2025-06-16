@@ -8,7 +8,7 @@ const { addSkillToUser } = require('../sql/skills.js');
 const { updateUser, deleteUserById, getUserById } = require('../sql/users.js');
 
 const authAdmin = require('../auth/authAdmin.js');
-const canEdit = require('../auth/canEdit.js');
+const { canEdit } = require('../auth/canEdit.js');
 
 const router = express.Router();
 
