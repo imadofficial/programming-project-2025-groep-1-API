@@ -64,6 +64,7 @@ app.use('/auth/login', require('./auth/login.js'));
 app.use('/auth/refresh', require('./auth/refresh.js'));
 app.use('/auth/logout', require('./auth/logout.js'));
 app.use('/auth/register', require('./auth/register.js'));
+app.use('/qr', require('./routes/qr.js'));
 
 const port = process.env.STATUS == "production" ? 3000 : 3001;
 
