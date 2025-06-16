@@ -3092,3 +3092,67 @@ paths:
       responses:
         '204':
           description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Stand ID is required'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Stand not found'
+  
+  /qr:
+    description: Generate a QR Code for the authenticated user
+    get:
+      parameters:
+        - name: userID
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Optional user ID to generate QR code for. If omitted, uses the authenticated user.
+      tags:
+        - QR
+      summary: Generate a QR Code for the authenticated user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                  type: string
+                  format: binary
+                  example: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...'
+
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'User ID is required'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'User not found'
