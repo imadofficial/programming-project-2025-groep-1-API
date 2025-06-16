@@ -20,7 +20,7 @@ const upload = multer({
 });
 const utapi = new UTApi();
 
-const { addTempProfielFoto } = require('../sql/profielFoto.js'); // Adjust the path as necessary
+const { addTempProfielFoto, deleteProfielFoto, cleanupTempProfielFoto } = require('../sql/profielFoto.js'); // Adjust the path as necessary
 // TODO: implement Uploadthing using https://docs.uploadthing.com/api-reference/ut-api
 
 
@@ -69,5 +69,24 @@ router.post('/', upload.single('image'), async (req, res) => {
     }
 });
 
+
+// DELETE /:fotoKey
+router.delete('/:fotoKey', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const fotoKey = req.params.fotoKey;
+    if (!fotoKey) {
+        return res.status(400).json({ message: 'Foto key is required' });
+    }
+
+    try {
+        const cleanupResult = await cleanupTempProfielFoto(fotoKey);
+        if (!cleanupResult) {
+            return res.status(404).json({ message: 'Temporary profile picture not found' });
+        }
+        res.json({ message: 'Temporary profile picture deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting temporary profile picture:', error);
+        res.status(500).json({ error: 'Internal server error: Could not delete profile picture' });
+    }
+});
 
 module.exports = router;
