@@ -143,20 +143,26 @@ async function getAcceptedSpeeddatesByUserId(id) {
         console.log('Query result:', rows); // Log the query result
         // Map each row to omit datum, add begin/einde, and construct profiel_foto URLs
         return rows.map(speeddate => {
-            const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
-            const begin = datum; // Convert to ISO format
+            const begin = speeddate.datum;
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
-            const profiel_foto_bedrijf_url = profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_bedrijf}` : null;
-            const profiel_foto_student_url = profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_student}` : null;
-            const returnObject = {
-                ...rest,
+            const profiel_foto_bedrijf_url = speeddate.profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${speeddate.profiel_foto_bedrijf}` : null;
+            const profiel_foto_student_url = speeddate.profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${speeddate.profiel_foto_student}` : null;
+            return {
+                id: speeddate.id,
+                id_bedrijf: speeddate.id_bedrijf,
+                naam_bedrijf: speeddate.naam_bedrijf,
                 profiel_foto_bedrijf: profiel_foto_bedrijf_url,
+                id_sector: speeddate.id_sector,
+                sector_bedrijf: speeddate.sector_bedrijf,
+                id_student: speeddate.id_student,
+                voornaam_student: speeddate.voornaam_student,
+                achternaam_student: speeddate.achternaam_student,
                 profiel_foto_student: profiel_foto_student_url,
+                akkoord: speeddate.akkoord,
+                lokaal: speeddate.lokaal,
                 begin,
                 einde,
             };
-            console.log('Returning speeddate:', returnObject); // Log the returned speeddate
-            return returnObject;
         });
     } catch (error) {
         console.error('Database query error:', error); // Log the error
