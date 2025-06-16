@@ -39,7 +39,7 @@ router.get('/:id', [passport.authenticate('jwt', { session: false }), authAdmin]
 
 
 // POST /contact
-router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.post('/', async (req, res) => {
     const { email, onderwerp, bericht } = req.body;
 
     if (!email || !onderwerp || !bericht) {
