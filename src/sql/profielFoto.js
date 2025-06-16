@@ -34,6 +34,18 @@ async function cleanupTempProfielFoto(fotoKey) {
     }
 }
 
+async function isLinkedToUser(fotoKey) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'SELECT 1 FROM student WHERE profiel_foto = ? UNION SELECT 1 FROM bedrijf WHERE profiel_foto = ?';
+    try {
+        const [result] = await pool.query(query, [fotoKey, fotoKey]);
+        return result.length > 0; // Return true if the fotoKey is linked to any user
+    } catch (error) {
+        console.error('Database query error in isLinkedToUser:', error.message, error.stack);
+        throw new Error('Checking if profiel foto is linked to user failed');
+    }
+}
+
 async function updateProfielFoto(gebruikerId, fotoKey) {
     const pool = getPool('ehbmatchdev');
 
