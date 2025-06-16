@@ -15,9 +15,8 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
         url = baseUrl + 'student/' + userId;
     } else if (userType === 3) {
         url = baseUrl + 'bedrijf/' + userId;
-    }
-    if (!url) {
-        return res.status(400).json({ error: 'Missing url query parameter' });
+    } else {
+        return res.status(400).json({ error: 'Unsupported user type' });
     }
     try {
         // Set response type to PNG image
