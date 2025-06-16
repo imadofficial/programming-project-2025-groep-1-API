@@ -25,6 +25,7 @@ async function cleanupTempProfielFoto(fotoKey) {
     const pool = getPool('ehbmatchdev');
     const query = 'DELETE FROM temp_uploaded_profiel_fotos WHERE file_key = ?';
     try {
+        utapi.deleteFiles([fotoKey]); // Delete the file from Uploadthing
         const [result] = await pool.query(query, [fotoKey]);
         return result.affectedRows > 0; // Return true if the delete was successful
     } catch (error) {
