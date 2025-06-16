@@ -122,13 +122,14 @@ async function getAcceptedSpeeddatesByUserId(id) {
         LEFT JOIN sector sec ON b.id_sector = sec.id
         LEFT JOIN stand ON s.id_bedrijf = stand.id_bedrijf
         WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.akkoord = 1 AND s.datum >= NOW() - INTERVAL 10 MINUTE
+        ORDER BY s.datum ASC
     `;
     try {
         const [rows] = await pool.query(query, [id, id]);
         // Map each row to omit datum, add begin/einde, and construct profiel_foto URLs
         return rows.map(speeddate => {
             const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
-            const begin = datum.replace(' ', 'T'); // Convert to ISO format
+            const begin = datum; // Convert to ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
             const profiel_foto_bedrijf_url = profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_bedrijf}` : null;
             const profiel_foto_student_url = profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_student}` : null;
@@ -156,6 +157,7 @@ async function getRejectedSpeeddatesByUserId(id) {
         LEFT JOIN sector sec ON b.id_sector = sec.id
         LEFT JOIN stand ON s.id_bedrijf = stand.id_bedrijf
         WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.akkoord = 0 AND s.datum >= NOW() - INTERVAL 10 MINUTE
+        ORDER BY s.datum ASC
     `;
     try {
         const [rows] = await pool.query(query, [id, id]);
