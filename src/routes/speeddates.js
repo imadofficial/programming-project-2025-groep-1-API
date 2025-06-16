@@ -80,7 +80,16 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
     const body = req.body;
     const studentId = body.id_student ? Number(body.id_student) : Number(req.user.id); // Use id_student if provided, otherwise use authenticated user ID
     const bedrijfId = body.id_bedrijf ? Number(body.id_bedrijf) : null; // Use id_bedrijf if provided, otherwise null
-    const datum = body.datum ? body.datum : null; // Use datum if provided, otherwise null
+    let datum = body.datum ? body.datum : null; // Use datum if provided, otherwise null
+    // Force seconds to 00 if datum is in the correct format (YYYY-MM-DD hh:mm:ss or YYYY-MM-DD hh:mm)
+    if (typeof datum === 'string') {
+        // If datum is in format YYYY-MM-DD hh:mm:ss, replace seconds with 00
+        datum = datum.replace(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}):\d{2}$/, '$1:00');
+        // If datum is in format YYYY-MM-DD hh:mm, add :00
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(datum)) {
+            datum = datum + ':00';
+        }
+    }
     console.log('Creating speeddate with:', { datum, bedrijfId, studentId });
     if (!datum || !bedrijfId || !studentId) {
         return res.status(400).json({ error: 'Datum (datetime), id_bedrijf, and id_student are required' });
