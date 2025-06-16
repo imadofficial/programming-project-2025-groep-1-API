@@ -53,11 +53,11 @@ router.post('/', upload.single('image'), async (req, res) => {
     try {
         const uploadResult = await uploadServerSideFile(file);
         console.log('Upload result:', uploadResult);
-        if (!uploadResult || !uploadResult.key || !uploadResult.ufUrl) {
+        if (!uploadResult || !uploadResult.key || !uploadResult.ufsUrl) {
             return res.status(500).json({ message: 'File upload failed' });
         }
         const fileKey = uploadResult.key;
-        const fileUrl = uploadResult.ufUrl; // Assuming the URL is returned in the response
+        const fileUrl = uploadResult.ufsUrl; // Assuming the URL is returned in the response
         const gebruikerId = req.user.id; // Get the user ID from the request
         const saveResult = await addTempProfielFoto(fileKey);
         if (!saveResult) {
