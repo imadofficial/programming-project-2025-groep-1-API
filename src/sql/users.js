@@ -50,7 +50,8 @@ async function getUserInfo(id) {
                     voornaam: row.student_voornaam,
                     achternaam: row.student_achternaam,
                     date_of_birth: row.date_of_birth,
-                    profiel_foto: row.profiel_foto,
+                    profiel_foto_key: row.profiel_foto,
+                    profiel_foto_url: row.profiel_foto ? `https://gt0kk4fbet.ufs.sh/f/${row.profiel_foto}` : null,
                     linkedin: row.student_linkedin,
                     studiejaar: row.studiejaar,
                     opleiding: row.opleiding
@@ -63,7 +64,8 @@ async function getUserInfo(id) {
                     email: row.email,
                     naam: row.bedrijf_naam,
                     plaats: row.plaats,
-                    profiel_foto: row.bedrijf_profiel_foto,
+                    profiel_foto_key: row.profiel_foto,
+                    profiel_foto_url: row.profiel_foto ? `https://gt0kk4fbet.ufs.sh/f/${row.profiel_foto}` : null,
                     contact_email: row.contact_email,
                     linkedin: row.bedrijf_linkedin
                 };
