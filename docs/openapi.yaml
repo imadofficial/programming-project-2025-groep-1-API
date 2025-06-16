@@ -3066,9 +3066,6 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
-                      type: integer
-                      example: 1
                     begin:
                       type: string
                       format: date-time
