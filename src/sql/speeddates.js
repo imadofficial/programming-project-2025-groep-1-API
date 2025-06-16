@@ -127,6 +127,7 @@ async function getAcceptedSpeeddatesByUserId(id) {
     `;
     try {
         const [rows] = await pool.query(query, [id, id]);
+        console.log('Query result:', rows); // Log the query result
         // Map each row to omit datum, add begin/einde, and construct profiel_foto URLs
         return rows.map(speeddate => {
             const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
