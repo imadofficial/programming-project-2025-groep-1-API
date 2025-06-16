@@ -13,12 +13,13 @@ const authAdmin = require('../auth/authAdmin.js');
 
 // GET /contact
 router.get('/', [passport.authenticate('jwt', { session: false }), authAdmin], async (req, res) => {
-    if (!id) {
-        return res.status(400).json({ error: 'User ID is required' });
+    try {
+        const contacts = await getAllContacts();
+        res.json(contacts);
+    } catch (error) {
+        console.error('Error fetching contacts:', error);
+        return res.status(500).json({ error: 'Failed to fetch contacts' });
     }
-
-    const contacts = await getAllContacts();
-    res.json(contacts);
 });
 
 
