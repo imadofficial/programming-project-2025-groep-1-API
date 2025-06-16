@@ -69,7 +69,8 @@ components:
         voornaam: Jan
         achternaam: Jansen
         linkedin: /in/janjansen
-        profiel_foto: /profile.jpg
+        profiel_foto_key: 69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh
+        profiel_foto_url: https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh
         studiejaar: 2
         opleiding_id: 1
         date_of_birth: '2000-01-01'
@@ -123,7 +124,8 @@ components:
         plaats: Brussel
         contact_email: contact@techsolutions.com
         linkedin: /company/techsolutions
-        profiel_foto: /company_logo.jpg
+        profiel_foto_key: 69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh
+        profiel_foto_url: https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh
     Admin:
       type: object
       description: An admin user object.
