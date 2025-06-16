@@ -5,6 +5,9 @@ const { getPool } = require('../globalEntries.js');
  * If suggestions=false, orders by functie_matches, opleiding_matches, match_percentage, match_score, and name.
  * @param {number} studentId - The gebruiker_id of the student to compare to.
  */
+
+const baseUrl = "https://gt0kk4fbet.ufs.sh/f/";
+
 async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = false) {
     const pool = getPool('ehbmatchdev');
     // Pre-fetch opleiding_id for the student to avoid subquery in every row
@@ -122,8 +125,25 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
         `;
         params = onlyNew ? [opleidingId, studentId, studentId, studentId] : [opleidingId, studentId, studentId];
     }
-    const [rows] = await pool.query(query, params);
-    return rows;
+    try {
+        const [rows] = await pool.query(query, params);
+        if (rows.length > 0) {
+            const student = rows[0];
+            if (student.profiel_foto) {
+                student.profiel_foto_key = student.profiel_foto;
+                student.profiel_foto_url = baseUrl + student.profiel_foto;
+            } else {
+                student.profiel_foto_key = null;
+                student.profiel_foto_url = null;
+            }
+            delete student.profiel_foto; // Remove the original profiel_foto field
+            return student; // Return the first student found with extra fields
+        }
+        return rows;
+    } catch (error) {
+        console.error('Error fetching bedrijf data:', error);
+        throw new Error('Database query failed');
+    }
 }
 
 /**
@@ -252,8 +272,24 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = fal
         `;
         params = onlyNew ? [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId, bedrijfId] : [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId];
     }
-    const [rows] = await pool.query(query, params);
-    return rows;
+    try {
+        const [rows] = await pool.query(query, params);
+        if (rows.length > 0) {
+            const student = rows[0];
+            if (student.profiel_foto) {
+                student.profiel_foto_key = student.profiel_foto;
+                student.profiel_foto_url = baseUrl + student.profiel_foto;
+            } else {
+                student.profiel_foto_key = null;
+                student.profiel_foto_url = null;
+            }
+            delete student.profiel_foto; // Remove the original profiel_foto field
+            return student; // Return the first student found with extra fields
+        }
+        return rows; // Return all rows if no specific student is found
+    } catch (error) {
+        console.error('Error fetching student data:', error);
+    }
 }
 
 module.exports = {
