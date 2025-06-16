@@ -135,6 +135,22 @@ async function getInfo(id) {
     }
 }
 
+async function getAcceptedSpeeddatesByUserId(id){
+    const pool = getPool('ehbmatchdev');
+    const query = 'SELECT * FROM speeddate WHERE (id_bedrijf = ? OR id_student = ?) and akkoord = 1';
+        try {
+        const [rows] = await pool.query(query, [id, id]);
+        if (rows.length > 0) {
+            return rows[0]; // Return the first row if found
+        } else {
+            return null; // Return null if no row is found
+        }
+    } catch (error) {
+        console.error('Database query error in getInfo:', error.message, error.stack);
+        throw new Error('Getting speeddate info failed');
+    }
+}
+    
 module.exports = {
     getSpeeddateById,
     getSpeeddatesByUserId,
@@ -143,5 +159,6 @@ module.exports = {
     speeddateAkkoord,
     speeddateAfgekeurd,
     addSpeeddate,
-    getInfo
+    getInfo,
+    getAcceptedSpeeddatesByUserId
 };
