@@ -3119,9 +3119,9 @@ paths:
                     example: 'Stand not found'
   
   /qr:
-    description: |
-      [DEPRECATED] This endpoint is not implemented. QR code generation is currently unavailable.
     get:
+      description: |
+        [DEPRECATED] This endpoint is not implemented. QR code generation currently returns a placeholder url.
       deprecated: true
       parameters:
         - name: userID
