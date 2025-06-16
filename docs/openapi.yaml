@@ -194,6 +194,10 @@ tags:
   - name: Stands
     description: >
       Endpoints for managing stands.
+  - name: QR
+    description: >
+      Endpoints for managing QR codes.
+      Momentarily not implemented, but will be used for scanning QR codes at events.
 
 servers:
   - url: https://api.ehb-match.me
@@ -1798,7 +1802,7 @@ paths:
                     type: integer
                   opleiding_id:
                     type: integer
-      '404':
+        '404':
           description: Not Found
           content:
             application/json:
@@ -2731,6 +2735,7 @@ paths:
                     akkoord:
                       type: boolean
                       example: true
+
                     lokaal:
                       type: string
                       example: 'A101'
@@ -3114,8 +3119,10 @@ paths:
                     example: 'Stand not found'
   
   /qr:
-    description: Generate a QR Code for the authenticated user
+    description: |
+      [DEPRECATED] This endpoint is not implemented. QR code generation is currently unavailable.
     get:
+      deprecated: true
       parameters:
         - name: userID
           in: query
@@ -3125,17 +3132,18 @@ paths:
           description: Optional user ID to generate QR code for. If omitted, uses the authenticated user.
       tags:
         - QR
-      summary: Generate a QR Code for the authenticated user
+      summary: Generate a QR Code for the authenticated user (NOT IMPLEMENTED)
       responses:
-        '200':
-          description: OK
+        '501':
+          description: Not Implemented
           content:
             application/json:
               schema:
-                  type: string
-                  format: binary
-                  example: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...'
-
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'QR code generation is not implemented.'
         '400':
           description: Bad Request
           content:
