@@ -262,7 +262,7 @@ async function getAvailableDates(id_bedrijf, id_student, evenementId) {
             throw new Error('Event not found');
         }
         const { begin, einde } = timeRows[0];
-        const [rows] = await pool.query(query, [id_bedrijf, id_student]);
+        const [rows] = await pool.query(query, [id_bedrijf, id_student, id_bedrijf, id_student]);
         const startDate = new Date(begin);
         const stopDate = new Date(einde);
         // Get all taken windows for this company/student
