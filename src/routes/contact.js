@@ -39,15 +39,14 @@ router.get('/:id', [passport.authenticate('jwt', { session: false }), authAdmin]
 
 // POST /contact
 router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const { onderwerp, bericht } = req.body;
-    const gebruiker_id = req.user.id;
+    const { email, onderwerp, bericht } = req.body;
 
-    if (!onderwerp || !bericht) {
-        return res.status(400).json({ error: 'Onderwerp and bericht are required' });
+    if (!email || !onderwerp || !bericht) {
+        return res.status(400).json({ error: 'Email, onderwerp and bericht are required' });
     }
 
     try {
-        const contactId = await createContact(gebruiker_id, onderwerp, bericht);
+        const contactId = await createContact(email, onderwerp, bericht);
         res.status(201).json({ message: 'Contact created successfully', id: contactId });
     } catch (error) {
         console.error('Error creating contact:', error);
