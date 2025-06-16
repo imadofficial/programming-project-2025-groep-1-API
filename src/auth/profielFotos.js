@@ -85,7 +85,7 @@ router.delete('/:fotoKey', passport.authenticate('jwt', { session: false }), asy
         res.json({ message: 'Temporary profile picture deleted successfully' });
     } catch (error) {
         console.error('Error deleting temporary profile picture:', error);
-        res.status(500).json({ message: 'Internal server error' });
+        res.status(500).json({ error: 'Internal server error: Could not delete profile picture' });
     }
 });
 
