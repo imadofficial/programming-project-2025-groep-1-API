@@ -77,10 +77,11 @@ router.get('/:speeddateID', passport.authenticate('jwt', { session: false }), as
 });
 
 router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const { id_student, id_bedrijf, datum } = req.body;
-    const studentId = id_student ? Number(id_student) : Number(req.user.id); // Use id_student if provided, otherwise use authenticated user ID
-    const bedrijfId = id_bedrijf ? Number(id_bedrijf) : null; // Use id_bedrijf if provided, otherwise null
-    if (!datum || !id_bedrijf || !studentId) {
+    const body = req.body;
+    const studentId = body.id_student ? Number(body.id_student) : Number(req.user.id); // Use id_student if provided, otherwise use authenticated user ID
+    const bedrijfId = body.id_bedrijf ? Number(body.id_bedrijf) : null; // Use id_bedrijf if provided, otherwise null
+    const datum = body.datum ? body.datum : null; // Use datum if provided, otherwise null
+    if (!datum || !bedrijfId || !studentId) {
         return res.status(400).json({ error: 'Datum (datetime), id_bedrijf, and id_student are required' });
     }
 
