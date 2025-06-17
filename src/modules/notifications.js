@@ -1,4 +1,5 @@
 async function sendNotification(userIds, title, message) {
+    console.log('userIds:', userIds);
     if (!Array.isArray(userIds) || userIds.length === 0) {
         throw new Error('userIds must be a non-empty array');
     }
