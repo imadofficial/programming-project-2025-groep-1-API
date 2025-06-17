@@ -1,10 +1,15 @@
 const express = require('express')
 const jwt = require('jsonwebtoken');
 
+require('dotenv').config();
+
 const router = express.Router();
 
 router.post('/', (req, res, next) => {
-    const refreshToken = req.cookies.refreshToken;
+    // Check if request has a refresh token in the body, if not, check cookies
+    const refreshToken = req.body && typeof req.body.refreshToken !== 'undefined' ? req.body.refreshToken : req.cookies.refreshToken;
+
+    console.log('Received refresh token:', refreshToken);
 
     if (!refreshToken) {
         return res.status(401).json({ message: 'No refresh token provided' });
@@ -13,6 +18,7 @@ router.post('/', (req, res, next) => {
     try {
         jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
             if (err) {
+                console.error('Refresh token verification failed:', err);
                 return res.status(403).json({ message: 'Invalid refresh token' });
             }
 
