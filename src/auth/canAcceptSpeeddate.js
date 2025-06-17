@@ -1,5 +1,5 @@
 // Middleware check if authenticated user is the id_student or id_bedrijf from the requested speeddate, or an admin
-const { getPool } = require('../sql/db.js');
+const { getPool } = require('../globalEntries.js');
 
 async function canAcceptSpeeddate(req, res, next) {
     const user = req.user;
