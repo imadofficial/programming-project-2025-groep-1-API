@@ -193,9 +193,11 @@ async function getAvailableDates(id1, id2) {
     try {
         // Get all bedrijf_evenement for the given ids
         const [bedrijfRows] = await pool.query(bedrijfEvenementQuery, [id1, id2]);
+        console.log('Bedrijf rows:', bedrijfRows); // Log the rows for debugging
         if (!bedrijfRows || bedrijfRows.length === 0) return [];
         // Get all speeddates for id1 or id2 (as bedrijf or student)
         const [sdRows] = await pool.query(speeddateQuery, [id1, id2, id1, id2]);
+        console.log('Speeddate rows:', sdRows); // Log the rows for debugging
         // Precompute all taken windows in Europe/Brussels
         const takenWindows = sdRows.map(row => {
             const takenBegin = DateTime.fromSQL(row.datum, { zone: 'Europe/Brussels' });
