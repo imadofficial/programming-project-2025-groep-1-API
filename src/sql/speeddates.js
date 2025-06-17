@@ -133,9 +133,11 @@ async function getAcceptedSpeeddatesByUserId(id) {
         const [rows] = await pool.query(query, [id, id]);
         // Map each row to omit datum, add begin/einde
         return rows.map(speeddate => {
-            const { datum, ...rest } = speeddate;
+            const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
             const begin = datum.replace(' ', 'T'); // Convert to ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            const profiel_foto_bedrijf_url = profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_bedrijf}` : null;
+            const profiel_foto_student_url = profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_student}` : null;
             return {
                 id: speeddate.id,
                 asked_by: speeddate.asked_by,
