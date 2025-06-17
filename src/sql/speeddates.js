@@ -185,44 +185,40 @@ async function getUnavailableDates(id1, id2) {
     }
 }
 
-async function getAvailableDates(id1, id2, evenementId) {  
+async function getAvailableDates(id1, id2) {
     const pool = getPool('ehbmatchdev');
-    // Query for overlapping speeddates for the same student or company
-    const query = `
-        SELECT * FROM speeddate 
-        WHERE (id_bedrijf = ? OR id_student = ?) OR (id_student = ? OR id_bedrijf = ?)
-        `;
-    const timeQuery = `SELECT * FROM evenement WHERE id = ?`;
+    const bedrijfEvenementQuery = `SELECT * FROM bedrijf_evenement WHERE bedrijf_id = ? OR bedrijf_id = ?`;
+    const speeddateQuery = `SELECT datum FROM speeddate WHERE id_bedrijf = ? OR id_bedrijf = ? OR id_student = ? OR id_student = ?`;
     try {
-        const [timeRows] = await pool.query(timeQuery, [evenementId]);
-        if (timeRows.length === 0) {
-            throw new Error('Event not found');
+        const [beRows] = await pool.query(bedrijfEvenementQuery, [id1, id2]);
+        if (beRows.length === 0) return [];
+        let allWindows = [];
+        for (const row of beRows) {
+            const startDate = new Date(row.begin);
+            const stopDate = new Date(row.einde);
+            let windowStart = new Date(startDate);
+            while (windowStart.getTime() + 10 * 60 * 1000 <= stopDate.getTime()) {
+                const windowEnd = new Date(windowStart.getTime() + 10 * 60 * 1000);
+                allWindows.push({ begin: new Date(windowStart), einde: new Date(windowEnd) });
+                windowStart = new Date(windowStart.getTime() + 10 * 60 * 1000);
+            }
         }
-        const { begin, einde } = timeRows[0];
-        const [rows] = await pool.query(query, [id1, id2, id1, id2]);
-        const startDate = new Date(begin);
-        const stopDate = new Date(einde);
-        // Get all taken windows for this company/student
-        const takenWindows = rows.map(row => {
+        // Get all taken windows from speeddates (datum to datum+10m)
+        const [sdRows] = await pool.query(speeddateQuery, [id1, id2, id1, id2]);
+        const takenWindows = sdRows.map(row => {
             const takenBegin = new Date(row.datum);
             const takenEnd = new Date(takenBegin.getTime() + 10 * 60 * 1000);
             return { begin: takenBegin, einde: takenEnd };
         });
-        // Generate all possible 10-min windows between startDate and stopDate
-        const allWindows = [];
-        let windowStart = new Date(startDate);
-        while (windowStart.getTime() + 10 * 60 * 1000 <= stopDate.getTime()) {
-            const windowEnd = new Date(windowStart.getTime() + 10 * 60 * 1000);
-            allWindows.push({ begin: new Date(windowStart), einde: new Date(windowEnd) });
-            windowStart = new Date(windowStart.getTime() + 10 * 60 * 1000);
-        }
-        // Exclude windows that overlap with any taken window
+        // Filter out all windows that overlap with any taken window
+        // Allow a window to start exactly at the end of a taken window (einde === taken.begin is allowed)
         const availableWindows = allWindows.filter(({ begin, einde }) => {
-            return !takenWindows.some(taken =>
-                (begin < taken.einde && einde > taken.begin)
-            );
+            // Overlap only if begin < taken.einde && einde > taken.begin
+            // But allow: begin === taken.einde or einde === taken.begin
+            return !takenWindows.some(taken => (begin < taken.einde && einde > taken.begin));
         });
-        // Return as ISO strings
+        // Debug: log taken and available windows count
+        // console.log('Taken:', takenWindows, 'Available:', availableWindows);
         return availableWindows.map(({ begin, einde }) => ({
             begin: begin.toISOString(),
             einde: einde.toISOString()
