@@ -75,8 +75,15 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
 // POST /accept/:speeddateID
 router.post('/accept/:speeddateID', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const speeddateId = req.params['speeddateID'];
+    const userId = req.user.id;
+    if (!userId) {
+        return res.status(400).json({ error: 'User ID is required' });
+    }
     if (!speeddateId) {
         return res.status(400).json({ error: 'Speeddate ID is required' });
+    }
+    if (isOwner(speeddateId, userId)) {
+        return res.status(400).json({ error: 'You cannot accept your own speeddate' });
     }
     try {
         const accepted = await speeddateAkkoord(speeddateId);
