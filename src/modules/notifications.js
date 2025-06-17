@@ -29,7 +29,8 @@ async function sendNotification(userIds, title, message) {
            }),
        })
    );
-   await Promise.all(promises);
+   const responses = await Promise.all(promises);
+   return Promise.all(responses.map(r => r.json()));
 }
 
 module.exports = {
