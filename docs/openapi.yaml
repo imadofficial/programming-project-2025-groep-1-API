@@ -1617,10 +1617,16 @@ paths:
         content:
           application/json:
             schema:
-              example: [1, 2, 3]
-              type: array
-              items:
-                type: integer
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: 'Add functions to student'
+                functies:
+                  type: array
+                  items:
+                    type: integer
+                    example: [1, 2, 3]
 
       responses:
         '200':
@@ -2044,10 +2050,16 @@ paths:
         content:
           application/json:
             schema:
-              example: [1, 2, 3]
-              type: array
-              items:
-                type: integer
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: 'Add functions to student'
+                functies:
+                  type: array
+                  items:
+                    type: integer
+                    example: [1, 2, 3]
       responses:
         '200':
           description: OK
