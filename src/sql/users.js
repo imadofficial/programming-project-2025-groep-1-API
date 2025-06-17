@@ -25,12 +25,13 @@ async function getUserInfo(id) {
     const query = `
         SELECT 
             g.id, g.email, g.type,
-            s.voornaam AS student_voornaam, s.achternaam AS student_achternaam, s.date_of_birth, s.linkedin AS student_linkedin, s.profiel_foto, s.studiejaar, o.naam AS opleiding,
-            b.naam AS bedrijf_naam, b.plaats, b.contact_email, b.linkedin AS bedrijf_linkedin, b.profiel_foto AS bedrijf_profiel_foto
+            s.voornaam AS student_voornaam, s.achternaam AS student_achternaam, s.date_of_birth, s.linkedin AS student_linkedin, s.profiel_foto AS profiel_foto_student, s.studiejaar, o.naam AS opleiding,
+            b.naam AS bedrijf_naam, b.plaats, b.contact_email, b.linkedin AS bedrijf_linkedin, b.profiel_foto AS profiel_foto_bedrijf, sr.naam AS sector_bedrijf
         FROM gebruiker g
         LEFT JOIN student s ON g.id = s.gebruiker_id
         LEFT JOIN bedrijf b ON g.id = b.gebruiker_id
         LEFT JOIN opleiding o ON s.opleiding_id = o.id
+        LEFT JOIN sector sr ON b.id_sector = sr.id
         WHERE g.id = ?
     `;
 
@@ -50,7 +51,8 @@ async function getUserInfo(id) {
                     voornaam: row.student_voornaam,
                     achternaam: row.student_achternaam,
                     date_of_birth: row.date_of_birth,
-                    profiel_foto: row.profiel_foto,
+                    profiel_foto_key: row.profiel_foto_student,
+                    profiel_foto_url: row.profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${row.profiel_foto_student}` : null,
                     linkedin: row.student_linkedin,
                     studiejaar: row.studiejaar,
                     opleiding: row.opleiding
@@ -63,9 +65,11 @@ async function getUserInfo(id) {
                     email: row.email,
                     naam: row.bedrijf_naam,
                     plaats: row.plaats,
-                    profiel_foto: row.bedrijf_profiel_foto,
+                    profiel_foto_key: row.profiel_foto_bedrijf,
+                    profiel_foto_url: row.profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${row.profiel_foto_bedrijf}` : null,
                     contact_email: row.contact_email,
-                    linkedin: row.bedrijf_linkedin
+                    linkedin: row.bedrijf_linkedin,
+                    sector_bedrijf: row.sector_bedrijf
                 };
             default:
                 // User is neither student nor company

@@ -1,6 +1,7 @@
 const express = require('express');
 const passport = require('passport');
-const { getAllSpeeddates, getSpeeddateById, getSpeeddatesByUserId, addSpeeddate, isDateAvailable, getSpeeddateInfo, speeddateAkkoord, speeddateAfgekeurd, getAcceptedSpeeddatesByUserId, getRejectedSpeeddatesByUserId, getSpeeddateHistoryByUserId } = require('../sql/speeddates.js');
+const { getAllSpeeddates, getSpeeddateById, getUnavailableDates, getSpeeddatesByUserId, addSpeeddate, isDateAvailable, getSpeeddateInfo, speeddateAkkoord, speeddateAfgekeurd, getAcceptedSpeeddatesByUserId, getRejectedSpeeddatesByUserId, getSpeeddateHistoryByUserId, getAvailableDates } = require('../sql/speeddates.js');
+const { sendNotification } = require('../modules/notifications.js');
 
 require('../auth/passportJWT.js');
 
@@ -48,6 +49,7 @@ router.get('/accepted', passport.authenticate('jwt', { session: false }), async 
         return res.status(400).json({ error: 'Invalid User ID' });
     }
     const speeddates = await getAcceptedSpeeddatesByUserId(userId);
+    console.log('Accepted speeddates for user ID', userId, ':', speeddates);
     res.json(speeddates);
 });
 
@@ -75,8 +77,21 @@ router.get('/:speeddateID', passport.authenticate('jwt', { session: false }), as
 });
 
 router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    const { id_bedrijf, id_student, datum } = req.body;
-    if (!datum || !id_bedrijf || !id_student) {
+    const body = req.body;
+    const studentId = body.id_student ? Number(body.id_student) : Number(req.user.id); // Use id_student if provided, otherwise use authenticated user ID
+    const bedrijfId = body.id_bedrijf ? Number(body.id_bedrijf) : null; // Use id_bedrijf if provided, otherwise null
+    let datum = body.datum ? body.datum : null; // Use datum if provided, otherwise null
+    // Force seconds to 00 if datum is in the correct format (YYYY-MM-DD hh:mm:ss or YYYY-MM-DD hh:mm)
+    if (typeof datum === 'string') {
+        // If datum is in format YYYY-MM-DD hh:mm:ss, replace seconds with 00
+        datum = datum.replace(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}):\d{2}$/, '$1:00');
+        // If datum is in format YYYY-MM-DD hh:mm, add :00
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(datum)) {
+            datum = datum + ':00';
+        }
+    }
+    console.log('Creating speeddate with:', { datum, bedrijfId, studentId });
+    if (!datum || !bedrijfId || !studentId) {
         return res.status(400).json({ error: 'Datum (datetime), id_bedrijf, and id_student are required' });
     }
 
@@ -87,18 +102,18 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
         return res.status(400).json({ error: 'Invalid datetime format. Use MySQL DATETIME (e.g., 2025-06-13 15:30:00)' });
     }
 
-    if (isNaN(id_bedrijf) || isNaN(id_student)) {
+    if (isNaN(bedrijfId) || isNaN(studentId)) {
         return res.status(400).json({ error: 'id_bedrijf and id_student must be valid numbers' });
     }
 
-    const isAvailable = await isDateAvailable(id_bedrijf, id_student, datum);
+    const isAvailable = await isDateAvailable(bedrijfId, studentId, datum);
 
     if (!isAvailable) {
         return res.status(400).json({ error: 'The selected date and time is not available for the student or company' });
     }
 
     try {
-        const newSpeeddate = await addSpeeddate(id_bedrijf, id_student, datum);
+        const newSpeeddate = await addSpeeddate(bedrijfId, studentId, datum);
         if (newSpeeddate) {
             const info = await getSpeeddateInfo(newSpeeddate);
             res.status(201).json({ message: 'Speeddate created successfully', speeddate: info });
@@ -162,22 +177,36 @@ router.post('/reject/:speeddateID', passport.authenticate('jwt', { session: fals
 // GET /user/:userID/unavailable
 router.get('/user/:userID/unavailable', passport.authenticate('jwt', { session: false }), async (req, res) => {
     const userId = req.params['userID'];
+    const ownId = req.user.id;
     if (!userId) {
         return res.status(400).json({ error: 'userID is required' });
     }
     try {
         // Get all speeddates for the given id (bedrijf or student)
-        const speeddates = await getSpeeddatesByUserId(userId);
-        // Map to time windows
-        const windows = speeddates.map(sd => {
-            const id = sd.id;
-            const begin = sd.datum;
-            const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
-            return { id, begin, einde };
-        });
-        res.json(windows);
+        const unavailableDates = await getUnavailableDates(ownId, userId);
+        res.json(unavailableDates);
     } catch (error) {
         console.error('Error fetching unavailable time windows:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+router.get('/user/:userID/available', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const userId = req.params['userID'];
+    const ownId = req.user.id;
+    const eventId = req.query.eventId ? req.query.eventId : 1; // Optional event ID for filtering
+    if (!userId) {
+        return res.status(400).json({ error: 'userID is required' });
+    }
+    try {
+        // Get all speeddates for the given id (bedrijf or student)
+        const availableDates = await getAvailableDates(ownId, userId, eventId);
+        console.log('Available dates for user ID', userId, ':', availableDates);
+
+        res.json(availableDates);
+    } catch (error) {
+        console.error('Error fetching available time windows:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

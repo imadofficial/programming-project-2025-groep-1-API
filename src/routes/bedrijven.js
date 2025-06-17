@@ -4,11 +4,12 @@ const { getAllBedrijven, getBedrijfById, getGoedgekeurdeBedrijven, getNietGoedge
 const { addSkillToUser, removeSkillFromUser, getSkillsByUserId, addSkillsToUser } = require('../sql/skills.js');
 const { getFunctiesByUserId, addFunctiesToUser, removeFunctieFromUser } = require('../sql/functie.js');
 const authAdmin = require('../auth/authAdmin.js');
-const canEdit = require('../auth/canEdit.js');
+const { canEdit } = require('../auth/canEdit.js');
+const { updateProfielFoto, deleteProfielFoto } = require('../sql/profielFoto.js');
 
 require('../auth/passportJWT.js');
 
-const router = express.Router()
+const router = express.Router();
 
 
 // GET /
@@ -238,5 +239,49 @@ router.delete('/:bedrijfID/skills/:skillID', [passport.authenticate('jwt', { ses
     }
 });
 
+
+// PUT /:bedrijfID/profielFoto
+router.put('/:bedrijfID/profielfoto', [passport.authenticate('jwt', { session: false }), canEdit], async (req, res) => {
+    const bedrijfId = req.params['bedrijfID'];
+    const { profiel_foto } = req.body;
+
+    if (!bedrijfId) {
+        return res.status(400).json({ error: 'Bedrijf ID is required' });
+    }
+    if (!profiel_foto || typeof profiel_foto !== 'string') {
+        return res.status(400).json({ error: 'Profiel foto key must be a valid string' });
+    }
+
+    try {
+        const success = await updateProfielFoto(bedrijfId, profiel_foto);
+        if (success) {
+            const updatedBedrijf = await getBedrijfById(bedrijfId);
+            res.json({ message: 'Profiel foto updated successfully', bedrijf: updatedBedrijf });
+        } else {
+            res.status(404).json({ message: 'Bedrijf not found or not updated' });
+        }
+    } catch (error) {
+        console.error('Error updating profiel foto:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+// DELETE /:bedrijfID/profielfoto
+router.delete('/:bedrijfID/profielfoto', [passport.authenticate('jwt', { session: false }), canEdit], async (req, res) => {
+    const bedrijfId = req.params['bedrijfID'];
+    try {
+        const success = await deleteProfielFoto(bedrijfId);
+        if (success) {
+            const updatedBedrijf = await getBedrijfById(bedrijfId);
+            res.json({ message: 'Profiel foto deleted successfully', bedrijf: updatedBedrijf });
+        } else {
+            res.status(404).json({ message: 'Bedrijf not found or profiel foto not deleted' });
+        }
+    } catch (error) {
+        console.error('Error deleting profiel foto:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 module.exports = router;

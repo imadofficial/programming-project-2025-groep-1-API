@@ -27,7 +27,7 @@ components:
           type: integer
           enum: [2]
           description: The type of user (always "student" for this schema).
-        gebruiker_id:
+        id:
           type: integer
           description: The unique user ID.
         voornaam:
@@ -40,31 +40,47 @@ components:
           type: string
           format: uri
           description: The student's LinkedIn profile URL.
-        profiel_foto:
+        profiel_foto_key:
+          type: string
+          description: The key for the student's profile photo.
+          example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+        profiel_foto_url:
           type: string
           format: uri
           description: The student's profile photo URL.
+          example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
         studiejaar:
           type: integer
           description: The student's year of study.
         opleiding_id:
           type: integer
           description: The ID of the student's opleiding (program).
+        date_of_birth:
+          type: string
+          format: date
+          description: The student's date of birth.
+        contact_email:
+          type: string
+          format: email
+          description: The student's contact email.
       example:
         type: 2
-        gebruiker_id: 1
+        id: 1
         voornaam: Jan
         achternaam: Jansen
         linkedin: /in/janjansen
-        profiel_foto: /profile.jpg
+        profiel_foto_key: 69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh
+        profiel_foto_url: https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh
         studiejaar: 2
         opleiding_id: 1
+        date_of_birth: '2000-01-01'
+        contact_email: 'jan.jansen@example.com'
     Bedrijf:
       type: object
       description: A company (bedrijf) user object.
       required:
         - type
-        - gebruiker_id
+        - id
         - naam
         - plaats
         - contact_email
@@ -75,7 +91,7 @@ components:
           type: integer
           enum: [3]
           description: The type of user (always "bedrijf" for this schema).
-        gebruiker_id:
+        id:
           type: integer
           description: The unique user ID.
         naam:
@@ -92,31 +108,41 @@ components:
           type: string
           format: uri
           description: The company's LinkedIn profile URL.
-        profiel_foto:
+        sector_bedrijf:
+          type: string
+          description: The sector of the company.
+          example: 'Informatica'
+        profiel_foto_key:
+          type: string
+          description: The key for the company's profile photo.
+          example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+        profiel_foto_url:
           type: string
           format: uri
           description: The company's profile photo URL.
+          example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
       example:
         type: 3
-        gebruiker_id: 2
+        id: 2
         naam: Tech Solutions
         plaats: Brussel
         contact_email: contact@techsolutions.com
         linkedin: /company/techsolutions
-        profiel_foto: /company_logo.jpg
+        profiel_foto_key: 69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh
+        profiel_foto_url: https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh
     Admin:
       type: object
       description: An admin user object.
       required:
         - type
-        - gebruiker_id
+        - id
         - email
       properties:
         type:
           type: integer
           enum: [1]
           description: The type of user (always "admin" for this schema).
-        gebruiker_id:
+        id:
           type: integer
           description: The unique user ID.
         email:
@@ -126,7 +152,7 @@ components:
           description: The admin's email address.
       example:
         type: 1
-        gebruiker_id: 3
+        id: 3
         email: admin@example.com
 
 
@@ -136,12 +162,15 @@ security:
 
 info:
   title: EHB Match API
-  version: '0.2'
+  version: '0.4'
 
 tags:
   - name: Auth
     description: >
       Authentication endpoints for the API.
+  - name: Profielfotos
+    description: >
+      Endpoints for managing user profile photos.
   - name: Registration
     description: >
       Endpoints for user registration and management.
@@ -169,6 +198,10 @@ tags:
   - name: Stands
     description: >
       Endpoints for managing stands.
+  - name: QR
+    description: >
+      Endpoints for managing QR codes.
+      Momentarily not implemented, but will be used for scanning QR codes at events.
 
 servers:
   - url: https://api.ehb-match.me
@@ -308,6 +341,372 @@ paths:
                     type: string
                     example: 'Logout successful'
 
+  /profielfotos:
+    post:
+      tags:
+        - Profielfotos
+      operationId: uploadProfilePhoto
+      summary: Upload a profile photo
+      description: >
+        This endpoint allows users to upload a profile photo (Maximum 2MB).
+        Allowed file types are: jpg, jpeg, png, gif. Other file types will be rejected for security reasons.
+        The photo will be stored and associated with the user's account.
+        Please use the profiel_foto_key returned in the response to register the profile photo with a user.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                  description: The profile photo file to upload
+                  required: true
+      responses:
+        '200':
+          description: Successful upload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Profile photo uploaded successfully'
+                  profiel_foto_key:
+                    type: string
+                    example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                  profiel_foto_url:
+                    type: string
+                    format: uri
+                    example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+
+  /profielfotos/{profielFotoKey}:
+    delete:
+      tags:
+        - Profielfotos
+      operationId: deleteProfilePhoto
+      summary: Delete a profile photo
+      description: >
+        This endpoint allows users to delete their profile photo.
+        The photo will be removed from the user's account.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: profielFotoKey
+          in: path
+          required: true
+          schema:
+            type: string
+            description: The key of the profile photo to delete
+      responses:
+        '200':
+          description: Successful deletion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Temporary profile picture deleted successfully'
+        '404':
+          description: Profile photo not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Profile photo not found'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Internal server error: Could not delete profile picture'
+
+  /bedrijven/{bedrijfID}/profielfoto:
+    put:
+      tags:
+        - Profielfotos
+      operationId: updateCompanyProfilePhoto
+      summary: Update a company's profile photo
+      description: >
+        This endpoint allows companies to update their profile photo.
+        The photo will be stored and associated with the company's account.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profiel_foto:
+                  type: string
+                  description: >
+                    The profile photo key. This key was obtained from https://api.ehb-match.me/profielfotos.
+                    If not provided, no profile photo will be used.
+                  example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+      responses:
+        '200':
+          description: Successful update
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Company profile photo updated successfully'
+                  bedrijf:
+                    type: object
+                    properties:
+                      gebruiker_id:
+                        type: integer
+                        example: 42
+                      naam:
+                        type: string
+                        example: 'Tech Solutions'
+                      plaats:
+                        type: string
+                        example: 'Brussel'
+                      contact_email:
+                        type: string
+                        format: email
+                        example: 'info@techsolutions.com'
+                      linkedin:
+                        type: string
+                        format: uri
+                        example: 'https://www.linkedin.com/company/techsolutions'
+                      sector_bedrijf:
+                        type: string
+                        example: 'Informatica'
+                      profiel_foto_key:
+                        type: string
+                        example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      profiel_foto_url:
+                        type: string
+                        format: uri
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+    delete:
+      tags:
+        - Profielfotos
+      operationId: deleteCompanyProfilePhoto
+      summary: Delete a company's profile photo
+      description: >
+        This endpoint allows companies to delete their profile photo.
+        The photo will be removed from the company's account.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful deletion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Company profile photo deleted successfully'
+                  bedrijf:
+                    type: object
+                    properties:
+                      gebruiker_id:
+                        type: integer
+                        example: 42
+                      naam:
+                        type: string
+                        example: 'Tech Solutions'
+                      plaats:
+                        type: string
+                        example: 'Brussel'
+                      contact_email:
+                        type: string
+                        format: email
+                        example: 'info@techsolutions.com'
+                      linkedin:
+                        type: string
+                        format: uri
+                        example: 'https://www.linkedin.com/company/techsolutions'
+                      sector_bedrijf:
+                        type: string
+                        example: 'Informatica'
+                      profiel_foto_key:
+                        type: string
+                        example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      profiel_foto_url:
+                        type: string
+                        format: uri
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+
+  /studenten/{studentID}/profielfoto:
+    put:
+      tags:
+        - Profielfotos
+      operationId: updateStudentProfilePhoto
+      summary: Update a student's profile photo
+      description: >
+        This endpoint allows students to update their profile photo.
+        The photo will be stored and associated with the student's account.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profiel_foto:
+                  type: string
+                  description: >
+                    The profile photo key. This key was obtained from https://api.ehb-match.me/profielfotos.
+                    If not provided, no profile photo will be used.
+                  example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+      responses:
+        '200':
+          description: Successful update
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Student profile photo updated successfully'
+                  student:
+                    type: object
+                    properties:
+                      gebruiker_id:
+                        type: integer
+                        example: 42
+                      voornaam:
+                        type: string
+                        example: 'Jan'
+                      achternaam:
+                        type: string
+                        example: 'Jansen'
+                      linkedin:
+                        type: string
+                        format: uri
+                        example: '/in/janjansen'
+                      profiel_foto_key:
+                        type: string
+                        example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      profiel_foto_url:
+                        type: string
+                        format: uri
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      studiejaar:
+                        type: integer
+                        example: 2
+                      opleiding_id:
+                        type: integer
+                        example: 1
+                      date_of_birth:
+                        type: string
+                        format: date
+                        example: '1970-01-01'
+                      contact_email:
+                        type: string
+                        format: email
+                        example: 'jan.jansen@example.com'
+    delete:
+      tags:
+        - Profielfotos
+      operationId: deleteStudentProfilePhoto
+      summary: Delete a student's profile photo
+      description: >
+        This endpoint allows students to delete their profile photo.
+        The photo will be removed from the student's account.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: studentID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Successful deletion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Student profile photo deleted successfully'
+                  student:
+                    type: object
+                    properties:
+                      gebruiker_id:
+                        type: integer
+                        example: 42
+                      voornaam:
+                        type: string
+                        example: 'Jan'
+                      achternaam:
+                        type: string
+                        example: 'Jansen'
+                      linkedin:
+                        type: string
+                        format: uri
+                        example: '/in/janjansen'
+                      profiel_foto_key:
+                        type: string
+                        example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      profiel_foto_url:
+                        type: string
+                        format: uri
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      studiejaar:
+                        type: integer
+                        example: 2
+                      opleiding_id:
+                        type: integer
+                        example: 1
+                      date_of_birth:
+                        type: string
+                        format: date
+                        example: '1970-01-01'
+                      contact_email:
+                        type: string
+                        format: email
+                        example: 'jan.jansen@example.com'
+
   /auth/register/user:
     post:
       tags:
@@ -390,6 +789,7 @@ paths:
         This endpoint allows the registration of a new student account.
         The student must provide their email, password, first name, last name,
         LinkedIn profile, profile photo, study year, and opleiding ID.
+        Please use the profiel_foto_key returned in the response of the profile photo upload endpoint to register the profile photo with a user.
       requestBody:
         required: true
         content:
@@ -424,8 +824,10 @@ paths:
                   example: '/in/janjansen'
                 profiel_foto:
                   type: string
-                  format: uri
-                  example: '/profile.jpg'
+                  description: >
+                    The profile photo key. This key was obtained from https://api.ehb-match.me/profielfotos.
+                    If not provided, no profile photo will be used.
+                  example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
                 studiejaar:
                   type: integer
                   example: 2
@@ -456,6 +858,11 @@ paths:
       tags:
         - Registration
       summary: Register a new company
+      description: >
+        This endpoint allows the registration of a new company account.
+        The company must provide their email, password, name, location,
+        contact email, LinkedIn profile, and profile photo.
+        Please use the profiel_foto_key returned in the response of the profile photo upload endpoint to register the profile photo with a user.
       requestBody:
         required: true
         content:
@@ -492,8 +899,10 @@ paths:
                   example: '/company/techsolutions'
                 profiel_foto:
                   type: string
-                  format: uri
-                  example: '/company_logo.jpg'
+                  description: >
+                    The profile photo key. This key was obtained from https://api.ehb-match.me/profielfotos.
+                    If not provided, no profile photo will be used.
+                  example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
       responses:
         '201':
           description: Created
@@ -637,6 +1046,15 @@ paths:
             default: true
           description: >
             If true (default), results are weighted by functie, opleiding and skills. If false, companies that want the student's functie are listed first, then opleiding, then others, all ordered by skill matches.
+        - name: onlyNew
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: >
+            If true, only returns companies that have not been matched with the student before.
+            This is used to avoid showing the same companies multiple times.
       responses:
         '200':
           description: List of bedrijven ordered by relevance
@@ -659,7 +1077,16 @@ paths:
                     linkedin:
                       type: string
                       format: uri
-                    profiel_foto:
+                    sector_bedrijf:
+                      type: string
+                      description: >
+                        The sector of the company.
+                        This is used to filter companies by sector.
+                      example: 'Informatica'
+                    profiel_foto_key:
+                      type: string
+                      example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                    profiel_foto_url:
                       type: string
                       format: uri
                       example: 'https://example.com/company_logo.jpg'
@@ -726,6 +1153,15 @@ paths:
             default: true
           description: >
             If true (default), results are weighted by functie, opleiding and skills. If false, students with matching functie are listed first, then opleiding, then others, all ordered by skill matches.
+        - name: onlyNew
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: >
+            If true, only returns students that have not been matched with the bedrijf before.
+            This is used to avoid showing the same students multiple times.
       responses:
         '200':
           description: List of studenten ordered by relevance
@@ -745,7 +1181,10 @@ paths:
                     linkedin:
                       type: string
                       format: uri
-                    profiel_foto:
+                    profiel_foto_key:
+                      type: string
+                      example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                    profiel_foto_url:
                       type: string
                       format: uri
                     studiejaar:
@@ -756,6 +1195,10 @@ paths:
                       type: string
                       format: date
                       example: '2006-05-16'
+                    contact_email:
+                      type: string
+                      format: email
+                      example: 'jan.jansen@example.com'
                     functie_matches:
                       type: boolean
                       description: >
@@ -817,7 +1260,10 @@ paths:
                     linkedin:
                       type: string
                       format: uri
-                    profiel_foto:
+                    profiel_foto_key:
+                      type: string
+                      example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                    profiel_foto_url:
                       type: string
                       format: uri
                       example: 'https://example.com/company_logo.jpg'
@@ -858,7 +1304,13 @@ paths:
                     type: string
                     format: uri
                     example: 'https://www.linkedin.com/company/techsolutions'
-                  profiel_foto:
+                  sector_bedrijf:
+                    type: string
+                    example: 'Informatica'
+                  profiel_foto_key:
+                    type: string
+                    example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                  profiel_foto_url:
                     type: string
                     format: uri
                     example: 'https://example.com/company_logo.jpg'
@@ -888,7 +1340,7 @@ paths:
             type: integer
       requestBody:
         required: true
-        description: Company data to update [Note: At least one field must be provided]
+        description: 'Company data to update [Note: At least one field must be provided]'
         content:
           application/json:
             schema:
@@ -911,62 +1363,68 @@ paths:
                 profiel_foto:
                   type: string
                   format: uri
-                  example: 'https://example.com/company_logo.jpg'
-        responses:
-          '200':
-            description: OK
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                      example: 'Company updated successfully'
-                    bedrijf:
-                      type: object
-                      properties:
-                        gebruiker_id:
-                          type: integer
-                          example: 42
-                        naam:
-                          type: string
-                          example: 'Tech Solutions'
-                        plaats:
-                          type: string
-                          example: 'Brussel'
-                        contact_email:
-                          type: string
-                          format: email
-                          example: 'contact@techsolutions.com'
-                        linkedin:
-                          type: string
-                          format: uri
-                          example: 'https://www.linkedin.com/company/techsolutions'
-                        profiel_foto:
-                          type: string
-                          format: uri
-                          example: 'https://example.com/company_logo.jpg'
-          '404':
-            description: Not Found
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                      example: 'Company not found'
-          '403':
-            description: Forbidden
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                      example: 'Forbidden: You can only update your own company record or must be admin.'
+                  example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Company updated successfully'
+                  bedrijf:
+                    type: object
+                    properties:
+                      gebruiker_id:
+                        type: integer
+                        example: 42
+                      naam:
+                        type: string
+                        example: 'Tech Solutions'
+                      plaats:
+                        type: string
+                        example: 'Brussel'
+                      contact_email:
+                        type: string
+                        format: email
+                        example: 'contact@techsolutions.com'
+                      linkedin:
+                        type: string
+                        format: uri
+                        example: 'https://www.linkedin.com/company/techsolutions'
+                      sector_bedrijf:
+                        type: string
+                        example: 'Informatica'
+                      profiel_foto_key:
+                        type: string
+                        example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      profiel_foto_url:
+                        type: string
+                        format: uri
+                        example: 'https://example.com/company_logo.jpg'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Company not found'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Forbidden: You can only update your own company record or must be admin.'
 
   /bedrijven/keur/{bedrijfID}:
     description: Approve or reject a company by ID
@@ -1042,7 +1500,13 @@ paths:
                     linkedin:
                       type: string
                       format: uri
-                    profiel_foto:
+                    sector_bedrijf:
+                      type: string
+                      example: 'Informatica'
+                    profiel_foto_key:
+                      type: string
+                      example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                    profiel_foto_url:
                       type: string
                       format: uri
                       example: 'https://example.com/company_logo.jpg'
@@ -1076,7 +1540,13 @@ paths:
                     linkedin:
                       type: string
                       format: uri
-                    profiel_foto:
+                    sector_bedrijf:
+                      type: string
+                      example: 'Informatica'
+                    profiel_foto_key:
+                      type: string
+                      example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                    profiel_foto_url:
                       type: string
                       format: uri
                       example: 'https://example.com/company_logo.jpg'
@@ -1399,14 +1869,19 @@ paths:
                   linkedin:
                     type: string
                     format: uri
-                  profiel_foto:
+                    example: '/in/janjansen'
+                  profiel_foto_key:
+                    type: string
+                    example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                  profiel_foto_url:
                     type: string
                     format: uri
+                    example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
                   studiejaar:
                     type: integer
                   opleiding_id:
                     type: integer
-      '404':
+        '404':
           description: Not Found
           content:
             application/json:
@@ -1472,6 +1947,10 @@ paths:
                   type: string
                   format: date
                   example: '1970-01-01'
+                contact_email:
+                  type: string
+                  format: email
+                  example: 'jan.jansen@example.com'
       responses:
         '200':
           description: OK
@@ -1495,9 +1974,13 @@ paths:
                       linkedin:
                         type: string
                         format: uri
-                      profiel_foto:
+                      profiel_foto_key:
+                        type: string
+                        example: '69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
+                      profiel_foto_url:
                         type: string
                         format: uri
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPrFUYmc4veo3W4nvKft2iVTm6jpdRUwzCM7Zkh'
                       studiejaar:
                         type: integer
                       opleiding_id:
@@ -2042,7 +2525,7 @@ paths:
                       profiel_foto_bedrijf:
                         type: string
                         format: uri
-                        example: 'https://example.com/company_logo.jpg'
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                       sector_bedrijf:
                         type: string
                         example: 'Informatica'
@@ -2058,7 +2541,7 @@ paths:
                       profiel_foto_student:
                         type: string
                         format: uri
-                        example: 'https://example.com/student_profile.jpg'
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                       akkoord:
                         type: boolean
                         example: false
@@ -2106,7 +2589,7 @@ paths:
                     profiel_foto_bedrijf:
                       type: string
                       format: uri
-                      example: 'https://example.com/company_logo.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     sector_bedrijf:
                       type: string
                       example: 'Informatica'
@@ -2122,7 +2605,7 @@ paths:
                     profiel_foto_student:
                       type: string
                       format: uri
-                      example: 'https://example.com/student_profile.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     akkoord:
                       type: boolean
                       example: true
@@ -2170,7 +2653,7 @@ paths:
                     profiel_foto_bedrijf:
                       type: string
                       format: uri
-                      example: 'https://example.com/company_logo.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     sector_bedrijf:
                       type: string
                       example: 'Informatica'
@@ -2186,7 +2669,7 @@ paths:
                     profiel_foto_student:
                       type: string
                       format: uri
-                      example: 'https://example.com/student_profile.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     akkoord:
                       type: boolean
                       example: true
@@ -2234,7 +2717,7 @@ paths:
                   profiel_foto_bedrijf:
                     type: string
                     format: uri
-                    example: 'https://example.com/company_logo.jpg'
+                    example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                   sector_bedrijf:
                     type: string
                     example: 'Informatica'
@@ -2250,7 +2733,7 @@ paths:
                   profiel_foto_student:
                     type: string
                     format: uri
-                    example: 'https://example.com/student_profile.jpg'
+                    example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                   akkoord:
                     type: boolean
                     example: true
@@ -2311,7 +2794,7 @@ paths:
                     profiel_foto_bedrijf:
                       type: string
                       format: uri
-                      example: 'https://example.com/company_logo.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     sector_bedrijf:
                       type: string
                       example: 'Informatica'
@@ -2327,10 +2810,11 @@ paths:
                     profiel_foto_student:
                       type: string
                       format: uri
-                      example: 'https://example.com/student_profile.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     akkoord:
                       type: boolean
                       example: true
+
                     lokaal:
                       type: string
                       example: 'A101'
@@ -2378,7 +2862,7 @@ paths:
                     profiel_foto_bedrijf:
                       type: string
                       format: uri
-                      example: 'https://example.com/company_logo.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     sector_bedrijf:
                       type: string
                       example: 'Informatica'
@@ -2394,7 +2878,7 @@ paths:
                     profiel_foto_student:
                       type: string
                       format: uri
-                      example: 'https://example.com/student_profile.jpg'
+                      example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                     akkoord:
                       type: boolean
                       example: false
@@ -2448,7 +2932,7 @@ paths:
                       profiel_foto_bedrijf:
                         type: string
                         format: uri
-                        example: 'https://example.com/company_logo.jpg'
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                       sector_bedrijf:
                         type: string
                         example: 'Informatica'
@@ -2464,7 +2948,7 @@ paths:
                       profiel_foto_student:
                         type: string
                         format: uri
-                        example: 'https://example.com/student_profile.jpg'
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                       akkoord:
                         type: boolean
                         example: true
@@ -2528,7 +3012,7 @@ paths:
                       profiel_foto_bedrijf:
                         type: string
                         format: uri
-                        example: 'https://example.com/company_logo.jpg'
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                       sector_bedrijf:
                         type: string
                         example: 'Informatica'
@@ -2544,7 +3028,7 @@ paths:
                       profiel_foto_student:
                         type: string
                         format: uri
-                        example: 'https://example.com/student_profile.jpg'
+                        example: 'https://gt0kk4fbet.ufs.sh/f/69hQMvkhSwPraCGnNWS7L1K2vb4pIFAPBaNtzcZmEqjTrw9n'
                       akkoord:
                         type: boolean
                         example: true
@@ -2595,6 +3079,43 @@ paths:
                     id:
                       type: integer
                       example: 1
+                    begin:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:00:00Z'
+                    einde:
+                      type: string
+                      format: date-time
+                      example: '2023-10-01T10:10:00Z'
+
+  /speeddates/user/{userID}/available:
+    description: List of available dates for a user and the authenticated user
+    get:
+      tags:
+        - Speeddates
+      summary: Get all available dates for a user
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: eventID
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Optional event ID to filter available dates for a specific event.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
                     begin:
                       type: string
                       format: date-time
@@ -2692,3 +3213,210 @@ paths:
       responses:
         '204':
           description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Stand ID is required'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Stand not found'
+
+  /contact:
+    post:
+      tags:
+        - Contact
+      summary: 'Send a contact message'
+      description: 'Send a contact message to the support team'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: 'john.doe@example.com'
+                onderwerp:
+                  type: string
+                  example: 'Question about my order'
+                bericht:
+                  type: string
+                  example: 'I would like to know the status of my order.'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Contact message sent successfully'
+                  id:
+                    type: integer
+                    example: 42
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Invalid input data'
+    get:
+      tags:
+        - Contact
+      summary: Get all contact messages
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 42
+                    email:
+                      type: string
+                      format: email
+                      example: 'john.doe@example.com'
+                    onderwerp:
+                      type: string
+                      example: 'Question about my order'
+                    bericht:
+                      type: string
+                      example: 'I would like to know the status of my order.'
+  /contact/{messageID}:
+    get:
+      tags:
+        - Contact
+      summary: Get a specific contact message by ID
+      parameters:
+        - name: messageID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 42
+                  email:
+                    type: string
+                    format: email
+                    example: 'john.doe@example.com'
+                  onderwerp:
+                    type: string
+                    example: 'Question about my order'
+                  bericht:
+                    type: string
+                    example: 'I would like to know the status of my order.'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Contact message not found'
+    delete:
+      tags:
+        - Contact
+      summary: Delete a contact message by ID
+      parameters:
+        - name: messageID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Contact message not found'
+
+  /qr:
+    get:
+      description: |
+        [DEPRECATED] This endpoint is not implemented. QR code generation currently returns a placeholder url.
+      deprecated: true
+      parameters:
+        - name: userID
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Optional user ID to generate QR code for. If omitted, uses the authenticated user.
+      tags:
+        - QR
+      summary: Generate a QR Code for the authenticated user (NOT IMPLEMENTED)
+      responses:
+        '501':
+          description: Not Implemented
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'QR code generation is not implemented.'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'User ID is required'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'User not found'

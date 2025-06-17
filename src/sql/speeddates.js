@@ -20,7 +20,7 @@ async function getSpeeddateById(id) {
     `;
     try {
         const [rows] = await pool.query(query, [id]);
-        // Map each row to omit datum, add begin/einde
+        // Map each row to omit datum, add begin/einde, and construct profiel_foto URLs
         return rows.map(speeddate => {
             const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
             const begin = datum; // Already returned in ISO format
@@ -60,8 +60,12 @@ async function getSpeeddateHistoryByUserId(id) {
             const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
             const begin = datum; // Already returned in ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            const profiel_foto_bedrijf_url = profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_bedrijf}` : null;
+            const profiel_foto_student_url = profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_student}` : null;
             return {
                 ...rest,
+                profiel_foto_bedrijf: profiel_foto_bedrijf_url,
+                profiel_foto_student: profiel_foto_student_url,
                 begin,
                 einde,
             };
@@ -87,7 +91,7 @@ async function getSpeeddatesByUserId(id) {
     `;
     try {
         const [rows] = await pool.query(query, [id, id]);
-        // Map each row to omit datum, add begin/einde
+        // Map each row to omit datum, add begin/einde, and construct profiel_foto URLs
         return rows.map(speeddate => {
             const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
             const begin = datum;
@@ -142,10 +146,12 @@ async function getAcceptedSpeeddatesByUserId(id) {
         LEFT JOIN sector sec ON b.id_sector = sec.id
         LEFT JOIN stand ON s.id_bedrijf = stand.id_bedrijf
         WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.akkoord = 1 AND s.datum >= NOW() - INTERVAL 10 MINUTE
+        ORDER BY s.datum ASC
     `;
     try {
         const [rows] = await pool.query(query, [id, id]);
-        // Map each row to omit datum, add begin/einde
+        console.log('Query result:', rows); // Log the query result
+        // Map each row to omit datum, add begin/einde, and construct profiel_foto URLs
         return rows.map(speeddate => {
             const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
             const begin = datum.replace(' ', 'T'); // Convert to ISO format
@@ -200,10 +206,11 @@ async function getRejectedSpeeddatesByUserId(id) {
         LEFT JOIN sector sec ON b.id_sector = sec.id
         LEFT JOIN stand ON s.id_bedrijf = stand.id_bedrijf
         WHERE (s.id_bedrijf = ? OR s.id_student = ?) AND s.akkoord = 0 AND s.datum >= NOW() - INTERVAL 10 MINUTE
+        ORDER BY s.datum ASC
     `;
     try {
         const [rows] = await pool.query(query, [id, id]);
-        // Map each row to omit datum, add begin/einde
+        // Map each row to omit datum, add begin/einde, and construct profiel_foto URLs
         return rows.map(speeddate => {
             const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
             const begin = datum.replace(' ', 'T'); // Convert to ISO format
@@ -232,6 +239,76 @@ async function getRejectedSpeeddatesByUserId(id) {
     }
 }
 
+async function getUnavailableDates(id1, id2) {
+    const pool = getPool('ehbmatchdev');
+    // Query for overlapping speeddates for the same student or company
+    const query = `
+        SELECT * FROM speeddate 
+        WHERE (id_bedrijf = ? OR id_student = ?) OR (id_student = ? OR id_bedrijf = ?)
+        `;
+    try {
+        const [rows] = await pool.query(query, [id1, id2, id1, id2]);
+        const windows = rows.map(row => {
+            const id = row.id;
+            const begin = row.datum; // Already in ISO format
+            const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            return { id, begin, einde };
+        });
+        return windows;
+    } catch (error) {
+        console.error('Database query error in getUnavailableDates:', error.message, error.stack);
+        throw new Error('Checking unavailable dates failed');
+    }
+}
+
+async function getAvailableDates(id1, id2, evenementId) {  
+    const pool = getPool('ehbmatchdev');
+    // Query for overlapping speeddates for the same student or company
+    const query = `
+        SELECT * FROM speeddate 
+        WHERE (id_bedrijf = ? OR id_student = ?) OR (id_student = ? OR id_bedrijf = ?)
+        `;
+    const timeQuery = `SELECT * FROM evenement WHERE id = ?`;
+    try {
+        const [timeRows] = await pool.query(timeQuery, [evenementId]);
+        if (timeRows.length === 0) {
+            throw new Error('Event not found');
+        }
+        const { begin, einde } = timeRows[0];
+        const [rows] = await pool.query(query, [id1, id2, id1, id2]);
+        const startDate = new Date(begin);
+        const stopDate = new Date(einde);
+        // Get all taken windows for this company/student
+        const takenWindows = rows.map(row => {
+            const takenBegin = new Date(row.datum);
+            const takenEnd = new Date(takenBegin.getTime() + 10 * 60 * 1000);
+            return { begin: takenBegin, einde: takenEnd };
+        });
+        // Generate all possible 10-min windows between startDate and stopDate
+        const allWindows = [];
+        let windowStart = new Date(startDate);
+        while (windowStart.getTime() + 10 * 60 * 1000 <= stopDate.getTime()) {
+            const windowEnd = new Date(windowStart.getTime() + 10 * 60 * 1000);
+            allWindows.push({ begin: new Date(windowStart), einde: new Date(windowEnd) });
+            windowStart = new Date(windowStart.getTime() + 10 * 60 * 1000);
+        }
+        // Exclude windows that overlap with any taken window
+        const availableWindows = allWindows.filter(({ begin, einde }) => {
+            return !takenWindows.some(taken =>
+                (begin < taken.einde && einde > taken.begin)
+            );
+        });
+        // Return as ISO strings
+        return availableWindows.map(({ begin, einde }) => ({
+            begin: begin.toISOString(),
+            einde: einde.toISOString()
+        }));
+    } catch (error) {
+        console.error('Database query error in getAvailableDates:', error.message, error.stack);
+        throw new Error('Checking available dates failed');
+    }
+}
+
 async function isDateAvailable(id_bedrijf, id_student, datum) {
     const pool = getPool('ehbmatchdev');
     // Calculate 10-minute window (+10 minutes)
@@ -242,7 +319,8 @@ async function isDateAvailable(id_bedrijf, id_student, datum) {
     const startWindow = new Date(dateObj.getTime());
     const endWindow = new Date(dateObj.getTime() + 10 * 60 * 1000); // 10 min after
     // Query for overlapping speeddates for the same student or company
-    const query = `SELECT * FROM speeddate 
+    const query = `
+        SELECT * FROM speeddate 
         WHERE (id_bedrijf = ? OR id_student = ?)
         AND datum >= ?
         AND datum < ?`;
@@ -347,7 +425,7 @@ async function getSpeeddateInfo(id) {
             const speeddate = rows[0];
             // Rename datum to begin and add einde (10 minutes later), omit datum
             const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
-            const begin = datum.replace(' ', 'T'); // Convert to ISO format
+            const begin = datum; // Already returned in ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
             const profiel_foto_bedrijf_url = profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_bedrijf}` : null;
             const profiel_foto_student_url = profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_student}` : null;

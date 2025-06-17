@@ -3,11 +3,12 @@ const passport = require('passport');
 const { getAllStudenten, getStudentById, updateStudent } = require('../sql/studenten.js');
 const { getSkillsByUserId, addSkillsToUser, removeSkillFromUser } = require('../sql/skills.js');
 const { getFunctiesByUserId, addFunctiesToUser, removeFunctieFromUser } = require('../sql/functie.js');
-const canEdit = require('../auth/canEdit.js');
+const { updateProfielFoto, deleteProfielFoto } = require('../sql/profielFoto.js');
+const { canEdit } = require('../auth/canEdit.js');
 
 require('../auth/passportJWT.js');
 
-const router = express.Router()
+const router = express.Router();
 
 
 // GET /
@@ -196,6 +197,48 @@ router.put('/:studentID', passport.authenticate('jwt', { session: false }), canE
         }
     } catch (error) {
         console.error('Error updating student:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+// PUT /:studentID/profiel_foto
+router.put('/:studentID/profielfoto', [passport.authenticate('jwt', { session: false }), canEdit], async (req, res) => {
+    const studentId = req.params.studentID;
+    const { profiel_foto } = req.body;
+
+    if (!profiel_foto || typeof profiel_foto !== 'string') {
+        return res.status(400).json({ message: 'Profiel foto key is required' });
+    }
+
+    try {
+        const success = await updateProfielFoto(studentId, profiel_foto);
+        if (success) {
+            const updatedStudent = await getStudentById(studentId);
+            res.json({ message: "Profiel foto updated successfully", student: updatedStudent });
+        } else {
+            res.status(404).json({ message: 'Student not found or not updated' });
+        }
+    } catch (error) {
+        console.error('Error updating profiel foto:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+// DELETE /:studentID/profielfoto
+router.delete('/:studentID/profielfoto', [passport.authenticate('jwt', { session: false }), canEdit], async (req, res) => {
+    const studentId = req.params.studentID;
+    try {
+        const success = await deleteProfielFoto(studentId);
+        if (success) {
+            const updatedStudent = await getStudentById(studentId);
+            res.json({ message: 'Profiel foto deleted successfully', student: updatedStudent });
+        } else {
+            res.status(404).json({ message: 'Student not found or profiel foto not deleted' });
+        }
+    } catch (error) {
+        console.error('Error deleting profiel foto:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

@@ -9,7 +9,7 @@ dotenv.config();
 
 async function getAllBedrijven() {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM bedrijf'; // Corrected table name
+    const query = 'SELECT b.*, s.naam AS sector_bedrijf FROM bedrijf b LEFT JOIN sector s ON b.id_sector = s.id'; // Corrected table name
 
     try {
         const [rows] = await pool.query(query);
@@ -27,12 +27,22 @@ async function getAllBedrijven() {
 }
 async function getBedrijfById(id) {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM bedrijf WHERE gebruiker_id = ?';
+    const query = 'SELECT b.*, s.naam AS sector_bedrijf FROM bedrijf b LEFT JOIN sector s ON b.id_sector = s.id WHERE b.gebruiker_id = ?';
+    const baseUrl = "https://gt0kk4fbet.ufs.sh/f/";
 
     try {
         const [rows] = await pool.query(query, [id]);
         if (rows.length > 0) {
-            return rows[0]; // Return the first bedrijf found
+            const bedrijf = rows[0];
+            if (bedrijf.profiel_foto) {
+                bedrijf.profiel_foto_key = bedrijf.profiel_foto;
+                bedrijf.profiel_foto_url = baseUrl + bedrijf.profiel_foto;
+            } else {
+                bedrijf.profiel_foto_key = null;
+                bedrijf.profiel_foto_url = null;
+            }
+            delete bedrijf.profiel_foto; // Remove the original profiel_foto field
+            return bedrijf; // Return the first bedrijf found with extra fields
         } else {
             return null; // Return null if no bedrijf is found
         }   
@@ -45,7 +55,7 @@ async function getBedrijfById(id) {
 
 async function getGoedgekeurdeBedrijven() {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM bedrijf WHERE goedkeuring = 1';
+    const query = 'SELECT b.*, s.naam AS sector_bedrijf FROM bedrijf b LEFT JOIN sector s ON b.id_sector = s.id WHERE b.goedkeuring = 1';
 
     try {
         const [rows] = await pool.query(query);
@@ -63,7 +73,7 @@ async function getGoedgekeurdeBedrijven() {
 
 async function getNietGoedgekeurdeBedrijven() {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM bedrijf WHERE goedkeuring = 0';
+    const query = 'SELECT b.*, s.naam AS sector_bedrijf FROM bedrijf b LEFT JOIN sector s ON b.id_sector = s.id WHERE b.goedkeuring = 0';
 
     try {
         const [rows] = await pool.query(query);

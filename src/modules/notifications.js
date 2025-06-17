@@ -32,4 +32,6 @@ async function sendNotification(userIds, title, message) {
    await Promise.all(promises);
 }
 
-module.exports = sendNotification;
+module.exports = {
+    sendNotification
+};
