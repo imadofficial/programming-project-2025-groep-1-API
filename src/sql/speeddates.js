@@ -196,32 +196,35 @@ async function getAvailableDates(id1, id2) {
         if (!evenementRows || evenementRows.length === 0) return [];
         // 2. Get all speeddates for id1 or id2 (as bedrijf or student)
         const [speeddateRows] = await pool.query(speeddateQuery, [id1, id2, id1, id2]);
-        // 3. Build a set of taken windows (start time in ISO string)
+        // 3. Build a set of taken windows (start time in ISO string, Brussels time)
         const takenWindows = new Set();
         for (const row of speeddateRows) {
             let takenStart;
             if (row.datum instanceof Date) {
-                takenStart = row.datum;
+                takenStart = DateTime.fromJSDate(row.datum, { zone: 'Europe/Brussels' });
             } else if (typeof row.datum === 'string' && row.datum) {
-                takenStart = new Date(row.datum.replace(' ', 'T'));
+                takenStart = DateTime.fromSQL(row.datum, { zone: 'Europe/Brussels' });
+                if (!takenStart.isValid) {
+                    takenStart = DateTime.fromISO(row.datum, { zone: 'Europe/Brussels' });
+                }
             }
-            if (takenStart && !isNaN(takenStart.getTime())) {
-                takenWindows.add(takenStart.toISOString());
+            if (takenStart && takenStart.isValid) {
+                takenWindows.add(takenStart.toISO());
             }
         }
         // 4. Generate all possible 10-minute windows from bedrijf_evenement
         let availableWindows = [];
         for (const row of evenementRows) {
-            let begin = new Date(row.begin);
-            let einde = new Date(row.einde);
-            for (let date = new Date(begin); date < einde; date.setMinutes(date.getMinutes() + 10)) {
-                const windowStart = new Date(date);
-                const windowEnd = new Date(windowStart.getTime() + 10 * 60 * 1000);
+            let begin = DateTime.fromSQL(row.begin, { zone: 'Europe/Brussels' });
+            let einde = DateTime.fromSQL(row.einde, { zone: 'Europe/Brussels' });
+            for (let date = begin; date < einde; date = date.plus({ minutes: 10 })) {
+                const windowStart = date;
+                const windowEnd = windowStart.plus({ minutes: 10 });
                 // Only include if this window is not taken
-                if (!takenWindows.has(windowStart.toISOString())) {
+                if (!takenWindows.has(windowStart.toISO())) {
                     availableWindows.push({
-                        begin: windowStart.toISOString(),
-                        einde: windowEnd.toISOString()
+                        begin: windowStart.toISO(),
+                        einde: windowEnd.toISO()
                     });
                 }
             }
