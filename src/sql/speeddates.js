@@ -89,11 +89,25 @@ async function getSpeeddatesByUserId(id) {
         const [rows] = await pool.query(query, [id, id]);
         // Map each row to omit datum, add begin/einde
         return rows.map(speeddate => {
-            const { datum, ...rest } = speeddate;
+            const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
             const begin = datum;
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            const profiel_foto_bedrijf_url = speeddate.profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${speeddate.profiel_foto_bedrijf}` : null;
+            const profiel_foto_student_url = speeddate.profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${speeddate.profiel_foto_student}` : null;
             return {
-                ...rest,
+                id: speeddate.id,
+                asked_by: speeddate.asked_by,
+                id_bedrijf: speeddate.id_bedrijf,
+                naam_bedrijf: speeddate.naam_bedrijf,
+                profiel_foto_bedrijf: profiel_foto_bedrijf_url,
+                id_sector: speeddate.id_sector,
+                sector_bedrijf: speeddate.sector_bedrijf,
+                id_student: speeddate.id_student,
+                voornaam_student: speeddate.voornaam_student,
+                achternaam_student: speeddate.achternaam_student,
+                profiel_foto_student: profiel_foto_student_url,
+                akkoord: speeddate.akkoord,
+                lokaal: speeddate.lokaal,
                 begin,
                 einde,
             };
@@ -191,13 +205,25 @@ async function getRejectedSpeeddatesByUserId(id) {
         const [rows] = await pool.query(query, [id, id]);
         // Map each row to omit datum, add begin/einde
         return rows.map(speeddate => {
-            const { datum, ...rest } = speeddate;
+            const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
             const begin = datum.replace(' ', 'T'); // Convert to ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            const profiel_foto_bedrijf_url = profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_bedrijf}` : null;
+            const profiel_foto_student_url = profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_student}` : null;
             return {
-                ...rest,
-                begin,
-                einde,
+                id: speeddate.id,
+                asked_by: speeddate.asked_by,
+                id_bedrijf: speeddate.id_bedrijf,
+                naam_bedrijf: speeddate.naam_bedrijf,
+                profiel_foto_bedrijf: profiel_foto_bedrijf_url,
+                id_sector: speeddate.id_sector,
+                sector_bedrijf: speeddate.sector_bedrijf,
+                id_student: speeddate.id_student,
+                voornaam_student: speeddate.voornaam_student,
+                achternaam_student: speeddate.achternaam_student,
+                profiel_foto_student: profiel_foto_student_url,
+                akkoord: speeddate.akkoord,
+                lokaal: speeddate.lokaal,
             };
         });
     } catch (error) {
@@ -320,11 +346,25 @@ async function getSpeeddateInfo(id) {
         if (rows.length > 0) {
             const speeddate = rows[0];
             // Rename datum to begin and add einde (10 minutes later), omit datum
-            const { datum, ...rest } = speeddate;
+            const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = speeddate;
             const begin = datum.replace(' ', 'T'); // Convert to ISO format
             const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            const profiel_foto_bedrijf_url = profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_bedrijf}` : null;
+            const profiel_foto_student_url = profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${profiel_foto_student}` : null;
             return {
-                ...rest,
+                id: speeddate.id,
+                asked_by: speeddate.asked_by,
+                id_bedrijf: speeddate.id_bedrijf,
+                naam_bedrijf: speeddate.naam_bedrijf,
+                profiel_foto_bedrijf: profiel_foto_bedrijf_url,
+                id_sector: speeddate.id_sector,
+                sector_bedrijf: speeddate.sector_bedrijf,
+                id_student: speeddate.id_student,
+                voornaam_student: speeddate.voornaam_student,
+                achternaam_student: speeddate.achternaam_student,
+                profiel_foto_student: profiel_foto_student_url,
+                akkoord: speeddate.akkoord,
+                lokaal: speeddate.lokaal,
                 begin,
                 einde,
             };
