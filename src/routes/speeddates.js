@@ -147,11 +147,22 @@ router.post('/accept/:speeddateID', passport.authenticate('jwt', { session: fals
             return res.status(404).json({ error: 'Speeddate not found' });
         }
         const info = await getSpeeddateInfo(speeddateId);
-        // Format date as 'YYYY-MM-DD HH:mm:ss' using JS Date object, removing T and Z
+        // Format date as 'YYYY-MM-DD HH:mm' or 'HH:mm' if today
         let formattedDate = '';
         if (info.begin) {
-            // info.begin is ISO string, e.g. '2025-06-22T10:00:00.000Z' or '2025-06-22T10:00:00.000+02:00'
-            formattedDate = info.begin.replace('T', ' ').replace(/\..*$/, '').replace('Z', '');
+            const dateObj = new Date(info.begin);
+            const now = new Date();
+            // Compare year, month, day
+            const isToday = dateObj.getFullYear() === now.getFullYear() &&
+                dateObj.getMonth() === now.getMonth() &&
+                dateObj.getDate() === now.getDate();
+            const pad = n => n.toString().padStart(2, '0');
+            const time = pad(dateObj.getHours()) + ':' + pad(dateObj.getMinutes());
+            if (isToday) {
+                formattedDate = time;
+            } else {
+                formattedDate = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ${time}`;
+            }
         }
         const notifications = await sendNotification(
             [info.id_bedrijf, info.id_student],
