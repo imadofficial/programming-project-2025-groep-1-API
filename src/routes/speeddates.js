@@ -122,7 +122,7 @@ router.post('/accept/:speeddateID', passport.authenticate('jwt', { session: fals
     if (!speeddateId) {
         return res.status(400).json({ error: 'Speeddate ID is required' });
     }
-    if (isOwner(speeddateId, userId)) {
+    if (await isOwner(speeddateId, userId)) {
         return res.status(400).json({ error: 'You cannot accept your own speeddate' });
     }
     try {
