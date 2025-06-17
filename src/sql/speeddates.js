@@ -200,7 +200,16 @@ async function getAvailableDates(id1, id2) {
         const takenWindows = new Set();
         for (const row of speeddateRows) {
             if (row.datum instanceof Date) {
-                const takenStart = DateTime.fromJSDate(row.datum, { zone: 'Europe/Brussels' });
+                // Interpret MySQL DATETIME as local Europe/Brussels time
+                const takenStart = DateTime.fromObject({
+                    year: row.datum.getFullYear(),
+                    month: row.datum.getMonth() + 1,
+                    day: row.datum.getDate(),
+                    hour: row.datum.getHours(),
+                    minute: row.datum.getMinutes(),
+                    second: row.datum.getSeconds(),
+                    millisecond: row.datum.getMilliseconds()
+                }, { zone: 'Europe/Brussels' });
                 if (takenStart.isValid) {
                     takenWindows.add(takenStart.toISO());
                 } else {
