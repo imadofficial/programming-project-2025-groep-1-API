@@ -147,9 +147,17 @@ router.post('/accept/:speeddateID', passport.authenticate('jwt', { session: fals
             return res.status(404).json({ error: 'Speeddate not found' });
         }
         const info = await getSpeeddateInfo(speeddateId);
-        const datum = new Date(info.begin);
-        info.begin = datum.toISOString().slice(0, 19).replace('T', ' '); // Format to MySQL DATETIME (YYYY-MM-DD HH:MM:SS)
-        const notifications = await sendNotification([info.id_bedrijf, info.id_student], 'Accepted Speeddate', `Jouw speeddate met ${info.naam_bedrijf} om ${datum} is geaccepteerd.`);
+        // Format date as 'YYYY-MM-DD HH:mm:ss' using JS Date object, removing T and Z
+        let formattedDate = '';
+        if (info.begin) {
+            // info.begin is ISO string, e.g. '2025-06-22T10:00:00.000Z' or '2025-06-22T10:00:00.000+02:00'
+            formattedDate = info.begin.replace('T', ' ').replace(/\..*$/, '').replace('Z', '');
+        }
+        const notifications = await sendNotification(
+            [info.id_bedrijf, info.id_student],
+            'Accepted Speeddate',
+            `Jouw speeddate met ${info.naam_bedrijf} om ${formattedDate} is geaccepteerd.`
+        );
         console.log('Notifications sent:', notifications);
         res.json({ message: 'Speeddate accepted', speeddate: info });
     } catch (error) {
