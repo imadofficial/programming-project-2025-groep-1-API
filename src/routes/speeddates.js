@@ -3,6 +3,8 @@ const passport = require('passport');
 const { getAllSpeeddates, getSpeeddateById, getUnavailableDates, getSpeeddatesByUserId, addSpeeddate, isDateAvailable, getSpeeddateInfo, speeddateAkkoord, speeddateAfgekeurd, getAcceptedSpeeddatesByUserId, getRejectedSpeeddatesByUserId, getSpeeddateHistoryByUserId, getAvailableDates, isOwner } = require('../sql/speeddates.js');
 const { sendNotification } = require('../modules/notifications.js');
 
+const { canAcceptSpeeddate } = require('../auth/canAcceptSpeeddate.js');
+
 require('../auth/passportJWT.js');
 
 const router = express.Router();
@@ -129,12 +131,9 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
 
 
 // POST /accept/:speeddateID
-router.post('/accept/:speeddateID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.post('/accept/:speeddateID', [passport.authenticate('jwt', { session: false }), canAcceptSpeeddate], async (req, res) => {
     const speeddateId = req.params['speeddateID'];
-    const userId = req.user.id;
-    if (!userId) {
-        return res.status(400).json({ error: 'User ID is required' });
-    }
+    const userId = req.user.id; // Declare userId
     if (!speeddateId) {
         return res.status(400).json({ error: 'Speeddate ID is required' });
     }
