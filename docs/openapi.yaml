@@ -225,16 +225,23 @@ paths:
           content:
             application/json:
               schema:
-                discriminator:
-                  propertyName: type
-                  mapping:
-                    1: '#/components/schemas/Admin'
-                    2: '#/components/schemas/Student'
-                    3: '#/components/schemas/Bedrijf'
-                oneOf:
-                 - $ref: '#/components/schemas/Student'
-                 - $ref: '#/components/schemas/Bedrijf'
-                 - $ref: '#/components/schemas/Admin'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'User information retrieved successfully'
+                  user:
+                    type: object
+                    oneOf:
+                      - $ref: '#/components/schemas/Student'
+                      - $ref: '#/components/schemas/Bedrijf'
+                      - $ref: '#/components/schemas/Admin'
+                    discriminator:
+                      propertyName: type
+                      mapping:
+                        1: '#/components/schemas/Admin'
+                        2: '#/components/schemas/Student'
+                        3: '#/components/schemas/Bedrijf'
 
 
   /auth/login:
