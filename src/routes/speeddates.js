@@ -133,6 +133,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
 // POST /accept/:speeddateID
 router.post('/accept/:speeddateID', [passport.authenticate('jwt', { session: false }), canAcceptSpeeddate], async (req, res) => {
     const speeddateId = req.params['speeddateID'];
+    const userId = req.user.id; // Declare userId
     if (!speeddateId) {
         return res.status(400).json({ error: 'Speeddate ID is required' });
     }
