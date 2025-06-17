@@ -195,6 +195,8 @@ router.get('/user/:userID/available', passport.authenticate('jwt', { session: fa
     try {
         // Get all speeddates for the given id (bedrijf or student)
         const availableDates = await getAvailableDates(ownId, userId, eventId);
+        console.log('Available dates for user ID', userId, ':', availableDates);
+
         res.json(availableDates);
     } catch (error) {
         console.error('Error fetching available time windows:', error);
