@@ -202,6 +202,7 @@ async function getAvailableDates(id1, id2) {
         const takenWindows = sdRows.map(row => {
             const takenBegin = DateTime.fromSQL(row.datum, { zone: 'Europe/Brussels' });
             const takenEnd = takenBegin.plus({ minutes: 10 });
+            console.log('Taken window:', takenBegin.toISO(), 'to', takenEnd.toISO()); // Log each taken window
             return { begin: takenBegin, einde: takenEnd };
         });
         let allAvailable = [];
