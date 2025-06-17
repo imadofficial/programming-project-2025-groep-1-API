@@ -192,20 +192,28 @@ async function getAvailableDates(id1, id2) {
     const speeddateQuery = `SELECT datum FROM speeddate WHERE id_bedrijf = ? OR id_bedrijf = ? OR id_student = ? OR id_student = ?`;
     try {
         const [beRows] = await pool.query(bedrijfEvenementQuery, [id1, id2]);
-        if (beRows.length === 0) return [];
+        console.log('bedrijf_evenement rows:', beRows);
+        if (beRows.length === 0) {
+            console.log('No bedrijf_evenement rows found for', id1, id2);
+            return [];
+        }
         // Get all speeddates for id1 or id2 (as bedrijf or student)
         const [sdRows] = await pool.query(speeddateQuery, [id1, id2, id1, id2]);
+        console.log('speeddate rows:', sdRows);
         // Precompute all taken windows in Europe/Brussels
         const takenWindows = sdRows.map(row => {
             const takenBegin = DateTime.fromSQL(row.datum, { zone: 'Europe/Brussels' });
             const takenEnd = takenBegin.plus({ minutes: 10 });
             return { begin: takenBegin, einde: takenEnd };
         });
+        console.log('takenWindows:', takenWindows.map(w => ({ begin: w.begin.toISO(), einde: w.einde.toISO() })));
         let allAvailable = [];
         for (const row of beRows) {
             const startDate = DateTime.fromSQL(row.begin, { zone: 'Europe/Brussels' });
             const stopDate = DateTime.fromSQL(row.einde, { zone: 'Europe/Brussels' });
+            console.log('bedrijf_evenement window:', { begin: startDate.toISO(), einde: stopDate.toISO() });
             let windowStart = startDate;
+            let i = 0;
             while (windowStart.plus({ minutes: 10 }) <= stopDate) {
                 const windowEnd = windowStart.plus({ minutes: 10 });
                 // Only consider taken windows that overlap with this bedrijf_evenement window
@@ -214,10 +222,18 @@ async function getAvailableDates(id1, id2) {
                 );
                 if (!overlaps) {
                     allAvailable.push({ begin: windowStart, einde: windowEnd });
+                } else {
+                    console.log(`Window ${windowStart.toISO()} - ${windowEnd.toISO()} overlaps with a taken window.`);
                 }
                 windowStart = windowStart.plus({ minutes: 10 });
+                i++;
+                if (i > 1000) { // safety break
+                    console.error('Infinite loop detected in window generation!');
+                    break;
+                }
             }
         }
+        console.log('allAvailable:', allAvailable.map(({ begin, einde }) => ({ begin: begin.toISO(), einde: einde.toISO() })));
         return allAvailable.map(({ begin, einde }) => ({
             begin: begin.toISO(),
             einde: einde.toISO()
