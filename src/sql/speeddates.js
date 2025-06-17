@@ -197,14 +197,14 @@ async function getAvailableDates(id1, id2) {
         const [sdRows] = await pool.query(speeddateQuery, [id1, id2, id1, id2]);
         // Precompute all taken windows in Europe/Brussels
         const takenWindows = sdRows.map(row => {
-            const takenBegin = DateTime.fromJSDate(new Date(row.datum), { zone: 'Europe/Brussels' });
+            const takenBegin = DateTime.fromSQL(row.datum, { zone: 'Europe/Brussels' });
             const takenEnd = takenBegin.plus({ minutes: 10 });
             return { begin: takenBegin, einde: takenEnd };
         });
         let allAvailable = [];
         for (const row of beRows) {
-            const startDate = DateTime.fromJSDate(new Date(row.begin), { zone: 'Europe/Brussels' });
-            const stopDate = DateTime.fromJSDate(new Date(row.einde), { zone: 'Europe/Brussels' });
+            const startDate = DateTime.fromSQL(row.begin, { zone: 'Europe/Brussels' });
+            const stopDate = DateTime.fromSQL(row.einde, { zone: 'Europe/Brussels' });
             let windowStart = startDate;
             while (windowStart.plus({ minutes: 10 }) <= stopDate) {
                 const windowEnd = windowStart.plus({ minutes: 10 });
