@@ -191,59 +191,42 @@ async function getAvailableDates(id1, id2) {
     const bedrijfEvenementQuery = `SELECT * FROM bedrijf_evenement WHERE bedrijf_id = ? OR bedrijf_id = ?`;
     const speeddateQuery = `SELECT datum FROM speeddate WHERE id_bedrijf = ? OR id_bedrijf = ? OR id_student = ? OR id_student = ?`;
     try {
-        // Get all bedrijf_evenement for the given ids
-        const [bedrijfRows] = await pool.query(bedrijfEvenementQuery, [id1, id2]);
-        console.log('Bedrijf rows:', bedrijfRows); // Log the rows for debugging
-        if (!bedrijfRows || bedrijfRows.length === 0) return [];
-        // Get all speeddates for id1 or id2 (as bedrijf or student)
-        const [sdRows] = await pool.query(speeddateQuery, [id1, id2, id1, id2]);
-        console.log('Speeddate rows:', sdRows); // Log the rows for debugging
-        // Precompute all taken windows in Europe/Brussels
-        const takenWindows = sdRows.map(row => {
-            let takenBegin = null;
+        // 1. Get all bedrijf_evenement for the given ids
+        const [evenementRows] = await pool.query(bedrijfEvenementQuery, [id1, id2]);
+        if (!evenementRows || evenementRows.length === 0) return [];
+        // 2. Get all speeddates for id1 or id2 (as bedrijf or student)
+        const [speeddateRows] = await pool.query(speeddateQuery, [id1, id2, id1, id2]);
+        // 3. Build a set of taken windows (start time in ISO string)
+        const takenWindows = new Set();
+        for (const row of speeddateRows) {
+            let takenStart;
             if (row.datum instanceof Date) {
-                takenBegin = DateTime.fromJSDate(row.datum, { zone: 'Europe/Brussels' });
+                takenStart = row.datum;
             } else if (typeof row.datum === 'string' && row.datum) {
-                takenBegin = DateTime.fromSQL(row.datum, { zone: 'Europe/Brussels' });
-                if (!takenBegin.isValid) {
-                    // Try ISO fallback
-                    takenBegin = DateTime.fromISO(row.datum, { zone: 'Europe/Brussels' });
-                }
+                takenStart = new Date(row.datum.replace(' ', 'T'));
             }
-            if (!takenBegin || !takenBegin.isValid) {
-                console.warn('Invalid or missing datum in speeddate row:', row.datum);
-                return { begin: null, einde: null };
+            if (takenStart && !isNaN(takenStart.getTime())) {
+                takenWindows.add(takenStart.toISOString());
             }
-            const takenEnd = takenBegin.plus({ minutes: 10 });
-            console.log('Taken window:', takenBegin.toISO(), 'to', takenEnd.toISO()); // Log each taken window
-            return { begin: takenBegin, einde: takenEnd };
-        }).filter(w => w.begin && w.einde);
-        let allAvailable = [];
-        for (const row of bedrijfRows) {
-            const startDate = DateTime.fromSQL(row.begin, { zone: 'Europe/Brussels' });
-            const stopDate = DateTime.fromSQL(row.einde, { zone: 'Europe/Brussels' });
-            let windowStart = startDate;
-            let i = 0;
-            while (windowStart.plus({ minutes: 10 }) <= stopDate) {
-                const windowEnd = windowStart.plus({ minutes: 10 });
-                // Only consider taken windows that overlap with this bedrijf_evenement window
-                const overlaps = takenWindows.some(taken =>
-                    windowStart < taken.einde && windowEnd > taken.begin
-                );
-                if (!overlaps) {
-                    allAvailable.push({ begin: windowStart, einde: windowEnd });
-                }
-                windowStart = windowStart.plus({ minutes: 10 });
-                i++;
-                if (i > 1000) { // safety break
-                    break;
+        }
+        // 4. Generate all possible 10-minute windows from bedrijf_evenement
+        let availableWindows = [];
+        for (const row of evenementRows) {
+            let begin = new Date(row.begin);
+            let einde = new Date(row.einde);
+            for (let date = new Date(begin); date < einde; date.setMinutes(date.getMinutes() + 10)) {
+                const windowStart = new Date(date);
+                const windowEnd = new Date(windowStart.getTime() + 10 * 60 * 1000);
+                // Only include if this window is not taken
+                if (!takenWindows.has(windowStart.toISOString())) {
+                    availableWindows.push({
+                        begin: windowStart.toISOString(),
+                        einde: windowEnd.toISOString()
+                    });
                 }
             }
         }
-        return allAvailable.map(({ begin, einde }) => ({
-            begin: begin.toISO(),
-            einde: einde.toISO()
-        }));
+        return availableWindows;
     } catch (error) {
         console.error('Database query error in getAvailableDates:', error.message, error.stack);
         throw new Error('Checking available dates failed');
