@@ -30,12 +30,7 @@ async function sendNotification(userIds, title, message) {
        })
    );
    const responses = await Promise.all(promises);
-   return responses.map(response => {
-       if (!response.ok) {
-           throw new Error(`Failed to send notification: ${response.statusText}`);
-       }
-       return response.json();
-   });
+   return responses;
 }
 
 module.exports = {
