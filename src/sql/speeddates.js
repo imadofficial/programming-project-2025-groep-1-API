@@ -200,11 +200,24 @@ async function getAvailableDates(id1, id2) {
         console.log('Speeddate rows:', sdRows); // Log the rows for debugging
         // Precompute all taken windows in Europe/Brussels
         const takenWindows = sdRows.map(row => {
-            const takenBegin = DateTime.fromSQL(row.datum, { zone: 'Europe/Brussels' });
+            let takenBegin = null;
+            if (row.datum instanceof Date) {
+                takenBegin = DateTime.fromJSDate(row.datum, { zone: 'Europe/Brussels' });
+            } else if (typeof row.datum === 'string' && row.datum) {
+                takenBegin = DateTime.fromSQL(row.datum, { zone: 'Europe/Brussels' });
+                if (!takenBegin.isValid) {
+                    // Try ISO fallback
+                    takenBegin = DateTime.fromISO(row.datum, { zone: 'Europe/Brussels' });
+                }
+            }
+            if (!takenBegin || !takenBegin.isValid) {
+                console.warn('Invalid or missing datum in speeddate row:', row.datum);
+                return { begin: null, einde: null };
+            }
             const takenEnd = takenBegin.plus({ minutes: 10 });
             console.log('Taken window:', takenBegin.toISO(), 'to', takenEnd.toISO()); // Log each taken window
             return { begin: takenBegin, einde: takenEnd };
-        });
+        }).filter(w => w.begin && w.einde);
         let allAvailable = [];
         for (const row of bedrijfRows) {
             const startDate = DateTime.fromSQL(row.begin, { zone: 'Europe/Brussels' });
