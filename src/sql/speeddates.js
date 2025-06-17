@@ -214,8 +214,9 @@ async function getAvailableDates(id1, id2) {
         let availableWindows = [];
         for (const row of evenementRows) {
             if (row.begin instanceof Date && row.einde instanceof Date) {
-                let begin = DateTime.fromJSDate(row.begin, { zone: 'Europe/Brussels' });
-                let einde = DateTime.fromJSDate(row.einde, { zone: 'Europe/Brussels' });
+                // Fix: interpret JS Date as local Europe/Brussels time, not UTC
+                let begin = DateTime.fromJSDate(row.begin, { zone: 'Europe/Brussels' }).setZone('Europe/Brussels', { keepLocalTime: true });
+                let einde = DateTime.fromJSDate(row.einde, { zone: 'Europe/Brussels' }).setZone('Europe/Brussels', { keepLocalTime: true });
                 if (!begin.isValid || !einde.isValid) {
                     console.warn('Invalid bedrijf_evenement begin/einde:', row.begin, row.einde, begin, einde);
                     continue;
