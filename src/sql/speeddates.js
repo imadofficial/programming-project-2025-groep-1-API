@@ -214,9 +214,25 @@ async function getAvailableDates(id1, id2) {
         let availableWindows = [];
         for (const row of evenementRows) {
             if (row.begin instanceof Date && row.einde instanceof Date) {
-                // Fix: interpret JS Date as local Europe/Brussels time, not UTC
-                let begin = DateTime.fromJSDate(row.begin, { zone: 'Europe/Brussels' }).setZone('Europe/Brussels', { keepLocalTime: true });
-                let einde = DateTime.fromJSDate(row.einde, { zone: 'Europe/Brussels' }).setZone('Europe/Brussels', { keepLocalTime: true });
+                // Correct: interpret MySQL DATETIME as local Europe/Brussels time
+                let begin = DateTime.fromObject({
+                    year: row.begin.getFullYear(),
+                    month: row.begin.getMonth() + 1,
+                    day: row.begin.getDate(),
+                    hour: row.begin.getHours(),
+                    minute: row.begin.getMinutes(),
+                    second: row.begin.getSeconds(),
+                    millisecond: row.begin.getMilliseconds()
+                }, { zone: 'Europe/Brussels' });
+                let einde = DateTime.fromObject({
+                    year: row.einde.getFullYear(),
+                    month: row.einde.getMonth() + 1,
+                    day: row.einde.getDate(),
+                    hour: row.einde.getHours(),
+                    minute: row.einde.getMinutes(),
+                    second: row.einde.getSeconds(),
+                    millisecond: row.einde.getMilliseconds()
+                }, { zone: 'Europe/Brussels' });
                 if (!begin.isValid || !einde.isValid) {
                     console.warn('Invalid bedrijf_evenement begin/einde:', row.begin, row.einde, begin, einde);
                     continue;
