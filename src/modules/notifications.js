@@ -1,5 +1,4 @@
 async function sendNotification(userIds, title, message) {
-    console.log('userIds:', userIds);
     if (!Array.isArray(userIds) || userIds.length === 0) {
         throw new Error('userIds must be a non-empty array');
     }
@@ -18,7 +17,7 @@ async function sendNotification(userIds, title, message) {
     }
 
    const promises = userIds.map(userId =>
-       fetch(`https://school.raven.co.com/`, {
+       fetch(`https://school.raven.co.com/send`, {
            method: 'POST',
            headers: {
                'Content-Type': 'application/json',
