@@ -80,6 +80,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
     const body = req.body;
     const studentId = body.id_student ? Number(body.id_student) : Number(req.user.id); // Use id_student if provided, otherwise use authenticated user ID
     const bedrijfId = body.id_bedrijf ? Number(body.id_bedrijf) : null; // Use id_bedrijf if provided, otherwise null
+    const userId = req.user.id;
     let datum = body.datum ? body.datum : null; // Use datum if provided, otherwise null
     // Force seconds to 00 if datum is in the correct format (YYYY-MM-DD hh:mm:ss or YYYY-MM-DD hh:mm)
     if (typeof datum === 'string') {
@@ -113,7 +114,7 @@ router.post('/', passport.authenticate('jwt', { session: false }), async (req, r
     }
 
     try {
-        const newSpeeddate = await addSpeeddate(bedrijfId, studentId, datum);
+        const newSpeeddate = await addSpeeddate(bedrijfId, studentId, datum, userId);
         if (newSpeeddate) {
             const info = await getSpeeddateInfo(newSpeeddate);
             res.status(201).json({ message: 'Speeddate created successfully', speeddate: info });

@@ -318,12 +318,12 @@ async function speeddateAfgekeurd(id){
     }
 }
 
-async function addSpeeddate(id_bedrijf, id_student, datum) {
+async function addSpeeddate(id_bedrijf, id_student, datum, asked_by) {
     const pool = getPool('ehbmatchdev');
-    const query = 'INSERT INTO speeddate (id_bedrijf, id_student, datum) VALUES (?,?, ?)';
+    const query = 'INSERT INTO speeddate (id_bedrijf, id_student, datum, asked_by) VALUES (?,?,?,?)';
 
     try {
-        const [result] = await pool.query(query, [id_bedrijf, id_student, datum]);
+        const [result] = await pool.query(query, [id_bedrijf, id_student, datum, asked_by]);
         console.log('Speeddate added with ID:', result.insertId); // Log the ID of the newly inserted speeddate
         return result.insertId; // Return the ID of the newly inserted speeddate
     } catch (error) {
