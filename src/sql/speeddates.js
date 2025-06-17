@@ -1,4 +1,5 @@
 const mysql = require('mysql2');
+const { DateTime } = require('luxon');
 
 const dotenv = require('dotenv');
 
@@ -194,32 +195,32 @@ async function getAvailableDates(id1, id2) {
         if (beRows.length === 0) return [];
         // Get all speeddates for id1 or id2 (as bedrijf or student)
         const [sdRows] = await pool.query(speeddateQuery, [id1, id2, id1, id2]);
-        // Precompute all taken windows
+        // Precompute all taken windows in Europe/Brussels
         const takenWindows = sdRows.map(row => {
-            const takenBegin = new Date(row.datum);
-            const takenEnd = new Date(takenBegin.getTime() + 10 * 60 * 1000);
+            const takenBegin = DateTime.fromJSDate(new Date(row.datum), { zone: 'Europe/Brussels' });
+            const takenEnd = takenBegin.plus({ minutes: 10 });
             return { begin: takenBegin, einde: takenEnd };
         });
         let allAvailable = [];
         for (const row of beRows) {
-            const startDate = new Date(row.begin);
-            const stopDate = new Date(row.einde);
-            let windowStart = new Date(startDate);
-            while (windowStart.getTime() + 10 * 60 * 1000 <= stopDate.getTime()) {
-                const windowEnd = new Date(windowStart.getTime() + 10 * 60 * 1000);
+            const startDate = DateTime.fromJSDate(new Date(row.begin), { zone: 'Europe/Brussels' });
+            const stopDate = DateTime.fromJSDate(new Date(row.einde), { zone: 'Europe/Brussels' });
+            let windowStart = startDate;
+            while (windowStart.plus({ minutes: 10 }) <= stopDate) {
+                const windowEnd = windowStart.plus({ minutes: 10 });
                 // Only consider taken windows that overlap with this bedrijf_evenement window
                 const overlaps = takenWindows.some(taken =>
                     windowStart < taken.einde && windowEnd > taken.begin
                 );
                 if (!overlaps) {
-                    allAvailable.push({ begin: new Date(windowStart), einde: new Date(windowEnd) });
+                    allAvailable.push({ begin: windowStart, einde: windowEnd });
                 }
-                windowStart = new Date(windowStart.getTime() + 10 * 60 * 1000);
+                windowStart = windowStart.plus({ minutes: 10 });
             }
         }
         return allAvailable.map(({ begin, einde }) => ({
-            begin: begin.toISOString(),
-            einde: einde.toISOString()
+            begin: begin.toISO(),
+            einde: einde.toISO()
         }));
     } catch (error) {
         console.error('Database query error in getAvailableDates:', error.message, error.stack);
