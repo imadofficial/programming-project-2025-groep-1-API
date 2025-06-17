@@ -192,34 +192,32 @@ async function getAvailableDates(id1, id2) {
     try {
         const [beRows] = await pool.query(bedrijfEvenementQuery, [id1, id2]);
         if (beRows.length === 0) return [];
-        let allWindows = [];
+        // Get all speeddates for id1 or id2 (as bedrijf or student)
+        const [sdRows] = await pool.query(speeddateQuery, [id1, id2, id1, id2]);
+        // Precompute all taken windows
+        const takenWindows = sdRows.map(row => {
+            const takenBegin = new Date(row.datum);
+            const takenEnd = new Date(takenBegin.getTime() + 10 * 60 * 1000);
+            return { begin: takenBegin, einde: takenEnd };
+        });
+        let allAvailable = [];
         for (const row of beRows) {
             const startDate = new Date(row.begin);
             const stopDate = new Date(row.einde);
             let windowStart = new Date(startDate);
             while (windowStart.getTime() + 10 * 60 * 1000 <= stopDate.getTime()) {
                 const windowEnd = new Date(windowStart.getTime() + 10 * 60 * 1000);
-                allWindows.push({ begin: new Date(windowStart), einde: new Date(windowEnd) });
+                // Only consider taken windows that overlap with this bedrijf_evenement window
+                const overlaps = takenWindows.some(taken =>
+                    windowStart < taken.einde && windowEnd > taken.begin
+                );
+                if (!overlaps) {
+                    allAvailable.push({ begin: new Date(windowStart), einde: new Date(windowEnd) });
+                }
                 windowStart = new Date(windowStart.getTime() + 10 * 60 * 1000);
             }
         }
-        // Get all taken windows from speeddates (datum to datum+10m)
-        const [sdRows] = await pool.query(speeddateQuery, [id1, id2, id1, id2]);
-        const takenWindows = sdRows.map(row => {
-            const takenBegin = new Date(row.datum);
-            const takenEnd = new Date(takenBegin.getTime() + 10 * 60 * 1000);
-            return { begin: takenBegin, einde: takenEnd };
-        });
-        // Filter out all windows that overlap with any taken window
-        // Allow a window to start exactly at the end of a taken window (einde === taken.begin is allowed)
-        const availableWindows = allWindows.filter(({ begin, einde }) => {
-            // Overlap only if begin < taken.einde && einde > taken.begin
-            // But allow: begin === taken.einde or einde === taken.begin
-            return !takenWindows.some(taken => (begin < taken.einde && einde > taken.begin));
-        });
-        // Debug: log taken and available windows count
-        // console.log('Taken:', takenWindows, 'Available:', availableWindows);
-        return availableWindows.map(({ begin, einde }) => ({
+        return allAvailable.map(({ begin, einde }) => ({
             begin: begin.toISOString(),
             einde: einde.toISOString()
         }));
