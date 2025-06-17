@@ -2516,6 +2516,9 @@ paths:
                       id:
                         type: integer
                         example: 1
+                      asked_by:
+                        type: integer
+                        example: 42
                       id_bedrijf:
                         type: integer
                         example: 24
@@ -2580,6 +2583,9 @@ paths:
                     id:
                       type: integer
                       example: 1
+                    asked_by:
+                      type: integer
+                      example: 42
                     id_bedrijf:
                       type: integer
                       example: 24
@@ -2644,6 +2650,9 @@ paths:
                     id:
                       type: integer
                       example: 1
+                    asked_by:
+                      type: integer
+                      example: 42
                     id_bedrijf:
                       type: integer
                       example: 24
@@ -2708,6 +2717,9 @@ paths:
                   id:
                     type: integer
                     example: 1
+                  asked_by:
+                    type: integer
+                    example: 42
                   id_bedrijf:
                     type: integer
                     example: 24
@@ -2785,6 +2797,9 @@ paths:
                     id:
                       type: integer
                       example: 1
+                    asked_by:
+                      type: integer
+                      example: 42
                     id_bedrijf:
                       type: integer
                       example: 24
@@ -2853,6 +2868,9 @@ paths:
                     id:
                       type: integer
                       example: 1
+                    asked_by:
+                      type: integer
+                      example: 42
                     id_bedrijf:
                       type: integer
                       example: 24
@@ -2923,6 +2941,9 @@ paths:
                       id:
                         type: integer
                         example: 1
+                      asked_by:
+                        type: integer
+                        example: 42
                       id_bedrijf:
                         type: integer
                         example: 24
@@ -3003,6 +3024,9 @@ paths:
                       id:
                         type: integer
                         example: 1
+                      asked_by:
+                        type: integer
+                        example: 42
                       id_bedrijf:
                         type: integer
                         example: 24
