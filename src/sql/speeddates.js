@@ -199,34 +199,40 @@ async function getAvailableDates(id1, id2) {
         // 3. Build a set of taken windows (start time in ISO string, Brussels time)
         const takenWindows = new Set();
         for (const row of speeddateRows) {
-            let takenStart;
             if (row.datum instanceof Date) {
-                takenStart = DateTime.fromJSDate(row.datum, { zone: 'Europe/Brussels' });
-            } else if (typeof row.datum === 'string' && row.datum) {
-                takenStart = DateTime.fromSQL(row.datum, { zone: 'Europe/Brussels' });
-                if (!takenStart.isValid) {
-                    takenStart = DateTime.fromISO(row.datum, { zone: 'Europe/Brussels' });
+                const takenStart = DateTime.fromJSDate(row.datum, { zone: 'Europe/Brussels' });
+                if (takenStart.isValid) {
+                    takenWindows.add(takenStart.toISO());
+                } else {
+                    console.warn('Invalid speeddate datum:', row.datum, takenStart);
                 }
-            }
-            if (takenStart && takenStart.isValid) {
-                takenWindows.add(takenStart.toISO());
+            } else {
+                console.warn('Unexpected datum type in speeddate:', row.datum);
             }
         }
         // 4. Generate all possible 10-minute windows from bedrijf_evenement
         let availableWindows = [];
         for (const row of evenementRows) {
-            let begin = DateTime.fromSQL(row.begin, { zone: 'Europe/Brussels' });
-            let einde = DateTime.fromSQL(row.einde, { zone: 'Europe/Brussels' });
-            for (let date = begin; date < einde; date = date.plus({ minutes: 10 })) {
-                const windowStart = date;
-                const windowEnd = windowStart.plus({ minutes: 10 });
-                // Only include if this window is not taken
-                if (!takenWindows.has(windowStart.toISO())) {
-                    availableWindows.push({
-                        begin: windowStart.toISO(),
-                        einde: windowEnd.toISO()
-                    });
+            if (row.begin instanceof Date && row.einde instanceof Date) {
+                let begin = DateTime.fromJSDate(row.begin, { zone: 'Europe/Brussels' });
+                let einde = DateTime.fromJSDate(row.einde, { zone: 'Europe/Brussels' });
+                if (!begin.isValid || !einde.isValid) {
+                    console.warn('Invalid bedrijf_evenement begin/einde:', row.begin, row.einde, begin, einde);
+                    continue;
                 }
+                for (let date = begin; date < einde; date = date.plus({ minutes: 10 })) {
+                    const windowStart = date;
+                    const windowEnd = windowStart.plus({ minutes: 10 });
+                    // Only include if this window is not taken
+                    if (!takenWindows.has(windowStart.toISO())) {
+                        availableWindows.push({
+                            begin: windowStart.toISO(),
+                            einde: windowEnd.toISO()
+                        });
+                    }
+                }
+            } else {
+                console.warn('Unexpected begin/einde type in bedrijf_evenement:', row.begin, row.einde);
             }
         }
         return availableWindows;
