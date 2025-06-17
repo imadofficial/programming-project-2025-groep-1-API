@@ -120,15 +120,21 @@ async function addFunctieToUser(id_gebruiker, id_functie) {
 
 async function addFunctiesToUser(id_gebruiker, functies) {
     const pool = getPool('ehbmatchdev');
-    const query = 'INSERT INTO gebruiker_functie (id_gebruiker, id_functie) VALUES ?';
-    const values = functies.map(functie => [id_gebruiker, functie.id]);
-
+    if (!Array.isArray(functies) || functies.length === 0) {
+        return 0;
+    }
+    // Build bulk insert values
+    const values = functies.map(functieId => [id_gebruiker, functieId]);
+    // Dynamically build the query for bulk insert
+    const placeholders = values.map(() => '(?, ?)').join(', ');
+    const flatValues = values.flat();
+    const query = `INSERT INTO gebruiker_functie (id_gebruiker, id_functie) VALUES ${placeholders}`;
     try {
-        const [result] = await pool.query(query, [values]);
-        return result.affectedRows > 0; // Return true if at least one record was inserted
+        const [result] = await pool.query(query, flatValues);
+        return result.affectedRows > 0; // Return true if any rows were inserted
     } catch (error) {
         console.error('Database query error in addFunctiesToUser:', error.message, error.stack);
-        throw new Error('Adding functies to user failed');
+        throw new Error('Adding multiple functies to user failed');
     }
 }
 

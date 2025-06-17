@@ -137,9 +137,11 @@ async function addSkillsToUser(id_gebruiker, skillIds) {
     }
     // Build bulk insert values
     const values = skillIds.map(id_skill => [id_gebruiker, id_skill]);
-    const query = 'INSERT INTO gebruiker_skills (id_gebruiker, id_skill) VALUES ?';
+    const placeholders = values.map(() => '(?, ?)').join(', ');
+    const flatValues = values.flat();
+    const query = `INSERT INTO gebruiker_skills (id_gebruiker, id_skill) VALUES ${placeholders}`;
     try {
-        const [result] = await pool.query(query, [values]);
+        const [result] = await pool.query(query, flatValues);
         return result.affectedRows > 0; // Return true if any rows were inserted
     } catch (error) {
         console.error('Database query error in addSkillsToUser:', error.message, error.stack);
