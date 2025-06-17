@@ -42,13 +42,14 @@ router.post('/', [passport.authenticate('jwt', { session: false })], async (req,
         return res.status(400).json({ error: 'Skill name is required' });
     }
 
-    if (!type) {
-        return res.status(400).json({ error: 'Skill type is required' });
+    const typeId = parseInt(type, 10);
+    if (isNaN(typeId)) {
+        return res.status(400).json({ error: 'Skill type must be a valid number' });
     }
 
     try {
-        const newSkill = await addSkill(naam, type);
-        res.status(201).json({ message: 'Skill added successfully', skill: { id: newSkill.id, naam: naam, type: type } });
+        const newSkill = await addSkill(naam, typeId);
+        res.status(201).json({ message: 'Skill added successfully', skill: { id: newSkill.id, naam: naam, type: typeId } });
     } catch (error) {
         console.error('Error adding skill:', error);
         res.status(500).json({ message: 'Internal server error' });
