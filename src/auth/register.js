@@ -4,6 +4,7 @@ const { register, registerAdmin, registerStudent, registerBedrijf } = require('.
 const authAdmin = require('./authAdmin.js');
 const bcrypt = require('bcrypt');
 const { deleteProfielFoto, addTempProfielFoto, cleanupTempProfielFoto } = require('../sql/profielFoto.js');
+const { getAllEvents, addBedrijfToEvent } = require('../sql/event.js');
 
 require('../auth/passportJWT.js');
 
@@ -181,7 +182,7 @@ router.post('/student', async (req, res) => {
 
 router.post('/bedrijf', async (req, res) => {
     // The frontend should upload the file to /auth/profielfoto first and send the returned URL as 'profiel_foto'
-    const { email, password: wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto } = req.body;
+    const { email, password: wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto, evenement } = req.body;
 
     if (!email) {
         return res.status(400).json({ error: 'Email is required' });
@@ -216,6 +217,7 @@ router.post('/bedrijf', async (req, res) => {
     if (linkedinURL && !LINKEDIN_REGEX.test(linkedinURL)) {
         return res.status(400).json({ error: 'Invalid linkedin URL format' });
     }
+
     if (!wachtwoord) {
         return res.status(400).json({ error: 'Password is required' });
     }
@@ -234,6 +236,12 @@ router.post('/bedrijf', async (req, res) => {
             } catch (cleanupError) {
                 console.error('Error cleaning up temp profiel foto after bedrijf registration:', cleanupError);
             }
+        }
+        try {
+            const evenementResp = await addBedrijfToEvent(bedrijfId, evenement ? evenement : 1); // Default to event 1 if not provided
+            console.log('Bedrijf added to event:', evenementResp);
+        } catch (error) {
+            console.error('Event not found:', error);
         }
         res.status(201).json({ message: "Company registered successfully", Id: bedrijfId });
     } catch (error) {
