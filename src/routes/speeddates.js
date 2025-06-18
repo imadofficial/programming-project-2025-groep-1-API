@@ -188,10 +188,28 @@ router.post('/reject/:speeddateID', passport.authenticate('jwt', { session: fals
         if (!rejected) {
             return res.status(404).json({ error: 'Speeddate not found' });
         }
+        const info = await getSpeeddateInfo(speeddateId);
+        // Format date as 'YYYY-MM-DD HH:mm' or 'HH:mm' if today
+        let formattedDate = '';
+        if (info.begin) {
+            const dateObj = new Date(info.begin);
+            const now = new Date();
+            // Compare year, month, day
+            const isToday = dateObj.getFullYear() === now.getFullYear() &&
+                dateObj.getMonth() === now.getMonth() &&
+                dateObj.getDate() === now.getDate();
+            const pad = n => n.toString().padStart(2, '0');
+            const time = pad(dateObj.getHours()) + ':' + pad(dateObj.getMinutes());
+            if (isToday) {
+                formattedDate = time;
+            } else {
+                formattedDate = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ${time}`;
+            }
+        }
         const notifications = await sendNotification(
             [info.id_bedrijf, info.id_student],
             'Rejected Speeddate',
-            `Jouw speeddate met ${info.naam_bedrijf} om ${formattedDate} is afgewezen.`
+            [`Jouw speeddate met ${info.voornaam_student} ${info.achternaam_student} om ${formattedDate} is afgewezen.`, `Jouw speeddate met ${info.naam_bedrijf} om ${formattedDate} is afgewezen.`]
         );
         console.log('Notifications sent:', notifications);
         res.json({ message: 'Speeddate rejected' });
