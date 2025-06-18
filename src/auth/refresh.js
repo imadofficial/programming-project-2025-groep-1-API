@@ -1,6 +1,8 @@
 const express = require('express')
 const jwt = require('jsonwebtoken');
 
+
+
 require('dotenv').config();
 
 const router = express.Router();
@@ -22,11 +24,14 @@ router.post('/', (req, res, next) => {
                 return res.status(403).json({ message: 'Invalid refresh token' });
             }
 
-            // Generate new access token
-            const accessToken = jwt.sign({ id: decoded.id, type: decoded.type }, process.env.JWT_ACCESS_SECRET, { expiresIn: '15m' });
+            const accessMaxAge = 60; // 15 minutes in seconds [Temporarily set to 1 minute for testing]
+            const refreshMaxAge = 7 * 24 * 60 * 60; // 7 days in seconds
 
-            const accessTokenExpiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-            const refreshTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+            // Generate new access token
+            const accessToken = jwt.sign({ id: decoded.id, type: decoded.type }, process.env.JWT_ACCESS_SECRET, { expiresIn: accessMaxAge });
+
+            const accessTokenExpiresAt = new Date(Date.now() + accessMaxAge * 1000).toISOString();
+            const refreshTokenExpiresAt = new Date(Date.now() + refreshMaxAge * 1000).toISOString();
 
             return res.json({ message: 'Token refreshed successfully', accessToken: accessToken, accessTokenExpiresAt: accessTokenExpiresAt, refreshTokenExpiresAt: refreshTokenExpiresAt });
         });
