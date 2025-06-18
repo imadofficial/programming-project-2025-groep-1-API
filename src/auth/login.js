@@ -56,7 +56,8 @@ router.post('/', (req, res, next) => {
             sameSite: 'none', // Adjust as necessary
             path: "/auth/refresh", // Ensure the cookie is only sent to the refresh endpoint
             domain: "api.ehb-match.me",
-            maxAge: refreshMaxAge * 1000 // Convert seconds to milliseconds
+            maxAge: refreshMaxAge * 1000, // Convert seconds to milliseconds
+            partitioned: true // Use partitioned cookies for better privacy
         });
 
         const accessTokenExpiresAt = new Date(Date.now() + accessMaxAge * 1000).toISOString();
