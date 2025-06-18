@@ -40,7 +40,7 @@ router.post('/', (req, res, next) => {
             return res.status(401).json({ message: 'Invalid credentials'});
         }
 
-        const accessMaxAge = 15 * 60; // 15 minutes in seconds
+        const accessMaxAge = 60; // 15 minutes in seconds [Temporarily set to 1 minute for testing]
         const refreshMaxAge = 7 * 24 * 60 * 60; // 7 days in seconds
 
         // Generate JWT tokens
