@@ -6,6 +6,7 @@ const { getFunctiesByUserId, addFunctiesToUser, removeFunctieFromUser } = requir
 const authAdmin = require('../auth/authAdmin.js');
 const { canEdit } = require('../auth/canEdit.js');
 const { updateProfielFoto, deleteProfielFoto } = require('../sql/profielFoto.js');
+const { addOpleidingBijBedrijf, removeOpleidingBijBedrijf, getOpleidingenByUserId, addOpleidingenBijBedrijf } = require('../sql/opleiding.js')
 
 require('../auth/passportJWT.js');
 
@@ -92,6 +93,75 @@ router.put('/:bedrijfID', [passport.authenticate('jwt', { session: false }), can
         }
     } catch (error) {
         console.error('Error updating bedrijf:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+// GET /:bedrijfID/opleidingen
+router.get('/:bedrijfID/opleidingen', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const bedrijfId = req.params['bedrijfID'];
+    if (!bedrijfId) {
+        return res.status(400).json({ error: 'Bedrijf ID is required' });
+    }
+
+    try {
+        const opleidingen = await getOpleidingenByUserId(bedrijfId);
+        res.json({ message: 'Opleidingen fetched successfully', opleidingen: opleidingen });
+    } catch (error) {
+        console.error('Error fetching opleidingen:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+// POST /:bedrijfID/opleidingen
+router.post('/:bedrijfID/opleidingen', [passport.authenticate('jwt', { session: false }), canEdit], async (req, res) => {
+    const bedrijfId = req.params['bedrijfID'];
+    if (!bedrijfId) {
+        return res.status(400).json({ error: 'Bedrijf ID is required' });
+    }
+
+    const { opleidingen } = req.body;
+    if (!opleidingen || !Array.isArray(opleidingen)) {
+        return res.status(400).json({ error: 'Opleidingen must be an array' });
+    }
+    if (opleidingen.length === 0) {
+        return res.status(400).json({ error: 'Opleidingen array cannot be empty' });
+    }
+
+    try {
+        const success = await addOpleidingenBijBedrijf(opleidingen, bedrijfId);
+        if (success) {
+            res.status(200).json({ message: 'Opleidingen added successfully', opleidingen: await getOpleidingenByUserId(bedrijfId) });
+        } else {
+            res.status(404).json({ message: 'Bedrijf not found or opleidingen not added' });
+        }
+    } catch (error) {
+        console.error('Error adding opleidingen:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+// DELETE /:bedrijfID/opleidingen/:opleidingID
+router.delete('/:bedrijfID/opleidingen/:opleidingID', [passport.authenticate('jwt', { session: false }), canEdit], async (req, res) => {
+    const bedrijfId = req.params['bedrijfID'];
+    const opleidingId = req.params['opleidingID'];
+
+    if (!bedrijfId || !opleidingId) {
+        return res.status(400).json({ error: 'Bedrijf ID and Opleiding ID are required' });
+    }
+
+    try {
+        const success = await removeOpleidingBijBedrijf(opleidingId, bedrijfId);
+        if (success) {
+            res.json({ message: 'Opleiding removed successfully', opleidingen: await getOpleidingenByUserId(bedrijfId) });
+        } else {
+            res.status(404).json({ message: 'Opleiding not found or not removed' });
+        }
+    } catch (error) {
+        console.error('Error removing opleiding:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });

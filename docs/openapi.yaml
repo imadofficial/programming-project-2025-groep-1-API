@@ -1706,6 +1706,129 @@ paths:
                     type: string
                     example: 'Company or function not found'
 
+  /bedrijven/{bedrijfID}/opleidingen:
+    description: Get and manage opleidingen for a company
+    summary: Manage opleidingen by company ID
+    get:
+      summary: Get all opleidingen for a specific company
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of opleidingen for the company
+    post:
+      summary: Add opleidingen to a company
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        description: List of opleiding IDs to add to the company
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                opleidingen:
+                  type: array
+                  items:
+                    type: integer
+                  example: [1, 2, 3]
+      responses:
+        '200':
+          description: Opleidingen added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Opleidingen added successfully'
+                  opleidingen:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        naam:
+                          type: string
+                          example: 'Informatica'
+                      example: [
+                        {
+                          "id": 1,
+                          "naam": "Informatica",
+                        },
+                        {
+                          "id": 2,
+                          "naam": "Bedrijfskunde",
+                        }
+                      ]
+
+  /bedrijven/{bedrijfID}/opleidingen/{opleidingID}:
+    description: Remove an opleiding from a company
+    summary: Remove an opleiding from a company
+    delete:
+      summary: Remove an opleiding from a company
+      tags:
+        - Bedrijven
+      parameters:
+        - name: bedrijfID
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: opleidingID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Opleiding removed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Opleiding removed successfully'
+                  opleidingen:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        naam:
+                          type: string
+                          example: 'Informatica'
+                    example: [
+                      {
+                        "id": 1,
+                        "naam": "Informatica",
+                      },
+                      {
+                        "id": 2,
+                        "naam": "Bedrijfskunde",
+                      }
+                    ]
+
   /bedrijven/{bedrijfID}/skills:
     description: Get all skills for a specific company
     summary: Get skills by company ID
@@ -1772,10 +1895,7 @@ paths:
             schema:
               type: object
               properties:
-                message:
-                  type: string
-                  example: 'Add functions to student'
-                functies:
+                skills:
                   type: array
                   items:
                     type: integer
@@ -2189,7 +2309,7 @@ paths:
             schema:
               type: object
               properties:
-                functies:
+                skills:
                   type: array
                   items:
                     type: integer
@@ -2300,8 +2420,12 @@ paths:
             schema:
               type: object
               properties:
-                name:
+                naam:
                   type: string
+                type:
+                  type: string
+                  example: 'Bachelor'
+
       responses:
         '201':
           description: Created
@@ -2314,6 +2438,9 @@ paths:
                     type: integer
                   naam:
                     type: string
+                  type:
+                    type: string
+                    example: 'Bachelor'
     get:
       security: []
       tags:

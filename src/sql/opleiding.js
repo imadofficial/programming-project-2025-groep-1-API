@@ -117,6 +117,38 @@ async function getOpleidingById(id) {
     }
 }
 
+async function getOpleidingenByUserId(userId) {
+    const pool = getPool('ehbmatchdev');
+    const query = 'SELECT * FROM opleiding WHERE id IN (SELECT opleiding_id FROM bedrijf_opleiding WHERE bedrijf_id = ?)';
+
+    try {
+        const [rows] = await pool.query(query, [userId]);
+        return rows;
+    } catch (error) {
+        console.error('Database query error in getOpleidingenByUserId:', error.message, error.stack);
+        throw new Error('Getting opleidingen by user ID failed');
+    }
+}
+
+
+async function addOpleidingenBijBedrijf(opleidingIds, bedrijfId) {
+    const pool = getPool('ehbmatchdev');
+    if (!Array.isArray(opleidingIds) || opleidingIds.length === 0) {
+        return 0;
+    }
+    // Build bulk insert values
+    const values = opleidingIds.map(id_opleiding => [bedrijfId, id_opleiding]);
+    const placeholders = values.map(() => '(?, ?)').join(', ');
+    const flatValues = values.flat();
+    const query = `INSERT IGNORE INTO bedrijf_opleiding (bedrijf_id, opleiding_id) VALUES ${placeholders}`;
+    try {
+        const [result] = await pool.query(query, flatValues);
+        return result.affectedRows > 0; // Return true if any rows were inserted
+    } catch (error) {
+        console.error('Database query error in addOpleidingenBijBedrijf:', error.message, error.stack);
+        throw new Error('Adding multiple opleidingen to bedrijf failed');
+    }
+}
 
 module.exports = {
     getAllOpleidingen,
@@ -125,5 +157,7 @@ module.exports = {
     addOpleiding,
     deleteOpleiding,
     modifyOpleiding,
-    getOpleidingById
+    getOpleidingById,
+    getOpleidingenByUserId,
+    addOpleidingenBijBedrijf
 };
