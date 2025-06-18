@@ -184,11 +184,11 @@ router.post('/reject/:speeddateID', passport.authenticate('jwt', { session: fals
         return res.status(400).json({ error: 'Speeddate ID is required' });
     }
     try {
+        const info = await getSpeeddateInfo(speeddateId);
         const rejected = await speeddateAfgekeurd(speeddateId);
         if (!rejected) {
             return res.status(404).json({ error: 'Speeddate not found' });
         }
-        const info = await getSpeeddateInfo(speeddateId);
         // Format date as 'YYYY-MM-DD HH:mm' or 'HH:mm' if today
         let formattedDate = '';
         if (info.begin) {
