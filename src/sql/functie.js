@@ -130,7 +130,7 @@ async function addFunctiesToUser(id_gebruiker, functies) {
     }
 
     // If user is student, delete all existing functies first
-    if (getUserById(id_gebruiker).type === 2) {
+    if ((await getUserById(id_gebruiker)).type === 2) {
         const deleteQuery = 'DELETE FROM gebruiker_functie WHERE id_gebruiker = ?';
         try {
             const result = await pool.query(deleteQuery, [id_gebruiker]);
