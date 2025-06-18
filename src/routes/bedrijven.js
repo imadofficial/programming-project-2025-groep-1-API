@@ -133,7 +133,7 @@ router.post('/:bedrijfID/opleidingen', [passport.authenticate('jwt', { session: 
     try {
         const success = await addOpleidingenBijBedrijf(opleidingen, bedrijfId);
         if (success) {
-            res.status(200).json({ message: 'Opleidingen added successfully', opleidingen: await getOpleidingenByUserId(bedrijfId).opleidingen });
+            res.status(200).json({ message: 'Opleidingen added successfully', opleidingen: await getOpleidingenByUserId(bedrijfId) });
         } else {
             res.status(404).json({ message: 'Bedrijf not found or opleidingen not added' });
         }
@@ -156,7 +156,7 @@ router.delete('/:bedrijfID/opleidingen/:opleidingID', [passport.authenticate('jw
     try {
         const success = await removeOpleidingBijBedrijf(opleidingId, bedrijfId);
         if (success) {
-            res.json({ message: 'Opleiding removed successfully', opleidingen: await getOpleidingenByUserId(bedrijfId).opleidingen });
+            res.json({ message: 'Opleiding removed successfully', opleidingen: await getOpleidingenByUserId(bedrijfId) });
         } else {
             res.status(404).json({ message: 'Opleiding not found or not removed' });
         }
