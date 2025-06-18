@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 
 const { getPool } = require('../globalEntries.js');
 
+const { getUserById } = require('./users.js');
+
 
 dotenv.config();
 
@@ -123,6 +125,21 @@ async function addFunctiesToUser(id_gebruiker, functies) {
     if (!Array.isArray(functies) || functies.length === 0) {
         return 0;
     }
+    if (functies.some(functieId => typeof functieId !== 'number' || functieId <= 0)) {
+        throw new Error('All functie IDs must be positive integers');
+    }
+
+    // If user is student, delete all existing functies first
+    if (getUserById(id_gebruiker).type === 2) {
+        const deleteQuery = 'DELETE FROM gebruiker_functie WHERE id_gebruiker = ?';
+        try {
+            await pool.query(deleteQuery, [id_gebruiker]);
+        } catch (error) {
+            console.error('Database query error in addFunctiesToUser (delete):', error.message, error.stack);
+            throw new Error('Deleting existing functies failed');
+        }
+    }
+
     // Build bulk insert values
     const values = functies.map(functieId => [id_gebruiker, functieId]);
     // Dynamically build the query for bulk insert
