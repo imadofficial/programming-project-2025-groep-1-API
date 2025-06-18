@@ -166,7 +166,7 @@ router.post('/accept/:speeddateID', [passport.authenticate('jwt', { session: fal
         const notifications = await sendNotification(
             [info.id_bedrijf, info.id_student],
             'Accepted Speeddate',
-            `Jouw speeddate met ${info.naam_bedrijf} om ${formattedDate} is geaccepteerd.`
+            [`Jouw speeddate met ${info.voornaam_student} ${info.achternaam_student} om ${formattedDate} is geaccepteerd.`, `Jouw speeddate met ${info.naam_bedrijf} om ${formattedDate} is geaccepteerd.`]
         );
         console.log('Notifications sent:', notifications);
         res.json({ message: 'Speeddate accepted', speeddate: info });
