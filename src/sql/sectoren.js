@@ -47,6 +47,10 @@ async function addSector(naam) {
     const query = 'INSERT IGNORE INTO sector (naam) VALUES (?)';
 
     try {
+        naam = naam.trim(); // Trim whitespace from the sector name
+        naam = naam.replace(/[^a-zA-Z0-9\s]/g, ''); // Remove special characters
+        naam = naam.replace(/\s+/g, ' '); // Replace multiple spaces with a single space
+        naam = naam.toLowerCase(); // Convert to lowercase
         const [result] = await pool.query(query, [naam]);
         if (result.insertId && result.insertId !== 0) {
             return { id: result.insertId, naam: naam }; // Return the new sector with its ID
