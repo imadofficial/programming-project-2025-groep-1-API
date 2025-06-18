@@ -133,7 +133,8 @@ async function addFunctiesToUser(id_gebruiker, functies) {
     if (getUserById(id_gebruiker).type === 2) {
         const deleteQuery = 'DELETE FROM gebruiker_functie WHERE id_gebruiker = ?';
         try {
-            await pool.query(deleteQuery, [id_gebruiker]);
+            const result = await pool.query(deleteQuery, [id_gebruiker]);
+            console.log(`Deleted ${result.affectedRows} existing functies for user ${id_gebruiker}`);
         } catch (error) {
             console.error('Database query error in addFunctiesToUser (delete):', error.message, error.stack);
             throw new Error('Deleting existing functies failed');
