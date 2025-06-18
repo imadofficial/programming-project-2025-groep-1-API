@@ -2309,7 +2309,7 @@ paths:
             schema:
               type: object
               properties:
-                functies:
+                skills:
                   type: array
                   items:
                     type: integer
