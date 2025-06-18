@@ -107,7 +107,7 @@ async function getFunctiesByUserId(id_gebruiker) {
 
 async function addFunctieToUser(id_gebruiker, id_functie) {
     const pool = getPool('ehbmatchdev');
-    const query = 'INSERT INTO gebruiker_functie (id_gebruiker, id_functie) VALUES (?, ?)';
+    const query = 'INSERT IGNORE INTO gebruiker_functie (id_gebruiker, id_functie) VALUES (?, ?)';
 
     try {
         const [result] = await pool.query(query, [id_gebruiker, id_functie]);
@@ -128,7 +128,7 @@ async function addFunctiesToUser(id_gebruiker, functies) {
     // Dynamically build the query for bulk insert
     const placeholders = values.map(() => '(?, ?)').join(', ');
     const flatValues = values.flat();
-    const query = `INSERT INTO gebruiker_functie (id_gebruiker, id_functie) VALUES ${placeholders}`;
+    const query = `INSERT IGNORE INTO gebruiker_functie (id_gebruiker, id_functie) VALUES ${placeholders}`;
     try {
         const [result] = await pool.query(query, flatValues);
         return result.affectedRows > 0; // Return true if any rows were inserted

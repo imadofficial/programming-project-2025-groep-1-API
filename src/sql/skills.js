@@ -29,11 +29,11 @@ async function getAllSkills() {
 async function addSkillToUser(id_gebruiker, id_skill) {
     const pool = getPool('ehbmatchdev');
 
-    const query = 'INSERT INTO gebruiker_skills (id_gebruiker, id_skill) VALUES (?, ?)';
+    const query = 'INSERT IGNORE INTO gebruiker_skills (id_gebruiker, id_skill) VALUES (?, ?)';
 
     try {
         const [result] = await pool.query(query, [id_gebruiker, id_skill]);
-        return result.insertId; // Return the ID of the newly inserted record
+        return result.affectedRows > 0; // Return true if a row was inserted
     } catch (error) {
         console.error('Database query error in addSkillToUser:', error.message, error.stack);
         throw new Error('Adding skill to user failed');
@@ -76,11 +76,16 @@ async function getSkillsByUserId(id_gebruiker) {
 
 async function addSkill(naam, type) {
     const pool = getPool('ehbmatchdev');
-    const query = 'INSERT INTO skills (naam, type) VALUES (?, ?)';
+    const query = 'INSERT IGNORE INTO skills (naam, type) VALUES (?, ?)';
 
     try {
         const [result] = await pool.query(query, [naam, type]);
-        return result.insertId; // Return the ID of the newly inserted skill
+        if (result.insertId && result.insertId !== 0) {
+            return result.insertId; // Return the ID of the newly inserted skill
+        } else {
+            const [rows] = await pool.query('SELECT id FROM skills WHERE naam = ? AND type = ?', [naam, type]);
+            return rows[0].id; // Return the existing skill ID if it was not newly inserted
+        }
     } catch (error) {
         console.error('Database query error in addSkill:', error.message, error.stack);
         throw new Error('Adding skill failed');
@@ -139,7 +144,7 @@ async function addSkillsToUser(id_gebruiker, skillIds) {
     const values = skillIds.map(id_skill => [id_gebruiker, id_skill]);
     const placeholders = values.map(() => '(?, ?)').join(', ');
     const flatValues = values.flat();
-    const query = `INSERT INTO gebruiker_skills (id_gebruiker, id_skill) VALUES ${placeholders}`;
+    const query = `INSERT IGNORE INTO gebruiker_skills (id_gebruiker, id_skill) VALUES ${placeholders}`;
     try {
         const [result] = await pool.query(query, flatValues);
         return result.affectedRows > 0; // Return true if any rows were inserted

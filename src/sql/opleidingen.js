@@ -29,7 +29,7 @@ async function getAllOpleidingen() {
 async function addOpleidingBijBedrijf(opleidingId, bedrijfId) {
     const pool = getPool('ehbmatchdev');
 
-    const query = 'INSERT INTO bedrijf_opleiding (bedrijf_id, opleiding_id) VALUES (?, ?)';
+    const query = 'INSERT IGNORE INTO bedrijf_opleiding (bedrijf_id, opleiding_id) VALUES (?, ?)';
 
     try {
         const [result] = await pool.query(query, [bedrijfId, opleidingId]);

@@ -44,11 +44,18 @@ async function getSectorById(id) {
 
 async function addSector(naam) {
     const pool = getPool('ehbmatchdev');
-    const query = 'INSERT INTO sector (naam) VALUES (?)';
+    const query = 'INSERT IGNORE INTO sector (naam) VALUES (?)';
 
     try {
         const [result] = await pool.query(query, [naam]);
-        return { id: result.insertId, naam: naam }; // Return the new sector with its ID
+        if (result.insertId && result.insertId !== 0) {
+            return { id: result.insertId, naam: naam }; // Return the new sector with its ID
+        } else {
+            const [existingSector] = await pool.query('SELECT * FROM sector WHERE naam = ?', [naam]);
+            if (existingSector.length > 0) {
+                return existingSector[0]; // Return the existing sector if it was not inserted
+            }
+        }
     } catch (error) {
         console.error('Database query error:', error);
         throw new Error('Database query failed');
