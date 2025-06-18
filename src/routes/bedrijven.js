@@ -59,7 +59,7 @@ router.post('/keur/:bedrijfID', [passport.authenticate('jwt', { session: false }
 
 // List of allowed columns for update
 const allowedBedrijfColumns = [
-    'naam', 'plaats', 'contact_email', 'linkedin', 'profiel_foto', 'sector'
+    'naam', 'plaats', 'contact_email', 'linkedin', 'profiel_foto', 'id_sector'
 ];
 
 // PUT /:bedrijfID
