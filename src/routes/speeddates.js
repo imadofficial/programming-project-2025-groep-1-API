@@ -188,6 +188,12 @@ router.post('/reject/:speeddateID', passport.authenticate('jwt', { session: fals
         if (!rejected) {
             return res.status(404).json({ error: 'Speeddate not found' });
         }
+        const notifications = await sendNotification(
+            [info.id_bedrijf, info.id_student],
+            'Rejected Speeddate',
+            `Jouw speeddate met ${info.naam_bedrijf} om ${formattedDate} is afgewezen.`
+        );
+        console.log('Notifications sent:', notifications);
         res.json({ message: 'Speeddate rejected' });
     } catch (error) {
         console.error('Error rejecting speeddate:', error);
