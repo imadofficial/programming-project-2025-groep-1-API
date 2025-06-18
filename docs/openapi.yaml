@@ -112,6 +112,10 @@ components:
           type: string
           description: The sector of the company.
           example: 'Informatica'
+        id_sector_bedrijf:
+          type: integer
+          description: The ID of the company's sector.
+          example: 1
         profiel_foto_key:
           type: string
           description: The key for the company's profile photo.
