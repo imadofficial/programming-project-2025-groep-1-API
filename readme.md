@@ -60,5 +60,6 @@ Contributions are welcome! Please open an issue or submit a pull request if you 
 - [Swagger/OpenAPI Documentation](https://swagger.io/docs/)
 
 ---
+Made with ❤️ by us.
 
 © 2025 Programming Project Group 1 – EHB Match
