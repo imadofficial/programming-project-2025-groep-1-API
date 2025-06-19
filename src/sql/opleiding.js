@@ -29,7 +29,7 @@ async function getAllOpleidingen() {
 async function addOpleidingBijBedrijf(opleidingId, bedrijfId) {
     const pool = getPool('ehbmatchdev');
 
-    const query = 'INSERT IGNORE INTO bedrijf_opleiding (bedrijf_id, opleiding_id) VALUES (?, ?)';
+    const query = 'INSERT IGNORE INTO bedrijf_opleiding (id_bedrijf, id_opleiding) VALUES (?, ?)';
 
     try {
         const [result] = await pool.query(query, [bedrijfId, opleidingId]);
@@ -43,7 +43,7 @@ async function addOpleidingBijBedrijf(opleidingId, bedrijfId) {
 async function removeOpleidingBijBedrijf(opleidingId, bedrijfId) {
     const pool = getPool('ehbmatchdev');
 
-    const query = 'DELETE FROM bedrijf_opleiding WHERE bedrijf_id = ? AND opleiding_id = ?';
+    const query = 'DELETE FROM bedrijf_opleiding WHERE id_bedrijf = ? AND id_opleiding = ?';
 
     try {
         const [result] = await pool.query(query, [bedrijfId, opleidingId]);
@@ -119,7 +119,7 @@ async function getOpleidingById(id) {
 
 async function getOpleidingenByUserId(userId) {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM opleiding WHERE id IN (SELECT opleiding_id FROM bedrijf_opleiding WHERE bedrijf_id = ?)';
+    const query = 'SELECT * FROM opleiding WHERE id IN (SELECT id_opleiding FROM bedrijf_opleiding WHERE bedrijf_id = ?)';
 
     try {
         const [rows] = await pool.query(query, [userId]);
@@ -140,7 +140,7 @@ async function addOpleidingenBijBedrijf(opleidingIds, bedrijfId) {
     const values = opleidingIds.map(id_opleiding => [bedrijfId, id_opleiding]);
     const placeholders = values.map(() => '(?, ?)').join(', ');
     const flatValues = values.flat();
-    const query = `INSERT IGNORE INTO bedrijf_opleiding (bedrijf_id, opleiding_id) VALUES ${placeholders}`;
+    const query = `INSERT IGNORE INTO bedrijf_opleiding (id_bedrijf, id_opleiding) VALUES ${placeholders}`;
     try {
         const [result] = await pool.query(query, flatValues);
         return result.affectedRows > 0; // Return true if any rows were inserted
