@@ -25,14 +25,14 @@ function mapSpeeddateRow(row, includeAkkoord = true, includeLokaal = true) {
         minute: datum.getMinutes(),
         second: datum.getSeconds(),
         millisecond: datum.getMilliseconds()
-    }, { zone: 'Europe/Brussels' }).toISO();
-    const einde = begin ? begin.plus({ minutes: 10 }).toISO() : null;
+    }, { zone: 'Europe/Brussels' });
+    const einde = begin ? begin.plus({ minutes: 10 }) : null;
     const mapped = {
         ...rest,
         profiel_foto_bedrijf: getProfielFotoUrl(profiel_foto_bedrijf),
         profiel_foto_student: getProfielFotoUrl(profiel_foto_student),
-        begin,
-        einde,
+        begin: begin ? begin.toISO() : null,
+        einde: einde ? einde.toISO() : null,
     };
     if (includeAkkoord && typeof row.akkoord !== 'undefined') mapped.akkoord = row.akkoord;
     if (includeLokaal && typeof row.lokaal !== 'undefined') mapped.lokaal = row.lokaal;
