@@ -190,6 +190,9 @@ tags:
   - name: Studenten
     description: >
       Endpoints for managing students.
+  - name: Functies
+    description: >
+      Endpoints for managing job functions (functies).
   - name: Opleidingen
     description: >
       Endpoints for managing educational programs (opleidingen).
@@ -2409,6 +2412,138 @@ paths:
                     example: 'Student or skill not found'
 
 
+  /functies:
+    description: List of available functions
+    post:
+      tags:
+        - Functies
+      summary: 'Create a new function'
+      description: 'Create a new function'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                naam:
+                  type: string
+                  example: 'Parttime'
+
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  naam:
+                    type: string
+                    example: 'Parttime'
+    get:
+      security: []
+      tags:
+        - Functies
+      summary: Get all available functions
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    naam:
+                      type: string
+                      example: 'Parttime'
+
+  /functies/{functieID}:
+    get:
+      summary: Get a specific function by ID
+      tags:
+        - Functies
+      parameters:
+        - name: functieID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  naam:
+                    type: string
+                    example: 'Parttime'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Function not found'
+    delete:
+      tags:
+        - Functies
+      summary: 'Delete a function'
+      description: 'Delete a function by ID'
+      parameters:
+        - name: functieID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Function ID is required'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Function not found'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'An error occurred while deleting the function'
+
 
   /opleidingen:
     description: List of available opleidingen
@@ -2468,6 +2603,89 @@ paths:
                     type:
                       type: string
                       example: 'Bachelor'
+
+  /opleidingen/{opleidingID}:
+    get:
+      summary: Get a specific opleiding by ID
+      tags:
+        - Opleidingen
+      parameters:
+        - name: opleidingID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  naam:
+                    type: string
+                    example: 'Informatica'
+                  type:
+                    type: string
+                    example: 'Bachelor'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Opleiding not found'
+    delete:
+      tags:
+        - Opleidingen
+      summary: 'Delete an opleiding'
+      description: 'Delete an opleiding by ID'
+      parameters:
+        - name: opleidingID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Opleiding ID is required'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Opleiding not found'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'An error occurred while deleting the opleiding'
 
 
   /skills:
