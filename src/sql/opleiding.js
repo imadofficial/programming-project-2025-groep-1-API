@@ -119,7 +119,7 @@ async function getOpleidingById(id) {
 
 async function getOpleidingenByUserId(userId) {
     const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM opleiding WHERE id IN (SELECT id_opleiding FROM bedrijf_opleiding WHERE bedrijf_id = ?)';
+    const query = 'SELECT * FROM opleiding WHERE id IN (SELECT id_opleiding FROM bedrijf_opleiding WHERE id_bedrijf = ?)';
 
     try {
         const [rows] = await pool.query(query, [userId]);
