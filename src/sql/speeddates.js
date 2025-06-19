@@ -16,8 +16,17 @@ function getProfielFotoUrl(filename) {
 // Helper to map a speeddate row to API response
 function mapSpeeddateRow(row, includeAkkoord = true, includeLokaal = true) {
     const { datum, profiel_foto_bedrijf, profiel_foto_student, ...rest } = row;
-    const begin = datum instanceof Date ? datum.toISOString() : (datum ? datum.replace(' ', 'T') : null);
-    const einde = begin ? new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString() : null;
+    // Interpret MySQL DATETIME as local Europe/Brussels time
+    const begin = DateTime.fromObject({
+        year: datum.getFullYear(),
+        month: datum.getMonth() + 1,
+        day: datum.getDate(),
+        hour: datum.getHours(),
+        minute: datum.getMinutes(),
+        second: datum.getSeconds(),
+        millisecond: datum.getMilliseconds()
+    }, { zone: 'Europe/Brussels' }).toISO();
+    const einde = begin ? begin.plus({ minutes: 10 }).toISO() : null;
     const mapped = {
         ...rest,
         profiel_foto_bedrijf: getProfielFotoUrl(profiel_foto_bedrijf),
@@ -175,8 +184,17 @@ async function getUnavailableDates(id1, id2) {
         const [rows] = await pool.query(query, [id1, id2, id1, id2]);
         const windows = rows.map(row => {
             const id = row.id;
-            const begin = row.datum; // Already in ISO format
-            const einde = new Date(new Date(begin).getTime() + 10 * 60 * 1000).toISOString();
+            // Interpret MySQL DATETIME as local Europe/Brussels time
+            const begin = DateTime.fromObject({
+                year: datum.getFullYear(),
+                month: datum.getMonth() + 1,
+                day: datum.getDate(),
+                hour: datum.getHours(),
+                minute: datum.getMinutes(),
+                second: datum.getSeconds(),
+                millisecond: datum.getMilliseconds()
+            }, { zone: 'Europe/Brussels' }).toISO();
+            const einde = begin ? begin.plus({ minutes: 10 }).toISO() : null;
             return { id, begin, einde };
         });
         return windows;
@@ -327,7 +345,7 @@ async function getDatum(id) {
     }
 }
 
-async function speeddateAkkoord(id){
+async function speeddateAkkoord(id) {
     const pool = getPool('ehbmatchdev');
     const query = 'UPDATE speeddate SET akkoord = 1 WHERE id = ?';
 
@@ -340,7 +358,7 @@ async function speeddateAkkoord(id){
     }
 }
 
-async function speeddateAfgekeurd(id){
+async function speeddateAfgekeurd(id) {
     const pool = getPool('ehbmatchdev');
     const query = 'DELETE FROM speeddate WHERE id = ?';
 
