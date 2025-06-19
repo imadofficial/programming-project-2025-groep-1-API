@@ -62,4 +62,4 @@ Contributions are welcome! Please open an issue or submit a pull request if you 
 ---
 Made with ❤️ by us.
 
-© 2025 Programming Project Group 1 – EHB Match
+© 2025 Programming Project Group 1 – EhB-Match.me
