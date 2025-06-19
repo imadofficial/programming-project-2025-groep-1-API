@@ -204,7 +204,7 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = fal
             FROM student s
             JOIN bedrijf_reqs br ON br.gebruiker_id = s.gebruiker_id
             JOIN gebruiker g ON g.id = s.gebruiker_id
-            LEFFT JOIN opleiding opl ON s.opleiding_id = opl.id
+            LEFT JOIN opleiding opl ON s.opleiding_id = opl.id
             LEFT JOIN (
                 SELECT s2.gebruiker_id AS id_student, 1 AS count
                 FROM student s2
