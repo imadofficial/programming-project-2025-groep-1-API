@@ -186,6 +186,7 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = fal
             SELECT
                 s.*,
                 opl.naam AS opleiding_naam,
+                opl.type AS opleiding_type,
                 g.email AS contact_email,
                 COALESCE(opleiding_match.count, 0) AS opleiding_matches,
                 COALESCE(skill_match.count, 0) AS skill_matches,
@@ -241,6 +242,7 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = fal
             SELECT
                 s.*,
                 opl.naam AS opleiding_naam,
+                opl.type AS opleiding_type,
                 g.email AS contact_email,
                 COALESCE(opleiding_match.count, 0) AS opleiding_matches,
                 COALESCE(skill_match.count, 0) AS skill_matches,
