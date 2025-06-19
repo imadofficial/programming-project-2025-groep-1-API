@@ -2,6 +2,14 @@
 
 This repository contains the backend API code for our Programming Project 2025. The API is built with Node.js and Express, and serves as the backend for the EHB Match platform, enabling features such as user authentication, company and student management, speeddates, skills, opleidingen, and more.
 
+## API Documentation
+
+Full API documentation is available at:
+
+👉 [https://api.ehb-match.me](https://api.ehb-match.me)
+
+This documentation includes all available endpoints, request/response formats, authentication requirements, and example usage.
+
 ## Features
 - **User authentication (JWT-based):** Secure login, registration, and session management using JSON Web Tokens. Supports both students, companies, and admin users.
 - **Company (bedrijf) and student management:** CRUD operations for both user types, including profile updates, deletion, and role-based access control.
@@ -58,14 +66,6 @@ Security is a top priority in this project. Key security measures include:
 - `docs/` – OpenAPI/Swagger documentation and related files
 - `data/` – Example data files (JSON)
 - `readme.md` – This file
-
-## API Documentation
-
-Full API documentation is available at:
-
-👉 [https://api.ehb-match.me](https://api.ehb-match.me)
-
-This documentation includes all available endpoints, request/response formats, authentication requirements, and example usage. You can also view the OpenAPI/Swagger UI locally by running the server and visiting `/docs`.
 
 ## Key Concepts & Best Practices
 
