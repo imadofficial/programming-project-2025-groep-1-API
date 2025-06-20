@@ -22,7 +22,7 @@ async function getAllEvents() {
 
 async function addBedrijfToEvent(id_bedrijf, id_event) {
     const pool = getPool(DB_NAME);
-    const query = 'INSERT INTO evenement_bedrijf (id_event, id_bedrijf) VALUES (?, ?)';
+    const query = 'INSERT INTO bedrijf_evenement (id_event, id_bedrijf) VALUES (?, ?)';
 
     try {
         const [result] = await pool.query(query, [id_event, id_bedrijf]);
