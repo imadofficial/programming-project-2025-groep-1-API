@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { getPool } = require('../globalEntries.js');
 const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
 
