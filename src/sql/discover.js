@@ -71,7 +71,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
                 )
                 GROUP BY bedrijf_functie.id_gebruiker
             ) AS functie_match ON functie_match.bedrijf_id = b.gebruiker_id
-            WHERE 1=1 ${onlyNewCondition}
+            WHERE b.goedkeuring = 1 ${onlyNewCondition}
             ORDER BY match_percentage DESC, match_score DESC, b.naam ASC
         `;
         // params: [opleidingId, studentId, studentId, (studentId if onlyNew)]
@@ -126,7 +126,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
                 )
                 GROUP BY bedrijf_functie.id_gebruiker
             ) AS functie_match ON functie_match.bedrijf_id = b.gebruiker_id
-            WHERE 1=1 ${onlyNewCondition}
+            WHERE b.goedkeuring = 1 ${onlyNewCondition}
             ORDER BY functie_matches DESC, opleiding_matches DESC, match_percentage DESC, match_score DESC, b.naam ASC
         `;
         params = onlyNew ? [opleidingId, studentId, studentId, studentId] : [opleidingId, studentId, studentId];
@@ -135,7 +135,11 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
         const [rows] = await pool.query(query, params);
         if (rows.length > 0) {
             const bedrijven = rows.map(bedrijf => {
-                if (bedrijf.profiel_foto) {
+                // If bedrijf.profiel_foto is an url, use it instead of adding baseUrl
+                if (bedrijf.profiel_foto && bedrijf.profiel_foto.startsWith('http')) {
+                    bedrijf.profiel_foto_key = bedrijf.profiel_foto;
+                    bedrijf.profiel_foto_url = bedrijf.profiel_foto;
+                } else if (bedrijf.profiel_foto) {
                     bedrijf.profiel_foto_key = bedrijf.profiel_foto;
                     bedrijf.profiel_foto_url = baseUrl + bedrijf.profiel_foto;
                 } else {

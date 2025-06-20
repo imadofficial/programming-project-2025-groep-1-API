@@ -10,7 +10,7 @@ require('../auth/passportJWT.js');
 
 // Common regex constants
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const NAME_REGEX = /^[a-zA-Z\s]+$/;
+const NAME_REGEX = /^[\p{L}\s-]+$/u;
 const LINKEDIN_REGEX = /^(\/in\/[a-zA-Z0-9_-]+\/?|\/company\/[a-zA-Z0-9_-]+\/?$)/;
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -182,7 +182,7 @@ router.post('/student', async (req, res) => {
 
 router.post('/bedrijf', async (req, res) => {
     // The frontend should upload the file to /auth/profielfoto first and send the returned URL as 'profiel_foto'
-    const { email, password: wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto, evenement } = req.body;
+    const { email, password: wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto, evenement, sector_id } = req.body;
 
     if (!email) {
         return res.status(400).json({ error: 'Email is required' });
@@ -228,7 +228,7 @@ router.post('/bedrijf', async (req, res) => {
 
     try {
         const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
-        const bedrijfId = await registerBedrijf(emailLower, hashedPassword, naam, plaats, contactEmail, linkedinURL, profiel_foto);
+        const bedrijfId = await registerBedrijf(emailLower, hashedPassword, naam, plaats, contactEmail, linkedinURL, profiel_foto, sector_id);
         // Clean up temp profiel foto if provided
         if (profiel_foto) {
             try {
