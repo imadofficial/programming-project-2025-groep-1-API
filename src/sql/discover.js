@@ -135,7 +135,11 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
         const [rows] = await pool.query(query, params);
         if (rows.length > 0) {
             const bedrijven = rows.map(bedrijf => {
-                if (bedrijf.profiel_foto) {
+                // If bedrijf.profiel_foto is an url, use it instead of adding baseUrl
+                if (bedrijf.profiel_foto && bedrijf.profiel_foto.startsWith('http')) {
+                    bedrijf.profiel_foto_key = bedrijf.profiel_foto;
+                    bedrijf.profiel_foto_url = bedrijf.profiel_foto;
+                } else if (bedrijf.profiel_foto) {
                     bedrijf.profiel_foto_key = bedrijf.profiel_foto;
                     bedrijf.profiel_foto_url = baseUrl + bedrijf.profiel_foto;
                 } else {
