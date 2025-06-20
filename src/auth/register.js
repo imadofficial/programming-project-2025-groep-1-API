@@ -10,7 +10,7 @@ require('../auth/passportJWT.js');
 
 // Common regex constants
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const NAME_REGEX = /^[\p{L}\s]+$/u;
+const NAME_REGEX = /^[\p{L}\s-]+$/u;
 const LINKEDIN_REGEX = /^(\/in\/[a-zA-Z0-9_-]+\/?|\/company\/[a-zA-Z0-9_-]+\/?$)/;
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
