@@ -182,7 +182,7 @@ router.post('/student', async (req, res) => {
 
 router.post('/bedrijf', async (req, res) => {
     // The frontend should upload the file to /auth/profielfoto first and send the returned URL as 'profiel_foto'
-    const { email, password: wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto, evenement } = req.body;
+    const { email, password: wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto, evenement, sector_id } = req.body;
 
     if (!email) {
         return res.status(400).json({ error: 'Email is required' });
@@ -228,7 +228,7 @@ router.post('/bedrijf', async (req, res) => {
 
     try {
         const hashedPassword = await bcrypt.hash(wachtwoord, 11); // Hash the password before storing it
-        const bedrijfId = await registerBedrijf(emailLower, hashedPassword, naam, plaats, contactEmail, linkedinURL, profiel_foto);
+        const bedrijfId = await registerBedrijf(emailLower, hashedPassword, naam, plaats, contactEmail, linkedinURL, profiel_foto, sector_id);
         // Clean up temp profiel foto if provided
         if (profiel_foto) {
             try {
