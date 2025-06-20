@@ -7,8 +7,10 @@ const { getPool } = require('../globalEntries.js');
 
 dotenv.config();
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 async function getAllStudenten() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM student'; // Corrected table name
 
     try {
@@ -26,7 +28,7 @@ async function getAllStudenten() {
     }
 }
 async function getStudentById(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT g.type, s.*, g.email AS contact_email FROM student s JOIN gebruiker g ON s.gebruiker_id = g.id WHERE s.gebruiker_id = ?';
     const baseUrl = "https://gt0kk4fbet.ufs.sh/f/";
 
@@ -54,7 +56,7 @@ async function getStudentById(id) {
 }
 
 async function updateStudent(id, data) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'UPDATE student SET ? WHERE gebruiker_id = ?';
 
     if (!id || !data) {

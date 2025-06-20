@@ -7,8 +7,10 @@ const { getPool } = require('../globalEntries.js');
 
 dotenv.config();
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 async function getAllOpleidingen() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM opleiding'; // Corrected table name
 
     try {
@@ -27,7 +29,7 @@ async function getAllOpleidingen() {
 }
 
 async function addOpleidingBijBedrijf(opleidingId, bedrijfId) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
 
     const query = 'INSERT IGNORE INTO bedrijf_opleiding (bedrijf_id, opleiding_id) VALUES (?, ?)';
 
@@ -41,7 +43,7 @@ async function addOpleidingBijBedrijf(opleidingId, bedrijfId) {
 }
 
 async function removeOpleidingBijBedrijf(opleidingId, bedrijfId) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
 
     const query = 'DELETE FROM bedrijf_opleiding WHERE bedrijf_id = ? AND opleiding_id = ?';
 
@@ -55,7 +57,7 @@ async function removeOpleidingBijBedrijf(opleidingId, bedrijfId) {
 }
 
 async function changeOpleidingStudent(studentId, opleidingId) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
 
     const query = 'UPDATE student SET opleiding_id = ? WHERE gebruiker_id = ?';
 

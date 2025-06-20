@@ -7,8 +7,10 @@ const { getPool } = require('../globalEntries.js');
 
 dotenv.config();
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 async function getAllFinalWorks() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM finalwork';
 
     try {
@@ -28,7 +30,7 @@ async function getAllFinalWorks() {
 }
 
 async function addFinalWork(id_student, lokaal) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'INSERT INTO finalwork (id_student, lokaal) VALUES (?, ?)';
 
     try {
@@ -41,7 +43,7 @@ async function addFinalWork(id_student, lokaal) {
 }
 
 async function removeFinalWork(id_finalwork) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'DELETE FROM finalwork WHERE id = ?';
 
     try {
@@ -54,7 +56,7 @@ async function removeFinalWork(id_finalwork) {
 }
 
 async function getFinalworkById(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM finalwork WHERE id = ?';
 
     try {
@@ -71,7 +73,7 @@ async function getFinalworkById(id) {
 }
 
 async function modifyFinalWork(id_finalwork, id_student, lokaal) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'UPDATE finalwork SET id_student = ?, lokaal = ? WHERE id = ?';
 
     try {

@@ -1,9 +1,12 @@
 const dotenv = require('dotenv');
+dotenv.config();
 
 const { getPool } = require('../globalEntries.js');
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 async function getUserById(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT id, email, type FROM gebruiker WHERE id = ?'; // Corrected table name
 
     try {
@@ -20,7 +23,7 @@ async function getUserById(id) {
 }
 
 async function getUserInfo(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     console.log('Fetching user info for ID:', id); // Log the ID being fetched
     const query = `
         SELECT 
@@ -86,7 +89,7 @@ async function getUserInfo(id) {
 }
 
 async function deleteUserById(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     try {
         await pool.query('START TRANSACTION');
     } catch (error) {
@@ -113,7 +116,7 @@ async function deleteUserById(id) {
 }
 
 async function updateUser(id, data) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'UPDATE gebruiker SET ? WHERE id = ?';
 
     if (!id || !data) {

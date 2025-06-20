@@ -7,8 +7,10 @@ const { getPool } = require('../globalEntries.js');
 
 dotenv.config();
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 async function createContact(email, onderwerp, bericht) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'insert into contact (email, onderwerp, bericht) values (?, ?, ?)';
 
     try {
@@ -24,7 +26,7 @@ async function createContact(email, onderwerp, bericht) {
 
 
 async function deleteContact(id_contact) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'DELETE FROM contact WHERE id = ?';
 
     try {
@@ -37,7 +39,7 @@ async function deleteContact(id_contact) {
 }
 
 async function getContactById(id_contact) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM contact WHERE id = ?';
 
     try {
@@ -54,7 +56,7 @@ async function getContactById(id_contact) {
 }   
 
 async function getAllContacts() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM contact';
 
     try {

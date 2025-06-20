@@ -1,4 +1,5 @@
 const { getPool } = require('../globalEntries.js');
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
 
 /**
  * Returns bedrijven ordered by most relevant match_percentage, match_score, and name for a specific student.
@@ -9,7 +10,7 @@ const { getPool } = require('../globalEntries.js');
 const baseUrl = "https://gt0kk4fbet.ufs.sh/f/";
 
 async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = false) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     // Pre-fetch opleiding_id for the student to avoid subquery in every row
     const [[student]] = await pool.query('SELECT opleiding_id FROM student WHERE gebruiker_id = ?', [studentId]);
     const opleidingId = student ? student.opleiding_id : null;
@@ -159,7 +160,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
  * @param {boolean} suggestions - If true, use weighted total; if false, show all students with same opleiding first, then others.
  */
 async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = false) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     // Pre-fetch all opleiding_ids for the bedrijf to avoid subquery in every row
     const [bedrijfOplRows] = await pool.query('SELECT id_opleiding FROM bedrijf_opleiding WHERE id_bedrijf = ?', [bedrijfId]);
     const bedrijfOplIds = bedrijfOplRows.map(row => row.id_opleiding);

@@ -4,8 +4,10 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 async function getAllEvents() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM evenement';
 
     try {
@@ -19,7 +21,7 @@ async function getAllEvents() {
 
 
 async function addBedrijfToEvent(id_bedrijf, id_event) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'INSERT INTO evenement_bedrijf (id_event, id_bedrijf) VALUES (?, ?)';
 
     try {
