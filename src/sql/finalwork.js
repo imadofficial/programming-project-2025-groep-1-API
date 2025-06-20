@@ -14,8 +14,7 @@ async function getAllFinalWorks() {
     const query = 'SELECT * FROM finalwork';
 
     try {
-        const [rows] = await
-        pool.query(query);
+        const [rows] = await pool.query(query);
         console.log('Query result:', rows); // Log the query result
         if (rows.length > 0) {
             return rows; // Return all rows instead of just the first one
