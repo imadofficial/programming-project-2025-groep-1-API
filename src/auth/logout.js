@@ -9,7 +9,6 @@ router.post('/', (req, res) => {
             sameSite: 'none', // Adjust as necessary
             path: "/auth/refresh", // Ensure the cookie is only sent to the refresh endpoint
             domain: "api.ehb-match.me",
-            maxAge: refreshMaxAge * 1000, // Convert seconds to milliseconds
             partitioned: true // Use partitioned cookies for better privacy
         });
     res.json({ message: 'Logout successful' });
