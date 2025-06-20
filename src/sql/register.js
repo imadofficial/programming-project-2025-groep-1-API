@@ -51,19 +51,15 @@ async function registerStudent(email, wachtwoord, voornaam, achternaam, linkedin
     }
 }
 
-async function registerBedrijf(email, wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto) {
+async function registerBedrijf(email, wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto = '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4', sectorId = null) {
     const pool = getPool(DB_NAME);
     const query1 = 'INSERT INTO gebruiker (email, wachtwoord, type) VALUES (?,?,3)';
-    const query2 = 'INSERT INTO bedrijf (gebruiker_id, naam, plaats, contact_email, linkedin, profiel_foto) VALUES (?, ?, ?, ?, ?, ?)';
-
-    if (!profiel_foto) {
-        profiel_foto = '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'; // Default profile photo key
-    }
+    const query2 = 'INSERT INTO bedrijf (gebruiker_id, naam, plaats, contact_email, linkedin, profiel_foto, id_sector) VALUES (?, ?, ?, ?, ?, ?, ?)';
 
     try {
         const [result] = await pool.query(query1, [email, wachtwoord]);
         const gebruikerId = result.insertId;
-        const [result2] = await pool.query(query2, [gebruikerId, naam, plaats, contact_email, linkedin, profiel_foto]);
+        const [result2] = await pool.query(query2, [gebruikerId, naam, plaats, contact_email, linkedin, profiel_foto, sectorId]);
         if (result2.affectedRows === 0) {
             throw new Error('Bedrijf registration failed');
         }
