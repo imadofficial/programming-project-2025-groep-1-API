@@ -5,6 +5,8 @@ const authAdmin = require('./authAdmin.js');
 const bcrypt = require('bcrypt');
 const { deleteProfielFoto, addTempProfielFoto, cleanupTempProfielFoto } = require('../sql/profielFoto.js');
 const { getAllEvents, addBedrijfToEvent } = require('../sql/event.js');
+const { getUserInfo } = require('../sql/users.js');
+const { addFunctiesToUser } = require('../sql/functie.js');
 
 require('../auth/passportJWT.js');
 
@@ -172,6 +174,16 @@ router.post('/student', async (req, res) => {
             } catch (cleanupError) {
                 console.error('Error cleaning up temp profiel foto after student registration:', cleanupError);
             }
+        }
+        // Add default Bachelorproef function for 3rd year students
+        if ((await getUserInfo(studentId)).studiejaar === 3) {
+            try {
+                const response = await addFunctiesToUser(studentId, [5]);
+                console.log('Added default functie for 3rd year student:', response);
+            } catch (error) {
+                console.error('Error adding functie to student after registration:', error);
+            }
+
         }
         res.status(201).json({ message: "Student registered successfully", Id: studentId });
     } catch (error) {
