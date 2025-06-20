@@ -20,12 +20,12 @@ async function getAllEvents() {
 }
 
 
-async function addBedrijfToEvent(id_bedrijf, id_event) {
+async function addBedrijfToEvent(id_bedrijf, id_event, begin = '2025-10-01 10:00:00', einde = '2025-10-01 18:00:00') {
     const pool = getPool(DB_NAME);
-    const query = 'INSERT INTO bedrijf_evenement (evenement_id, bedrijf_id) VALUES (?, ?)';
+    const query = 'INSERT INTO bedrijf_evenement (evenement_id, bedrijf_id, begin, einde) VALUES (?, ?, ?, ?)';
 
     try {
-        const [result] = await pool.query(query, [id_event, id_bedrijf]);
+        const [result] = await pool.query(query, [id_event, id_bedrijf, begin, einde]);
         return result.affectedRows > 0; // Return true if a row was inserted
     } catch (error) {
         console.error('Database query error in addBedrijfToEvent:', error.message, error.stack);
