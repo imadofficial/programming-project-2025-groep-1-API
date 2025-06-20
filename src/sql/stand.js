@@ -7,8 +7,10 @@ const { getPool } = require('../globalEntries.js');
 
 dotenv.config();
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 async function getAllStand(){
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM stand';
 
     try {
@@ -26,7 +28,7 @@ async function getAllStand(){
 }
 
 async function addStand(lokaal, id_bedrijf) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'INSERT IGNORE INTO stand (lokaal, id_bedrijf) VALUES (?, ?)';
 
     try {
@@ -44,7 +46,7 @@ async function addStand(lokaal, id_bedrijf) {
 }   
 
 async function removeStand(id_stand) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'DELETE FROM stand WHERE id = ?';
 
     try {
@@ -57,7 +59,7 @@ async function removeStand(id_stand) {
 }
 
 async function getStandById(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM stand WHERE id = ?';
 
     try {

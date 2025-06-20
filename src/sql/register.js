@@ -1,14 +1,11 @@
 const mysql = require('mysql2');
-
 const dotenv = require('dotenv');
-
 const { getPool } = require('../globalEntries.js');
-
-
 dotenv.config();
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
 
 async function register(email, wachtwoord) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'INSERT INTO gebruiker (email, wachtwoord, type) VALUES (?,?,0)';
 
     try {
@@ -21,7 +18,7 @@ async function register(email, wachtwoord) {
 }
 
 async function registerAdmin(email, wachtwoord) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'INSERT INTO gebruiker (email, wachtwoord, type) VALUES (?,?,1)';
 
     try {
@@ -34,7 +31,7 @@ async function registerAdmin(email, wachtwoord) {
 }
 
 async function registerStudent(email, wachtwoord, voornaam, achternaam, linkedin, profielFoto, studiejaar, opleidingId, dob) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query1 = 'INSERT INTO gebruiker (email, wachtwoord, type) VALUES (?,?,2)';
     const query2 = 'INSERT INTO student (gebruiker_id, voornaam, achternaam, linkedin, profiel_foto, studiejaar, opleiding_id, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 
@@ -55,7 +52,7 @@ async function registerStudent(email, wachtwoord, voornaam, achternaam, linkedin
 }
 
 async function registerBedrijf(email, wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query1 = 'INSERT INTO gebruiker (email, wachtwoord, type) VALUES (?,?,3)';
     const query2 = 'INSERT INTO bedrijf (gebruiker_id, naam, plaats, contact_email, linkedin, profiel_foto) VALUES (?, ?, ?, ?, ?, ?)';
 

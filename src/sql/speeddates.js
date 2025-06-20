@@ -8,6 +8,8 @@ const { getPool } = require('../globalEntries.js');
 
 dotenv.config();
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 // Helper to construct profile photo URL
 function getProfielFotoUrl(filename) {
     return filename ? `https://gt0kk4fbet.ufs.sh/f/${filename}` : null;
@@ -40,7 +42,7 @@ function mapSpeeddateRow(row, includeAkkoord = true, includeLokaal = true) {
 }
 
 async function getSpeeddateById(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = `
         SELECT s.id, s.asked_by AS asked_by, s.id_bedrijf, b.naam AS naam_bedrijf, b.profiel_foto AS profiel_foto_bedrijf, sec.naam AS sector_bedrijf, s.id_student, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student, st.profiel_foto AS profiel_foto_student, s.akkoord, stand.lokaal, s.datum
         FROM speeddate s
@@ -60,7 +62,7 @@ async function getSpeeddateById(id) {
 }
 
 async function getSpeeddateHistoryByUserId(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = `
         SELECT s.id, s.asked_by AS asked_by, s.id_bedrijf, b.naam AS naam_bedrijf, b.profiel_foto AS profiel_foto_bedrijf, sec.naam AS sector_bedrijf, s.id_student, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student, st.profiel_foto AS profiel_foto_student, s.akkoord, stand.lokaal, s.datum
         FROM speeddate s
@@ -82,7 +84,7 @@ async function getSpeeddateHistoryByUserId(id) {
 
 // function to get all speeddates by user ID (id_bedrijf or id_student)
 async function getSpeeddatesByUserId(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = `
         SELECT s.id, s.asked_by AS asked_by, s.id_bedrijf, b.naam AS naam_bedrijf, b.profiel_foto AS profiel_foto_bedrijf, b.id_sector, sec.naam AS sector_bedrijf, s.id_student, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student, st.profiel_foto AS profiel_foto_student, s.akkoord, stand.lokaal, s.datum
         FROM speeddate s
@@ -103,7 +105,7 @@ async function getSpeeddatesByUserId(id) {
 }
 
 async function getAcceptedSpeeddatesByUserId(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = `
         SELECT 
             s.id AS id,
@@ -138,7 +140,7 @@ async function getAcceptedSpeeddatesByUserId(id) {
 }
 
 async function getRejectedSpeeddatesByUserId(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = `
         SELECT 
             s.id AS id,
@@ -174,7 +176,7 @@ async function getRejectedSpeeddatesByUserId(id) {
 }
 
 async function getUnavailableDates(id1, id2) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     // Query for overlapping speeddates for the same student or company
     const query = `
         SELECT * FROM speeddate 
@@ -205,7 +207,7 @@ async function getUnavailableDates(id1, id2) {
 }
 
 async function getAvailableDates(id1, id2) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const bedrijfEvenementQuery = `SELECT * FROM bedrijf_evenement WHERE bedrijf_id = ? OR bedrijf_id = ?`;
     const speeddateQuery = `SELECT datum FROM speeddate WHERE id_bedrijf = ? OR id_bedrijf = ? OR id_student = ? OR id_student = ?`;
     try {
@@ -287,7 +289,7 @@ async function getAvailableDates(id1, id2) {
 }
 
 async function isDateAvailable(id_bedrijf, id_student, datum) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     // Calculate 10-minute window (+10 minutes)
     const dateObj = new Date(datum.replace(' ', 'T')); // Convert to ISO format
     if (isNaN(dateObj.getTime())) {
@@ -311,7 +313,7 @@ async function isDateAvailable(id_bedrijf, id_student, datum) {
 }
 
 async function getAllSpeeddates() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM speeddate';
 
     try {
@@ -329,7 +331,7 @@ async function getAllSpeeddates() {
 }
 
 async function getDatum(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT datum FROM speeddate WHERE id = ?';
 
     try {
@@ -346,7 +348,7 @@ async function getDatum(id) {
 }
 
 async function speeddateAkkoord(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'UPDATE speeddate SET akkoord = 1 WHERE id = ?';
 
     try {
@@ -359,7 +361,7 @@ async function speeddateAkkoord(id) {
 }
 
 async function speeddateAfgekeurd(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'DELETE FROM speeddate WHERE id = ?';
 
     try {
@@ -372,7 +374,7 @@ async function speeddateAfgekeurd(id) {
 }
 
 async function addSpeeddate(id_bedrijf, id_student, datum, asked_by) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'INSERT INTO speeddate (id_bedrijf, id_student, datum, asked_by) VALUES (?,?,?,?)';
 
     try {
@@ -386,7 +388,7 @@ async function addSpeeddate(id_bedrijf, id_student, datum, asked_by) {
 }
 
 async function getSpeeddateInfo(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = `
         SELECT s.id, s.asked_by AS asked_by, s.id_bedrijf, b.naam AS naam_bedrijf, b.profiel_foto AS profiel_foto_bedrijf, b.id_sector, sec.naam AS sector_bedrijf, s.id_student, st.voornaam AS voornaam_student, st.achternaam AS achternaam_student, st.profiel_foto AS profiel_foto_student, s.akkoord, stand.lokaal, s.datum
         FROM speeddate s
@@ -411,7 +413,7 @@ async function getSpeeddateInfo(id) {
 
 
 async function isOwner(id, userId) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM speeddate WHERE id = ? AND asked_by = ?';
 
     try {

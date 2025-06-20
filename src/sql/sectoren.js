@@ -1,13 +1,11 @@
 const mysql = require('mysql2');
-
-
 const { getPool } = require('../globalEntries.js');
-
 require('dotenv').config();
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
 
 
 async function getAllSectoren() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM sector';
 
     try {
@@ -26,7 +24,7 @@ async function getAllSectoren() {
 }
 
 async function getSectorById(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM sector WHERE id = ?';
 
     try {
@@ -43,7 +41,7 @@ async function getSectorById(id) {
 }
 
 async function addSector(naam) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'INSERT IGNORE INTO sector (naam) VALUES (?)';
 
     try {
@@ -66,7 +64,7 @@ async function addSector(naam) {
 }
 
 async function deleteSector(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     if (!id) {
         throw new Error('Sector ID is required for deletion');
     }

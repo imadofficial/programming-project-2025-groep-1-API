@@ -7,8 +7,10 @@ const { getPool } = require('../globalEntries.js');
 
 dotenv.config();
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 async function getAllOpleidingen() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM opleiding'; // Corrected table name
 
     try {
@@ -27,7 +29,7 @@ async function getAllOpleidingen() {
 }
 
 async function addOpleidingBijBedrijf(opleidingId, bedrijfId) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
 
     const query = 'INSERT IGNORE INTO bedrijf_opleiding (id_bedrijf, id_opleiding) VALUES (?, ?)';
 
@@ -41,7 +43,7 @@ async function addOpleidingBijBedrijf(opleidingId, bedrijfId) {
 }
 
 async function removeOpleidingBijBedrijf(opleidingId, bedrijfId) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
 
     const query = 'DELETE FROM bedrijf_opleiding WHERE id_bedrijf = ? AND id_opleiding = ?';
 
@@ -55,7 +57,7 @@ async function removeOpleidingBijBedrijf(opleidingId, bedrijfId) {
 }
 
 async function addOpleiding(naam, type) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'INSERT IGNORE INTO opleiding (naam, type) VALUES (?, ?)';
 
     try {
@@ -73,7 +75,7 @@ async function addOpleiding(naam, type) {
 }
 
 async function deleteOpleiding(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'DELETE FROM opleiding WHERE id = ?';
 
     try {
@@ -86,7 +88,7 @@ async function deleteOpleiding(id) {
 }
 
 async function modifyOpleiding(id, naam, type) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'UPDATE opleiding SET naam = ?, type = ? WHERE id = ?';
 
     try {
@@ -100,7 +102,7 @@ async function modifyOpleiding(id, naam, type) {
 }
 
 async function getOpleidingById(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM opleiding WHERE id = ?';
 
     try {
@@ -118,7 +120,7 @@ async function getOpleidingById(id) {
 }
 
 async function getOpleidingenByUserId(userId) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM opleiding WHERE id IN (SELECT id_opleiding FROM bedrijf_opleiding WHERE id_bedrijf = ?)';
 
     try {
@@ -132,7 +134,7 @@ async function getOpleidingenByUserId(userId) {
 
 
 async function addOpleidingenBijBedrijf(opleidingIds, bedrijfId) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     if (!Array.isArray(opleidingIds) || opleidingIds.length === 0) {
         return 0;
     }

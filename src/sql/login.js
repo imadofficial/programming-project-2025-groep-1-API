@@ -9,16 +9,17 @@ const bcrypt = require('bcrypt');
 
 dotenv.config();
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
 
 async function getWachtwoord(emailadres) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const [rows] = await pool.query('SELECT wachtwoord FROM gebruiker WHERE email = ?', [emailadres]);
     return rows[0];
 }
 
 
 async function getUserType(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT type FROM gebruiker WHERE id = ?'; // Corrected table name
 
     try {
@@ -36,7 +37,7 @@ async function getUserType(id) {
 
 
 async function isAdmin(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT type FROM gebruiker WHERE id = ?'; // Corrected table name
 
     try {
@@ -53,7 +54,7 @@ async function isAdmin(id) {
 }
 
 async function login(email, wachtwoord) {
-    const pool = getPool('ehbmatchdev'); // Updated database name
+    const pool = getPool(DB_NAME); // Updated database name
     const query = 'SELECT g.id, g.wachtwoord FROM gebruiker g WHERE email = ? AND NOT EXISTS (SELECT 1 FROM bedrijf WHERE gebruiker_id = g.id AND goedkeuring = 0)'; // Corrected table name
 
 

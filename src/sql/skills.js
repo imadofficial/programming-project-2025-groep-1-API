@@ -7,8 +7,10 @@ const { getPool } = require('../globalEntries.js');
 
 dotenv.config();
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 async function getAllSkills() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM skills';
 
     try {
@@ -27,7 +29,7 @@ async function getAllSkills() {
 }
 
 async function addSkillToUser(id_gebruiker, id_skill) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
 
     const query = 'INSERT IGNORE INTO gebruiker_skills (id_gebruiker, id_skill) VALUES (?, ?)';
 
@@ -42,7 +44,7 @@ async function addSkillToUser(id_gebruiker, id_skill) {
 }
 
 async function removeSkillFromUser(id_gebruiker, id_skill) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
 
     const query = 'DELETE FROM gebruiker_skills WHERE id_gebruiker = ? AND id_skill = ?';
 
@@ -56,7 +58,7 @@ async function removeSkillFromUser(id_gebruiker, id_skill) {
 }
 
 async function getSkillsByUserId(id_gebruiker) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
 
     const query = `
         SELECT s.* 
@@ -75,7 +77,7 @@ async function getSkillsByUserId(id_gebruiker) {
 }
 
 async function addSkill(naam, type) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'INSERT IGNORE INTO skills (naam, type) VALUES (?, ?)';
 
     try {
@@ -93,7 +95,7 @@ async function addSkill(naam, type) {
 }
 
 async function removeSkill(id_skill) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'DELETE FROM skills WHERE id = ?';
 
     try {
@@ -106,7 +108,7 @@ async function removeSkill(id_skill) {
 }
 
 async function modifySkill(id_skill, newName) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'UPDATE skills SET naam = ? WHERE id = ?';
 
     try {
@@ -119,7 +121,7 @@ async function modifySkill(id_skill, newName) {
 }
 
 async function getSkillById(id_skill) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM skills WHERE id = ?';
 
     try {
@@ -136,7 +138,7 @@ async function getSkillById(id_skill) {
 }
 
 async function addSkillsToUser(id_gebruiker, skillIds) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     if (!Array.isArray(skillIds) || skillIds.length === 0) {
         return 0;
     }

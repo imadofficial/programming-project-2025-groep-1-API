@@ -7,8 +7,10 @@ const { getPool } = require('../globalEntries.js');
 
 dotenv.config();
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 async function getAllBedrijven() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT b.*, s.naam AS sector_bedrijf FROM bedrijf b LEFT JOIN sector s ON b.id_sector = s.id'; // Corrected table name
 
     try {
@@ -26,7 +28,7 @@ async function getAllBedrijven() {
     }
 }
 async function getBedrijfById(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT b.*, s.naam AS sector_bedrijf FROM bedrijf b LEFT JOIN sector s ON b.id_sector = s.id WHERE b.gebruiker_id = ?';
     const baseUrl = "https://gt0kk4fbet.ufs.sh/f/";
 
@@ -54,7 +56,7 @@ async function getBedrijfById(id) {
 }
 
 async function getGoedgekeurdeBedrijven() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT b.*, s.naam AS sector_bedrijf FROM bedrijf b LEFT JOIN sector s ON b.id_sector = s.id WHERE b.goedkeuring = 1';
 
     try {
@@ -72,7 +74,7 @@ async function getGoedgekeurdeBedrijven() {
 }
 
 async function getNietGoedgekeurdeBedrijven() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT b.*, s.naam AS sector_bedrijf FROM bedrijf b LEFT JOIN sector s ON b.id_sector = s.id WHERE b.goedkeuring = 0';
 
     try {
@@ -90,7 +92,7 @@ async function getNietGoedgekeurdeBedrijven() {
 }
 
 async function keurBedrijfGoed(id){
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'UPDATE bedrijf SET goedkeuring = 1 WHERE gebruiker_id = ?';
 
     try {
@@ -103,7 +105,7 @@ async function keurBedrijfGoed(id){
 }
 
 async function updateBedrijf(id, data) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'UPDATE bedrijf SET ? WHERE gebruiker_id = ?';
 
     if (!id || !data) {

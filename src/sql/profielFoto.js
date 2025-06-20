@@ -1,16 +1,13 @@
 const mysql = require('mysql2');
-
 const dotenv = require('dotenv');
-
 const { getPool } = require('../globalEntries.js');
-
 const { UTApi } = require('uploadthing/server');
 const utapi = new UTApi();
-
 dotenv.config();
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
 
 async function addTempProfielFoto(fotoKey) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'INSERT INTO temp_uploaded_profiel_fotos (file_key) VALUES (?)';
     try {
         const [result] = await pool.query(query, [fotoKey]);
@@ -22,7 +19,7 @@ async function addTempProfielFoto(fotoKey) {
 }
 
 async function cleanupTempProfielFoto(fotoKey) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'DELETE FROM temp_uploaded_profiel_fotos WHERE file_key = ?';
     try {
         const deletedResponse = await utapi.deleteFiles([fotoKey]); // Delete the file from Uploadthing
@@ -38,7 +35,7 @@ async function cleanupTempProfielFoto(fotoKey) {
 }
 
 async function isLinkedToUser(fotoKey) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT 1 FROM student WHERE profiel_foto = ? UNION SELECT 1 FROM bedrijf WHERE profiel_foto = ?';
     try {
         const [result] = await pool.query(query, [fotoKey, fotoKey]);
@@ -50,7 +47,7 @@ async function isLinkedToUser(fotoKey) {
 }
 
 async function getLinkedUser(fotoKey) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT gebruiker_id FROM student WHERE profiel_foto = ? UNION SELECT gebruiker_id FROM bedrijf WHERE profiel_foto = ?';
     try {
         const [result] = await pool.query(query, [fotoKey, fotoKey]);
@@ -65,7 +62,7 @@ async function getLinkedUser(fotoKey) {
 }
 
 async function updateProfielFoto(gebruikerId, fotoKey) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
 
     const queryStudent = 'UPDATE student SET profiel_foto = ? WHERE gebruiker_id = ?';
     const queryBedrijf = 'UPDATE bedrijf SET profiel_foto = ? WHERE gebruiker_id = ?';
@@ -81,7 +78,7 @@ async function updateProfielFoto(gebruikerId, fotoKey) {
 }
 
 async function deleteProfielFoto(gebruikerId) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
 
     const getProfielFotoQuery = 'SELECT profiel_foto FROM student WHERE gebruiker_id = ? UNION SELECT profiel_foto FROM bedrijf WHERE gebruiker_id = ?';
     const [resultKey] = await pool.query(getProfielFotoQuery, [gebruikerId, gebruikerId]);

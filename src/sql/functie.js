@@ -9,8 +9,10 @@ const { getUserById } = require('./users.js');
 
 dotenv.config();
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 async function getAllFuncties() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM functie';
 
     try {
@@ -29,7 +31,7 @@ async function getAllFuncties() {
 }
 
 async function addFunctie(naam) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'INSERT INTO functie (naam) VALUES (?)';
 
     try {
@@ -43,7 +45,7 @@ async function addFunctie(naam) {
 
 
 async function removeFunctie(id_functie) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'DELETE FROM functie WHERE id = ?';
 
     try {
@@ -56,7 +58,7 @@ async function removeFunctie(id_functie) {
 }
 
 async function modifyFunctie(id_functie, naam) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'UPDATE functie SET naam = ? WHERE id = ?';
 
     try {
@@ -69,7 +71,7 @@ async function modifyFunctie(id_functie, naam) {
 }
 
 async function getFunctieById(id_functie) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM functie WHERE id = ?';
 
     try {
@@ -86,7 +88,7 @@ async function getFunctieById(id_functie) {
 }
 
 async function getFunctiesByUserId(id_gebruiker) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = `
         SELECT f.*
         FROM functie f
@@ -108,7 +110,7 @@ async function getFunctiesByUserId(id_gebruiker) {
 }
 
 async function addFunctieToUser(id_gebruiker, id_functie) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'INSERT IGNORE INTO gebruiker_functie (id_gebruiker, id_functie) VALUES (?, ?)';
 
     try {
@@ -121,7 +123,7 @@ async function addFunctieToUser(id_gebruiker, id_functie) {
 }
 
 async function addFunctiesToUser(id_gebruiker, functies) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     if (!Array.isArray(functies) || functies.length === 0) {
         return 0;
     }
@@ -157,7 +159,7 @@ async function addFunctiesToUser(id_gebruiker, functies) {
 }
 
 async function removeFunctieFromUser(id_gebruiker, id_functie) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'DELETE FROM gebruiker_functie WHERE id_gebruiker = ? AND id_functie = ?';
 
     try {
