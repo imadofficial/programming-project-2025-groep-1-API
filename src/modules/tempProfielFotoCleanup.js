@@ -2,11 +2,15 @@
 const { getPool } = require('../globalEntries.js');
 const { UTApi } = require('uploadthing/server');
 
+const dotenv = require('dotenv');
+dotenv.config();
+const DB_NAME = process.env.DB_NAME || 'ehbmatch';
+
 const utapi = new UTApi();
 
 // Cleanup temp profile photos older than 1 hour and not linked to any user
 async function cleanupTempProfielFotos() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     // Find temp photos older than 1 hour and not linked to any bedrijf or student
     const [rows] = await pool.query(`
         SELECT file_key

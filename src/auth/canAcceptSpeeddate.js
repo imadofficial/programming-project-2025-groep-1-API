@@ -1,6 +1,10 @@
 // Middleware check if authenticated user is the id_student or id_bedrijf from the requested speeddate, or an admin
 const { getPool } = require('../globalEntries.js');
 
+const dotenv = require('dotenv');
+dotenv.config();
+const DB_NAME = process.env.DB_NAME || 'ehbmatch';
+
 async function canAcceptSpeeddate(req, res, next) {
     const user = req.user;
     if (!user) {
@@ -12,7 +16,7 @@ async function canAcceptSpeeddate(req, res, next) {
         return res.status(400).json({ message: 'No speeddate id provided in route parameters' });
     }
 
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT id_student, id_bedrijf, asked_by FROM speeddate WHERE id = ?';
     
     try {
