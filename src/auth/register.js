@@ -258,7 +258,7 @@ router.post('/bedrijf', async (req, res) => {
         res.status(201).json({ message: "Company registered successfully", Id: bedrijfId });
     } catch (error) {
         console.error('Error registering company:', error);
-        res.status(500).json({ error: 'Company registration failed' });
+        res.status(500).json({ error: 'Company registration failed!\nAn account with that email address might already exist' });
     }
 });
 
