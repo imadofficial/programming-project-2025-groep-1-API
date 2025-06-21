@@ -381,7 +381,7 @@ router.post('/:bedrijfID/events', [passport.authenticate('jwt', { session: false
         return res.status(400).json({ error: 'Bedrijf ID is required' });
     }
 
-    const { event_ids } = req.body;
+    const { event_ids, begin, einde } = req.body;
     // Event must be an array of integers
     if (!event_ids || !Array.isArray(event_ids) || event_ids.length === 0) {
         return res.status(400).json({ error: 'Event must be a non-empty array' });
@@ -392,7 +392,7 @@ router.post('/:bedrijfID/events', [passport.authenticate('jwt', { session: false
             if (typeof eventId !== 'number' || eventId <= 0) {
                 return res.status(400).json({ error: 'Each event ID must be a valid positive integer' });
             }
-            const success = await addBedrijfToEvent(bedrijfId, eventId);
+            const success = await addBedrijfToEvent(bedrijfId, eventId, begin, einde);
             if (!success) {
                 return res.status(404).json({ message: `Event with ID ${eventId} not found or not added to bedrijf` });
             }
