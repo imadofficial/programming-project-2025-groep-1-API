@@ -10,7 +10,7 @@ require('./passportJWT.js');
 const router = express.Router();
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 2 * 1024 * 1024 }, // Limit file size to 2MB
+  limits: { fileSize: 3 * 1024 * 1024 }, // Limit file size to 3MB
   fileFilter: (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
     if (allowedTypes.includes(file.mimetype)) {
