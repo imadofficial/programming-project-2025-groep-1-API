@@ -188,7 +188,7 @@ async function addEvents(bedrijfId) {
     const response = await fetch(`https://api.ehb-match.me/bedrijven/${bedrijfId}/events`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKEY}` },
-      body: JSON.stringify({ event_ids: eventIds })
+      body: JSON.stringify({ event_ids: eventIds, begin: '2025-10-02 12:00:00', einde: '2025-10-02 15:00:00' })
   });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
