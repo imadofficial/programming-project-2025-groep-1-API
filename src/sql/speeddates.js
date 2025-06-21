@@ -8,7 +8,7 @@ const { getPool } = require('../globalEntries.js');
 
 dotenv.config();
 
-const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+const DB_NAME = process.env.DB_NAME || 'ehbmatch';
 
 // Helper to construct profile photo URL
 function getProfielFotoUrl(filename) {
