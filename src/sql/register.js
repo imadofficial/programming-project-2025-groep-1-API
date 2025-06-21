@@ -35,10 +35,6 @@ async function registerStudent(email, wachtwoord, voornaam, achternaam, linkedin
     const query1 = 'INSERT INTO gebruiker (email, wachtwoord, type) VALUES (?,?,2)';
     const query2 = 'INSERT INTO student (gebruiker_id, voornaam, achternaam, linkedin, profiel_foto, studiejaar, opleiding_id, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
 
-    if (!profielFoto) {
-        profielFoto = '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'; // Default profile photo key
-    }
-
     try {
         const [result] = await pool.query(query1, [email, wachtwoord]);
         const gebruikerId = result.insertId;
@@ -55,11 +51,6 @@ async function registerBedrijf(email, wachtwoord, naam, plaats, contact_email, l
     const pool = getPool(DB_NAME);
     const query1 = 'INSERT INTO gebruiker (email, wachtwoord, type) VALUES (?,?,3)';
     const query2 = 'INSERT INTO bedrijf (gebruiker_id, naam, plaats, contact_email, linkedin, profiel_foto, id_sector) VALUES (?, ?, ?, ?, ?, ?, ?)';
-
-    // if profiel_foto is null, use a default value
-    if (!profiel_foto) {
-        profiel_foto = '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4'; // Default profile photo key
-    }
 
     try {
         const [result] = await pool.query(query1, [email, wachtwoord]);
