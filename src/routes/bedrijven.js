@@ -6,7 +6,8 @@ const { getFunctiesByUserId, addFunctiesToUser, removeFunctieFromUser } = requir
 const authAdmin = require('../auth/authAdmin.js');
 const { canEdit } = require('../auth/canEdit.js');
 const { updateProfielFoto, deleteProfielFoto } = require('../sql/profielFoto.js');
-const { addOpleidingBijBedrijf, removeOpleidingBijBedrijf, getOpleidingenByUserId, addOpleidingenBijBedrijf } = require('../sql/opleiding.js')
+const { addOpleidingBijBedrijf, removeOpleidingBijBedrijf, getOpleidingenByUserId, addOpleidingenBijBedrijf } = require('../sql/opleiding.js');
+const { getEventsByBedrijfId } = require('../sql/event.js');
 
 require('../auth/passportJWT.js');
 
@@ -350,6 +351,24 @@ router.delete('/:bedrijfID/profielfoto', [passport.authenticate('jwt', { session
         }
     } catch (error) {
         console.error('Error deleting profiel foto:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+
+router.get('/:bedrijfID/events', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const bedrijfId = req.params['bedrijfID'];
+    if (!bedrijfId) {
+        return res.status(400).json({ error: 'Bedrijf ID is required' });
+    }
+
+    try {
+        // Assuming you have a function to get events by bedrijfId
+        const events = await getEventsByBedrijfId(bedrijfId);
+        res.json(events);
+    } catch (error) {
+        console.error('Error fetching events:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
