@@ -47,7 +47,7 @@ async function registerStudent(email, wachtwoord, voornaam, achternaam, linkedin
     }
 }
 
-async function registerBedrijf(email, wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto = '69hQMvkhSwPrBnoUSJEphqgXTDlWRHMuSxI9LmrdCscbikZ4', sectorId = null) {
+async function registerBedrijf(email, wachtwoord, naam, plaats, contact_email, linkedin, profiel_foto = null, sectorId = null) {
     const pool = getPool(DB_NAME);
     const query1 = 'INSERT INTO gebruiker (email, wachtwoord, type) VALUES (?,?,3)';
     const query2 = 'INSERT INTO bedrijf (gebruiker_id, naam, plaats, contact_email, linkedin, profiel_foto, id_sector) VALUES (?, ?, ?, ?, ?, ?, ?)';
