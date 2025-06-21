@@ -34,6 +34,19 @@ async function cleanupTempProfielFoto(fotoKey) {
     }
 }
 
+async function removeTempRecord(fotoKey) {
+    const pool = getPool(DB_NAME);
+    const query = 'DELETE FROM temp_uploaded_profiel_fotos WHERE file_key = ?';
+    try {
+        const [result] = await pool.query(query, [fotoKey]);
+        return result.affectedRows > 0; // Return true if the delete was successful
+    }
+    catch (error) {
+        console.error('Database query error in removeTempRecord:', error.message, error.stack);
+        throw new Error('Removing temp profiel foto record failed');
+    }
+};
+
 async function isLinkedToUser(fotoKey) {
     const pool = getPool(DB_NAME);
     const query = 'SELECT 1 FROM student WHERE profiel_foto = ? UNION SELECT 1 FROM bedrijf WHERE profiel_foto = ?';
@@ -114,6 +127,7 @@ async function deleteProfielFoto(gebruikerId) {
 module.exports = {
     addTempProfielFoto,
     cleanupTempProfielFoto,
+    removeTempRecord,
     updateProfielFoto,
     deleteProfielFoto,
     isLinkedToUser,

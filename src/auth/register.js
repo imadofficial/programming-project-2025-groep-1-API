@@ -3,7 +3,7 @@ const passport = require('passport');
 const { register, registerAdmin, registerStudent, registerBedrijf } = require('../sql/register.js');
 const authAdmin = require('./authAdmin.js');
 const bcrypt = require('bcrypt');
-const { deleteProfielFoto, addTempProfielFoto, cleanupTempProfielFoto } = require('../sql/profielFoto.js');
+const { deleteProfielFoto, addTempProfielFoto, cleanupTempProfielFoto, removeTempRecord } = require('../sql/profielFoto.js');
 const { getAllEvents, addBedrijfToEvent } = require('../sql/event.js');
 const { getUserInfo } = require('../sql/users.js');
 const { addFunctiesToUser } = require('../sql/functie.js');
@@ -170,7 +170,7 @@ router.post('/student', async (req, res) => {
         // Clean up temp profiel foto if provided
         if (profiel_foto) {
             try {
-                await cleanupTempProfielFoto(profiel_foto); // This will clean up temp_uploaded_profiel_fotos for the new student
+                await removeTempRecord(profiel_foto); // This will clean up temp_uploaded_profiel_fotos for the new student
             } catch (cleanupError) {
                 console.error('Error cleaning up temp profiel foto after student registration:', cleanupError);
             }
@@ -244,7 +244,7 @@ router.post('/bedrijf', async (req, res) => {
         // Clean up temp profiel foto if provided
         if (profiel_foto) {
             try {
-                await cleanupTempProfielFoto(profiel_foto); // This will clean up temp_uploaded_profiel_fotos for the new bedrijf
+                await removeTempRecord(profiel_foto); // This will clean up temp_uploaded_profiel_fotos for the new bedrijf
             } catch (cleanupError) {
                 console.error('Error cleaning up temp profiel foto after bedrijf registration:', cleanupError);
             }
