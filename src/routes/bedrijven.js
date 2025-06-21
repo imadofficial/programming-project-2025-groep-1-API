@@ -7,7 +7,7 @@ const authAdmin = require('../auth/authAdmin.js');
 const { canEdit } = require('../auth/canEdit.js');
 const { updateProfielFoto, deleteProfielFoto } = require('../sql/profielFoto.js');
 const { addOpleidingBijBedrijf, removeOpleidingBijBedrijf, getOpleidingenByUserId, addOpleidingenBijBedrijf } = require('../sql/opleiding.js');
-const { getEventsByBedrijfId } = require('../sql/event.js');
+const { getEventsByBedrijfId, addBedrijfToEvent } = require('../sql/event.js');
 
 require('../auth/passportJWT.js');
 
@@ -369,6 +369,37 @@ router.get('/:bedrijfID/events', passport.authenticate('jwt', { session: false }
         res.json(events);
     } catch (error) {
         console.error('Error fetching events:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+
+router.post('/:bedrijfID/events', [passport.authenticate('jwt', { session: false }), canEdit], async (req, res) => {
+    const bedrijfId = req.params['bedrijfID'];
+    if (!bedrijfId) {
+        return res.status(400).json({ error: 'Bedrijf ID is required' });
+    }
+
+    const { event_ids } = req.body;
+    // Event must be an array of integers
+    if (!event_ids || !Array.isArray(event_ids) || event_ids.length === 0) {
+        return res.status(400).json({ error: 'Event must be a non-empty array' });
+    }
+    try {
+        // Add all events from event_ids and return success or failure
+        for (const eventId of event_ids) {
+            if (typeof eventId !== 'number' || eventId <= 0) {
+                return res.status(400).json({ error: 'Each event ID must be a valid positive integer' });
+            }
+            const success = await addBedrijfToEvent(bedrijfId, eventId);
+            if (!success) {
+                return res.status(404).json({ message: `Event with ID ${eventId} not found or not added to bedrijf` });
+            }
+        }
+        res.status(201).json({ message: 'Events added successfully to bedrijf' });
+    } catch (error) {
+        console.error('Error creating event:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
