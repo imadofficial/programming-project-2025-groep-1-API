@@ -12,6 +12,7 @@ const DB_NAME = process.env.DB_NAME || 'ehbmatch';
 
 // Helper to construct profile photo URL
 function getProfielFotoUrl(filename) {
+    if (filename.startsWith('https://')) return filename;
     return filename ? `https://gt0kk4fbet.ufs.sh/f/${filename}` : null;
 }
 
