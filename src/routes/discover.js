@@ -10,7 +10,7 @@ const router = express.Router();
 router.get('/bedrijven', passport.authenticate('jwt', { session: false }), async (req, res) => {
     // Get studentId from authenticated user
     let studentId = req.query.id ? req.query.id : req.user.id;
-    let limit = req.query.limit ? parseInt(req.query.limit, 10) : 20; // Default limit to 20
+    let limit = req.query.limit ? parseInt(req.query.limit, 10) : null; // Default limit to null (no limit)
     let offset = req.query.offset ? parseInt(req.query.offset, 10) : 0; // Default offset to 0
 
     // Parse and validate studentId as integer
@@ -40,7 +40,7 @@ router.get('/bedrijven', passport.authenticate('jwt', { session: false }), async
 router.get('/studenten', passport.authenticate('jwt', { session: false }), async (req, res) => {
     // Get bedrijfId from authenticated user
     let bedrijfId = req.query.id ? req.query.id : req.user.id;
-    let limit = req.query.limit ? parseInt(req.query.limit, 10) : null; // Default limit to null
+    let limit = req.query.limit ? parseInt(req.query.limit, 10) : null; // Default limit to null (no limit)
     let offset = req.query.offset ? parseInt(req.query.offset, 10) : 0; // Default offset to 0
 
     // Parse and validate bedrijfId as integer
