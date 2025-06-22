@@ -10,6 +10,8 @@ const router = express.Router();
 router.get('/bedrijven', passport.authenticate('jwt', { session: false }), async (req, res) => {
     // Get studentId from authenticated user
     let studentId = req.query.id ? req.query.id : req.user.id;
+    let limit = req.query.limit ? parseInt(req.query.limit, 10) : 10; // Default limit to 10
+    let offset = req.query.offset ? parseInt(req.query.offset, 10) : 0; // Default offset to 0
 
     // Parse and validate studentId as integer
     studentId = parseInt(studentId, 10);
@@ -26,7 +28,7 @@ router.get('/bedrijven', passport.authenticate('jwt', { session: false }), async
         return res.status(400).json({ error: 'Student ID is required' });
     }
     try {
-        const rows = await getDiscoverBedrijven(studentId, suggestions, onlyNew);
+        const rows = await getDiscoverBedrijven(studentId, suggestions, onlyNew, limit, offset);
         res.json(rows);
     } catch (error) {
         console.error('Error in /discover/bedrijven:', error);
@@ -38,6 +40,8 @@ router.get('/bedrijven', passport.authenticate('jwt', { session: false }), async
 router.get('/studenten', passport.authenticate('jwt', { session: false }), async (req, res) => {
     // Get bedrijfId from authenticated user
     let bedrijfId = req.query.id ? req.query.id : req.user.id;
+    let limit = req.query.limit ? parseInt(req.query.limit, 10) : 10; // Default limit to 10
+    let offset = req.query.offset ? parseInt(req.query.offset, 10) : 0; // Default offset to 0
 
     // Parse and validate bedrijfId as integer
     bedrijfId = parseInt(bedrijfId, 10);
@@ -54,7 +58,7 @@ router.get('/studenten', passport.authenticate('jwt', { session: false }), async
         return res.status(400).json({ error: 'Bedrijf ID is required' });
     }
     try {
-        const rows = await getDiscoverStudenten(bedrijfId, suggestions, onlyNew);
+        const rows = await getDiscoverStudenten(bedrijfId, suggestions, onlyNew, limit, offset);
         res.json(rows);
     } catch (error) {
         console.error('Error in /discover/studenten:', error);
