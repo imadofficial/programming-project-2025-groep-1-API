@@ -7,12 +7,14 @@ const { getPool } = require('../globalEntries.js');
 
 dotenv.config();
 
-async function createContact(gebruiker_id, onderwerp, bericht) {
-    const pool = getPool('ehbmatchdev');
-    const query = 'insert into contact (gebruiker_id, onderwerp, bericht) values (?, ?, ?)';
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
+async function createContact(email, onderwerp, bericht) {
+    const pool = getPool(DB_NAME);
+    const query = 'insert into contact (email, onderwerp, bericht) values (?, ?, ?)';
 
     try {
-        const [result] = await pool.query(query, [gebruiker_id, onderwerp, bericht]);
+        const [result] = await pool.query(query, [email, onderwerp, bericht]);
         return result.insertId; // Return the ID of the newly inserted contact
     } catch (error) {
         console.error('Database query error in createContact:', error.message, error.stack);
@@ -24,7 +26,7 @@ async function createContact(gebruiker_id, onderwerp, bericht) {
 
 
 async function deleteContact(id_contact) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'DELETE FROM contact WHERE id = ?';
 
     try {
@@ -37,7 +39,7 @@ async function deleteContact(id_contact) {
 }
 
 async function getContactById(id_contact) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM contact WHERE id = ?';
 
     try {
@@ -53,8 +55,22 @@ async function getContactById(id_contact) {
     }
 }   
 
+async function getAllContacts() {
+    const pool = getPool(DB_NAME);
+    const query = 'SELECT * FROM contact';
+
+    try {
+        const [rows] = await pool.query(query);
+        return rows; // Return all rows
+    } catch (error) {
+        console.error('Database query error in getAllContacts:', error.message, error.stack);
+        throw new Error('Getting all contacts failed');
+    }
+}
+
 module.exports = {
     createContact,
     deleteContact,
-    getContactById
+    getContactById,
+    getAllContacts
 };

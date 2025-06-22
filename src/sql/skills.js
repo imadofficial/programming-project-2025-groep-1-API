@@ -7,8 +7,10 @@ const { getPool } = require('../globalEntries.js');
 
 dotenv.config();
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 async function getAllSkills() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM skills';
 
     try {
@@ -27,13 +29,13 @@ async function getAllSkills() {
 }
 
 async function addSkillToUser(id_gebruiker, id_skill) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
 
-    const query = 'INSERT INTO gebruiker_skills (id_gebruiker, id_skill) VALUES (?, ?)';
+    const query = 'INSERT IGNORE INTO gebruiker_skills (id_gebruiker, id_skill) VALUES (?, ?)';
 
     try {
         const [result] = await pool.query(query, [id_gebruiker, id_skill]);
-        return result.insertId; // Return the ID of the newly inserted record
+        return result.affectedRows > 0; // Return true if a row was inserted
     } catch (error) {
         console.error('Database query error in addSkillToUser:', error.message, error.stack);
         throw new Error('Adding skill to user failed');
@@ -42,7 +44,7 @@ async function addSkillToUser(id_gebruiker, id_skill) {
 }
 
 async function removeSkillFromUser(id_gebruiker, id_skill) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
 
     const query = 'DELETE FROM gebruiker_skills WHERE id_gebruiker = ? AND id_skill = ?';
 
@@ -56,7 +58,7 @@ async function removeSkillFromUser(id_gebruiker, id_skill) {
 }
 
 async function getSkillsByUserId(id_gebruiker) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
 
     const query = `
         SELECT s.* 
@@ -74,13 +76,18 @@ async function getSkillsByUserId(id_gebruiker) {
     }
 }
 
-async function addSkill(naam) {
-    const pool = getPool('ehbmatchdev');
-    const query = 'INSERT INTO skills (naam) VALUES (?)';
+async function addSkill(naam, type) {
+    const pool = getPool(DB_NAME);
+    const query = 'INSERT IGNORE INTO skills (naam, type) VALUES (?, ?)';
 
     try {
-        const [result] = await pool.query(query, [naam]);
-        return result.insertId; // Return the ID of the newly inserted skill
+        const [result] = await pool.query(query, [naam, type]);
+        if (result.insertId && result.insertId !== 0) {
+            return result.insertId; // Return the ID of the newly inserted skill
+        } else {
+            const [rows] = await pool.query('SELECT id FROM skills WHERE naam = ? AND type = ?', [naam, type]);
+            return rows[0].id; // Return the existing skill ID if it was not newly inserted
+        }
     } catch (error) {
         console.error('Database query error in addSkill:', error.message, error.stack);
         throw new Error('Adding skill failed');
@@ -88,7 +95,7 @@ async function addSkill(naam) {
 }
 
 async function removeSkill(id_skill) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'DELETE FROM skills WHERE id = ?';
 
     try {
@@ -101,7 +108,7 @@ async function removeSkill(id_skill) {
 }
 
 async function modifySkill(id_skill, newName) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'UPDATE skills SET naam = ? WHERE id = ?';
 
     try {
@@ -114,7 +121,7 @@ async function modifySkill(id_skill, newName) {
 }
 
 async function getSkillById(id_skill) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM skills WHERE id = ?';
 
     try {
@@ -130,6 +137,25 @@ async function getSkillById(id_skill) {
     }
 }
 
+async function addSkillsToUser(id_gebruiker, skillIds) {
+    const pool = getPool(DB_NAME);
+    if (!Array.isArray(skillIds) || skillIds.length === 0) {
+        return 0;
+    }
+    // Build bulk insert values
+    const values = skillIds.map(id_skill => [id_gebruiker, id_skill]);
+    const placeholders = values.map(() => '(?, ?)').join(', ');
+    const flatValues = values.flat();
+    const query = `INSERT IGNORE INTO gebruiker_skills (id_gebruiker, id_skill) VALUES ${placeholders}`;
+    try {
+        const [result] = await pool.query(query, flatValues);
+        return result.affectedRows > 0; // Return true if any rows were inserted
+    } catch (error) {
+        console.error('Database query error in addSkillsToUser:', error.message, error.stack);
+        throw new Error('Adding multiple skills to user failed');
+    }
+}
+
 module.exports = {
     getAllSkills,
     addSkillToUser,
@@ -138,5 +164,6 @@ module.exports = {
     addSkill,
     removeSkill,
     modifySkill,
-    getSkillById
+    getSkillById,
+    addSkillsToUser
 };

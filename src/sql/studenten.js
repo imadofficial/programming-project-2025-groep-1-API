@@ -7,8 +7,10 @@ const { getPool } = require('../globalEntries.js');
 
 dotenv.config();
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 async function getAllStudenten() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM student'; // Corrected table name
 
     try {
@@ -26,13 +28,23 @@ async function getAllStudenten() {
     }
 }
 async function getStudentById(id) {
-    const pool = getPool('ehbmatchdev');
-    const query = 'SELECT * FROM student WHERE gebruiker_id = ?';
+    const pool = getPool(DB_NAME);
+    const query = 'SELECT g.type, s.*, g.email AS contact_email FROM student s JOIN gebruiker g ON s.gebruiker_id = g.id WHERE s.gebruiker_id = ?';
+    const baseUrl = "https://gt0kk4fbet.ufs.sh/f/";
 
     try {
         const [rows] = await pool.query(query, [id]);
         if (rows.length > 0) {
-            return rows[0]; // Return the first student found
+            const student = rows[0];
+            if (student.profiel_foto) {
+                student.profiel_foto_key = student.profiel_foto;
+                student.profiel_foto_url = baseUrl + student.profiel_foto;
+            } else {
+                student.profiel_foto_key = null;
+                student.profiel_foto_url = null;
+            }
+            delete student.profiel_foto; // Remove the original profiel_foto field
+            return student; // Return the first student found with extra fields
         } else {
             return null; // Return null if no student is found
         }   
@@ -44,7 +56,7 @@ async function getStudentById(id) {
 }
 
 async function updateStudent(id, data) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'UPDATE student SET ? WHERE gebruiker_id = ?';
 
     if (!id || !data) {

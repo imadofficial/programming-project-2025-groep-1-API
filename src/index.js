@@ -43,11 +43,16 @@ require('./auth/passportJWT.js');
 app.use('/bedrijven', require('./routes/bedrijven.js'));
 app.use('/studenten', require('./routes/studenten.js'));
 
+app.use('/functies', require('./routes/functies.js'));
+app.use('/discover', require('./routes/discover.js'));
 app.use('/skills', require('./routes/skills.js'));
 app.use('/opleidingen', require('./routes/opleidingen.js'));
 app.use('/stands', require('./routes/stands.js'));
+app.use('/sectoren', require('./routes/sectoren.js'));
 
 app.use('/speeddates', require('./routes/speeddates.js'));
+
+app.use('/contact', require('./routes/contact.js'));
 
 // User routes
 app.use('/user', require('./routes/user.js'));
@@ -55,12 +60,13 @@ app.use('/user', require('./routes/user.js'));
 // Authentication routes
 app.use('/auth/info', require('./auth/info.js'));
 
-// app.use('/auth/profielfoto', profielfoto); // TODO: implement Uploadthing using https://docs.uploadthing.com/api-reference/ut-api
+app.use('/profielfotos', require('./auth/profielFotos.js')); // TODO: implement Uploadthing using https://docs.uploadthing.com/api-reference/ut-api
 
 app.use('/auth/login', require('./auth/login.js'));
 app.use('/auth/refresh', require('./auth/refresh.js'));
 app.use('/auth/logout', require('./auth/logout.js'));
 app.use('/auth/register', require('./auth/register.js'));
+app.use('/qr', require('./routes/qr.js'));
 
 const port = process.env.STATUS == "production" ? 3000 : 3001;
 

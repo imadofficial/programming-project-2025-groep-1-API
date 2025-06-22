@@ -1,6 +1,6 @@
 const express = require('express');
 const passport = require('passport');
-const { getAllSkills, removeSkill, addSkill } = require('../sql/skills.js');
+const { getAllSkills, removeSkill, addSkill, getSkillById } = require('../sql/skills.js');
 const authAdmin = require('../auth/authAdmin.js');
 
 require('../auth/passportJWT.js');
@@ -17,16 +17,39 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get('/:skillID', async (req, res) => {
+    const skillId = req.params['skillID'];
+    if (!skillId) {
+        return res.status(400).json({ error: 'Skill ID is required' });
+    }
+
+    try {
+        const skill = await getSkillById(skillId);
+        if (!skill) {
+            return res.status(404).json({ error: 'Skill not found' });
+        }
+        res.json({ message: 'Skill retrieved successfully', skill: { id: skill.id, naam: skill.naam, type: skill.type } });
+    } catch (error) {
+        console.error('Error fetching skill:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 
 router.post('/', [passport.authenticate('jwt', { session: false })], async (req, res) => {
-    const { naam } = req.body;
+    const { naam, type } = req.body;
     if (!naam) {
         return res.status(400).json({ error: 'Skill name is required' });
     }
 
+    const typeId = parseInt(type, 10);
+    if (isNaN(typeId)) {
+        return res.status(400).json({ error: 'Skill type must be a valid number' });
+    }
+
     try {
-        const newSkill = await addSkill(naam);
-        res.status(201).json({ message: 'Skill added successfully', skill: { id: newSkill.id, naam: naam } });
+        const newSkill = await addSkill(naam, typeId);
+        res.status(201).json({ message: 'Skill added successfully', skill: { id: newSkill, naam: naam, type: typeId } });
     } catch (error) {
         console.error('Error adding skill:', error);
         res.status(500).json({ message: 'Internal server error' });

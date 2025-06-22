@@ -1,9 +1,12 @@
 const dotenv = require('dotenv');
+dotenv.config();
 
 const { getPool } = require('../globalEntries.js');
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 async function getUserById(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT id, email, type FROM gebruiker WHERE id = ?'; // Corrected table name
 
     try {
@@ -20,17 +23,18 @@ async function getUserById(id) {
 }
 
 async function getUserInfo(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     console.log('Fetching user info for ID:', id); // Log the ID being fetched
     const query = `
         SELECT 
             g.id, g.email, g.type,
-            s.voornaam AS student_voornaam, s.achternaam AS student_achternaam, s.date_of_birth, s.linkedin AS student_linkedin, s.profiel_foto, s.studiejaar, o.naam AS opleiding,
-            b.naam AS bedrijf_naam, b.plaats, b.contact_email, b.linkedin AS bedrijf_linkedin, b.profiel_foto AS bedrijf_profiel_foto
+            s.voornaam AS student_voornaam, s.achternaam AS student_achternaam, s.date_of_birth, s.linkedin AS student_linkedin, s.profiel_foto AS profiel_foto_student, s.studiejaar, o.naam AS opleiding,
+            b.naam AS bedrijf_naam, b.plaats, b.contact_email, b.linkedin AS bedrijf_linkedin, b.profiel_foto AS profiel_foto_bedrijf, sr.naam AS sector_bedrijf, sr.id AS id_sector_bedrijf
         FROM gebruiker g
         LEFT JOIN student s ON g.id = s.gebruiker_id
         LEFT JOIN bedrijf b ON g.id = b.gebruiker_id
         LEFT JOIN opleiding o ON s.opleiding_id = o.id
+        LEFT JOIN sector sr ON b.id_sector = sr.id
         WHERE g.id = ?
     `;
 
@@ -50,7 +54,8 @@ async function getUserInfo(id) {
                     voornaam: row.student_voornaam,
                     achternaam: row.student_achternaam,
                     date_of_birth: row.date_of_birth,
-                    profiel_foto: row.profiel_foto,
+                    profiel_foto_key: row.profiel_foto_student,
+                    profiel_foto_url: row.profiel_foto_student ? `https://gt0kk4fbet.ufs.sh/f/${row.profiel_foto_student}` : null,
                     linkedin: row.student_linkedin,
                     studiejaar: row.studiejaar,
                     opleiding: row.opleiding
@@ -63,9 +68,11 @@ async function getUserInfo(id) {
                     email: row.email,
                     naam: row.bedrijf_naam,
                     plaats: row.plaats,
-                    profiel_foto: row.bedrijf_profiel_foto,
+                    profiel_foto_key: row.profiel_foto_bedrijf,
+                    profiel_foto_url: row.profiel_foto_bedrijf ? `https://gt0kk4fbet.ufs.sh/f/${row.profiel_foto_bedrijf}` : null,
                     contact_email: row.contact_email,
-                    linkedin: row.bedrijf_linkedin
+                    linkedin: row.bedrijf_linkedin,
+                    sector_bedrijf: row.sector_bedrijf
                 };
             default:
                 // User is neither student nor company
@@ -82,7 +89,7 @@ async function getUserInfo(id) {
 }
 
 async function deleteUserById(id) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     try {
         await pool.query('START TRANSACTION');
     } catch (error) {
@@ -109,7 +116,7 @@ async function deleteUserById(id) {
 }
 
 async function updateUser(id, data) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'UPDATE gebruiker SET ? WHERE id = ?';
 
     if (!id || !data) {

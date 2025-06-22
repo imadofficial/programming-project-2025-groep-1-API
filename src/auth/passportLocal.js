@@ -15,7 +15,7 @@ passport.use(new LocalStrategy(
         email = email.toLowerCase();
         console.log("LocalStrategy called with email:", email);
         const userId = await login(email, password); 
-        if (userId === null) {
+        if (!userId) {
             return done(null, false, { message: 'Incorrect email or password.' });
         }
         const type = await getUserType(userId);

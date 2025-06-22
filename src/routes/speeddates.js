@@ -1,6 +1,9 @@
 const express = require('express');
 const passport = require('passport');
-const { getAllSpeeddates, getSpeeddateById, getSpeeddatesByUserId } = require('../sql/speeddates.js');
+const { getAllSpeeddates, getSpeeddateById, getUnavailableDates, getSpeeddatesByUserId, addSpeeddate, isDateAvailable, getSpeeddateInfo, speeddateAkkoord, speeddateAfgekeurd, getAcceptedSpeeddatesByUserId, getRejectedSpeeddatesByUserId, getSpeeddateHistoryByUserId, getAvailableDates, isOwner } = require('../sql/speeddates.js');
+const { sendNotification } = require('../modules/notifications.js');
+
+const { canAcceptSpeeddate } = require('../auth/canAcceptSpeeddate.js');
 
 require('../auth/passportJWT.js');
 
@@ -10,7 +13,59 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
     for (const [param, value] of Object.entries(req.query)) {
         console.log(param, value);
     }
-    const speeddates = await getSpeeddatesByUserId(req.user.id);
+    const id = req.query.id ? req.query.id : req.user.id;
+    if (!id) {
+        return res.status(400).json({ error: 'User ID is required' });
+    }
+    // Validate id as a number
+    const userId = parseInt(id, 10);
+    if (isNaN(userId)) {
+        return res.status(400).json({ error: 'Invalid User ID' });
+    }
+    const speeddates = await getSpeeddatesByUserId(userId);
+    res.json(speeddates);
+});
+
+router.get('/history', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const id = req.query.id ? req.query.id : req.user.id;
+    if (!id) {
+        return res.status(400).json({ error: 'User ID is required' });
+    }
+    // Validate id as a number
+    const userId = parseInt(id, 10);
+    if (isNaN(userId)) {
+        return res.status(400).json({ error: 'Invalid User ID' });
+    }
+    const speeddates = await getSpeeddateHistoryByUserId(userId);
+    res.json(speeddates);
+});
+
+router.get('/accepted', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const id = req.query.id ? req.query.id : req.user.id;
+    if (!id) {
+        return res.status(400).json({ error: 'User ID is required' });
+    }
+    // Validate id as a number
+    const userId = parseInt(id, 10);
+    if (isNaN(userId)) {
+        return res.status(400).json({ error: 'Invalid User ID' });
+    }
+    const speeddates = await getAcceptedSpeeddatesByUserId(userId);
+    console.log('Accepted speeddates for user ID', userId, ':', speeddates);
+    res.json(speeddates);
+});
+
+router.get('/pending', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const id = req.query.id ? req.query.id : req.user.id;
+    if (!id) {
+        return res.status(400).json({ error: 'User ID is required' });
+    }
+    // Validate id as a number
+    const userId = parseInt(id, 10);
+    if (isNaN(userId)) {
+        return res.status(400).json({ error: 'Invalid User ID' });
+    }
+    const speeddates = await getRejectedSpeeddatesByUserId(userId);
     res.json(speeddates);
 });
 
@@ -20,6 +75,185 @@ router.get('/:speeddateID', passport.authenticate('jwt', { session: false }), as
         res.json(speeddate);
     } else {
         res.status(404).json({ message: 'Speeddate not found' });
+    }
+});
+
+router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const body = req.body;
+    const studentId = body.id_student ? Number(body.id_student) : Number(req.user.id); // Use id_student if provided, otherwise use authenticated user ID
+    const bedrijfId = body.id_bedrijf ? Number(body.id_bedrijf) : null; // Use id_bedrijf if provided, otherwise null
+    const userId = req.user.id;
+    let datum = body.datum ? body.datum : null; // Use datum if provided, otherwise null
+    // Force seconds to 00 if datum is in the correct format (YYYY-MM-DD hh:mm:ss or YYYY-MM-DD hh:mm)
+    if (typeof datum === 'string') {
+        // If datum is in format YYYY-MM-DD hh:mm:ss, replace seconds with 00
+        datum = datum.replace(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}):\d{2}$/, '$1:00');
+        // If datum is in format YYYY-MM-DD hh:mm, add :00
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(datum)) {
+            datum = datum + ':00';
+        }
+    }
+    console.log('Creating speeddate with:', { datum, bedrijfId, studentId });
+    if (!datum || !bedrijfId || !studentId) {
+        return res.status(400).json({ error: 'Datum (datetime), id_bedrijf, and id_student are required' });
+    }
+
+    // Check if datum is a valid MySQL DATETIME string (YYYY-MM-DD HH:MM:SS)
+    const mysqlDatetimeRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+    const isValidDate = typeof datum === 'string' && mysqlDatetimeRegex.test(datum);
+    if (!isValidDate) {
+        return res.status(400).json({ error: 'Invalid datetime format. Use MySQL DATETIME (e.g., 2025-06-13 15:30:00)' });
+    }
+
+    if (isNaN(bedrijfId) || isNaN(studentId)) {
+        return res.status(400).json({ error: 'id_bedrijf and id_student must be valid numbers' });
+    }
+
+    const isAvailable = await isDateAvailable(bedrijfId, studentId, datum);
+
+    if (!isAvailable) {
+        return res.status(400).json({ error: 'The selected date and time is not available for the student or company' });
+    }
+
+    try {
+        const newSpeeddate = await addSpeeddate(bedrijfId, studentId, datum, userId);
+        if (newSpeeddate) {
+            const info = await getSpeeddateInfo(newSpeeddate);
+            res.status(201).json({ message: 'Speeddate created successfully', speeddate: info });
+        } else {
+            res.status(400).json({ message: 'Failed to create speeddate' });
+        }
+    } catch (error) {
+        console.error('Error creating speeddate:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+// POST /accept/:speeddateID
+router.post('/accept/:speeddateID', [passport.authenticate('jwt', { session: false }), canAcceptSpeeddate], async (req, res) => {
+    const speeddateId = req.params['speeddateID'];
+    const userId = req.user.id; // Declare userId
+    if (!speeddateId) {
+        return res.status(400).json({ error: 'Speeddate ID is required' });
+    }
+    if (await isOwner(speeddateId, userId)) {
+        return res.status(400).json({ error: 'You cannot accept your own speeddate' });
+    }
+    try {
+        const accepted = await speeddateAkkoord(speeddateId);
+        if (!accepted) {
+            return res.status(404).json({ error: 'Speeddate not found' });
+        }
+        const info = await getSpeeddateInfo(speeddateId);
+        // Format date as 'YYYY-MM-DD HH:mm' or 'HH:mm' if today
+        let formattedDate = '';
+        if (info.begin) {
+            const dateObj = new Date(info.begin);
+            const now = new Date();
+            // Compare year, month, day
+            const isToday = dateObj.getFullYear() === now.getFullYear() &&
+                dateObj.getMonth() === now.getMonth() &&
+                dateObj.getDate() === now.getDate();
+            const pad = n => n.toString().padStart(2, '0');
+            const time = pad(dateObj.getHours()) + ':' + pad(dateObj.getMinutes());
+            if (isToday) {
+                formattedDate = time;
+            } else {
+                formattedDate = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ${time}`;
+            }
+        }
+        const notifications = await sendNotification(
+            [info.id_bedrijf, info.id_student],
+            'Accepted Speeddate',
+            [`Jouw speeddate met ${info.voornaam_student} ${info.achternaam_student} om ${formattedDate} is geaccepteerd.`, `Jouw speeddate met ${info.naam_bedrijf} om ${formattedDate} is geaccepteerd.`]
+        );
+        console.log('Notifications sent:', notifications);
+        res.json({ message: 'Speeddate accepted', speeddate: info });
+    } catch (error) {
+        console.error('Error accepting speeddate:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+// POST /reject/:speeddateID
+router.post('/reject/:speeddateID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const speeddateId = req.params['speeddateID'];
+    if (!speeddateId) {
+        return res.status(400).json({ error: 'Speeddate ID is required' });
+    }
+    try {
+        const info = await getSpeeddateInfo(speeddateId);
+        const rejected = await speeddateAfgekeurd(speeddateId);
+        if (!rejected) {
+            return res.status(404).json({ error: 'Speeddate not found' });
+        }
+        // Format date as 'YYYY-MM-DD HH:mm' or 'HH:mm' if today
+        let formattedDate = '';
+        if (info.begin) {
+            const dateObj = new Date(info.begin);
+            const now = new Date();
+            // Compare year, month, day
+            const isToday = dateObj.getFullYear() === now.getFullYear() &&
+                dateObj.getMonth() === now.getMonth() &&
+                dateObj.getDate() === now.getDate();
+            const pad = n => n.toString().padStart(2, '0');
+            const time = pad(dateObj.getHours()) + ':' + pad(dateObj.getMinutes());
+            if (isToday) {
+                formattedDate = time;
+            } else {
+                formattedDate = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ${time}`;
+            }
+        }
+        const notifications = await sendNotification(
+            [info.id_bedrijf, info.id_student],
+            'Rejected Speeddate',
+            [`Jouw speeddate met ${info.voornaam_student} ${info.achternaam_student} om ${formattedDate} is afgewezen.`, `Jouw speeddate met ${info.naam_bedrijf} om ${formattedDate} is afgewezen.`]
+        );
+        console.log('Notifications sent:', notifications);
+        res.json({ message: 'Speeddate rejected' });
+    } catch (error) {
+        console.error('Error rejecting speeddate:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+// GET /user/:userID/unavailable
+router.get('/user/:userID/unavailable', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const userId = req.params['userID'];
+    const ownId = req.user.id;
+    if (!userId) {
+        return res.status(400).json({ error: 'userID is required' });
+    }
+    try {
+        // Get all speeddates for the given id (bedrijf or student)
+        const unavailableDates = await getUnavailableDates(ownId, userId);
+        res.json(unavailableDates);
+    } catch (error) {
+        console.error('Error fetching unavailable time windows:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+
+router.get('/user/:userID/available', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    const userId = req.params['userID'];
+    const ownId = req.user.id;
+    const eventId = req.query.eventId ? req.query.eventId : 1; // Optional event ID for filtering
+    if (!userId) {
+        return res.status(400).json({ error: 'userID is required' });
+    }
+    try {
+        // Get all speeddates for the given id (bedrijf or student)
+        const availableDates = await getAvailableDates(ownId, userId, eventId);
+        console.log('Available dates for user ID', userId, ':', availableDates);
+
+        res.json(availableDates);
+    } catch (error) {
+        console.error('Error fetching available time windows:', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 });
 

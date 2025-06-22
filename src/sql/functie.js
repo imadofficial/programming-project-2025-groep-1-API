@@ -4,11 +4,15 @@ const dotenv = require('dotenv');
 
 const { getPool } = require('../globalEntries.js');
 
+const { getUserById } = require('./users.js');
+
 
 dotenv.config();
 
+const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
+
 async function getAllFuncties() {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM functie';
 
     try {
@@ -27,7 +31,7 @@ async function getAllFuncties() {
 }
 
 async function addFunctie(naam) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'INSERT INTO functie (naam) VALUES (?)';
 
     try {
@@ -41,7 +45,7 @@ async function addFunctie(naam) {
 
 
 async function removeFunctie(id_functie) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'DELETE FROM functie WHERE id = ?';
 
     try {
@@ -54,7 +58,7 @@ async function removeFunctie(id_functie) {
 }
 
 async function modifyFunctie(id_functie, naam) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'UPDATE functie SET naam = ? WHERE id = ?';
 
     try {
@@ -67,7 +71,7 @@ async function modifyFunctie(id_functie, naam) {
 }
 
 async function getFunctieById(id_functie) {
-    const pool = getPool('ehbmatchdev');
+    const pool = getPool(DB_NAME);
     const query = 'SELECT * FROM functie WHERE id = ?';
 
     try {
@@ -83,11 +87,98 @@ async function getFunctieById(id_functie) {
     }
 }
 
+async function getFunctiesByUserId(id_gebruiker) {
+    const pool = getPool(DB_NAME);
+    const query = `
+        SELECT f.*
+        FROM functie f
+        JOIN gebruiker_functie gf ON gf.id_functie = f.id
+        WHERE gf.id_gebruiker = ?
+    `;
+
+    try {
+        const [rows] = await pool.query(query, [id_gebruiker]);
+        if (rows.length > 0) {
+            return rows; // Return all functies for the user
+        } else {
+            return []; // Return an empty array if no functies are found
+        }
+    } catch (error) {
+        console.error('Database query error in getFunctieByUserId:', error.message, error.stack);
+        throw new Error('Getting functie by user ID failed');
+    }
+}
+
+async function addFunctieToUser(id_gebruiker, id_functie) {
+    const pool = getPool(DB_NAME);
+    const query = 'INSERT IGNORE INTO gebruiker_functie (id_gebruiker, id_functie) VALUES (?, ?)';
+
+    try {
+        const [result] = await pool.query(query, [id_gebruiker, id_functie]);
+        return result.affectedRows > 0; // Return true if the record was inserted
+    } catch (error) {
+        console.error('Database query error in addFunctieToUser:', error.message, error.stack);
+        throw new Error('Adding functie to user failed');
+    }
+}
+
+async function addFunctiesToUser(id_gebruiker, functies) {
+    const pool = getPool(DB_NAME);
+    if (!Array.isArray(functies) || functies.length === 0) {
+        return 0;
+    }
+    if (functies.some(functieId => typeof functieId !== 'number' || functieId <= 0)) {
+        throw new Error('All functie IDs must be positive integers');
+    }
+
+    // If user is student, delete all existing functies first
+    if ((await getUserById(id_gebruiker)).type === 2) {
+        const deleteQuery = 'DELETE FROM gebruiker_functie WHERE id_gebruiker = ?';
+        try {
+            const result = await pool.query(deleteQuery, [id_gebruiker]);
+            console.log(`Deleted ${result.affectedRows} existing functies for user ${id_gebruiker}`);
+        } catch (error) {
+            console.error('Database query error in addFunctiesToUser (delete):', error.message, error.stack);
+            throw new Error('Deleting existing functies failed');
+        }
+    }
+
+    // Build bulk insert values
+    const values = functies.map(functieId => [id_gebruiker, functieId]);
+    // Dynamically build the query for bulk insert
+    const placeholders = values.map(() => '(?, ?)').join(', ');
+    const flatValues = values.flat();
+    const query = `INSERT IGNORE INTO gebruiker_functie (id_gebruiker, id_functie) VALUES ${placeholders}`;
+    try {
+        const [result] = await pool.query(query, flatValues);
+        return result.affectedRows > 0; // Return true if any rows were inserted
+    } catch (error) {
+        console.error('Database query error in addFunctiesToUser:', error.message, error.stack);
+        throw new Error('Adding multiple functies to user failed');
+    }
+}
+
+async function removeFunctieFromUser(id_gebruiker, id_functie) {
+    const pool = getPool(DB_NAME);
+    const query = 'DELETE FROM gebruiker_functie WHERE id_gebruiker = ? AND id_functie = ?';
+
+    try {
+        const [result] = await pool.query(query, [id_gebruiker, id_functie]);
+        return result.affectedRows > 0; // Return true if a row was deleted
+    } catch (error) {
+        console.error('Database query error in removeFunctieFromUser:', error.message, error.stack);
+        throw new Error('Removing functie from user failed');
+    }
+}
 
 module.exports = {
     getAllFuncties,
     addFunctie,
     removeFunctie,
     modifyFunctie,
-    getFunctieById
+    getFunctieById,
+    addFunctieToUser,
+    addFunctiesToUser,
+    getFunctiesByUserId,
+    removeFunctieFromUser
 };
