@@ -1637,7 +1637,7 @@ paths:
                   type: array
                   items:
                     type: integer
-                    example: [1, 2, 3]
+                  example: [1, 2, 3]
 
       responses:
         '200':
@@ -1906,7 +1906,7 @@ paths:
                   type: array
                   items:
                     type: integer
-                    example: [1, 2, 3]
+                  example: [1, 2, 3]
 
       responses:
         '200':
@@ -2193,7 +2193,7 @@ paths:
                   type: array
                   items:
                     type: integer
-                    example: [1, 2, 3]
+                  example: [1, 2, 3]
       responses:
         '200':
           description: OK
@@ -2320,7 +2320,7 @@ paths:
                   type: array
                   items:
                     type: integer
-                    example: [1, 2, 3]
+                  example: [1, 2, 3]
       responses:
         '200':
           description: OK
