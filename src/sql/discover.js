@@ -21,6 +21,15 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
     if (onlyNew) {
         onlyNewCondition = `AND NOT EXISTS (SELECT 1 FROM speeddate s WHERE s.id_student = ? AND s.id_bedrijf = b.gebruiker_id)`;
     }
+    const hasLimit = typeof limit === 'number' && !isNaN(limit);
+    const hasOffset = typeof offset === 'number' && !isNaN(offset);
+    let limitClause = '';
+    if (hasLimit) {
+        limitClause = 'LIMIT ?';
+        if (hasOffset) {
+            limitClause += ' OFFSET ?';
+        }
+    }
     if (suggestions) {
         query = `
             WITH bedrijf_reqs AS (
@@ -73,10 +82,10 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
             ) AS functie_match ON functie_match.bedrijf_id = b.gebruiker_id
             WHERE b.goedkeuring = 1 ${onlyNewCondition}
             ORDER BY match_percentage DESC, match_score DESC, b.naam ASC
-            LIMIT ? OFFSET ?
+            ${limitClause}
         `;
-        // params: [opleidingId, studentId, studentId, (studentId if onlyNew), limit, offset]
-        params = onlyNew ? [opleidingId, studentId, studentId, studentId, limit, offset] : [opleidingId, studentId, studentId, limit, offset];
+        // params: [opleidingId, studentId, studentId, studentId]
+        params = onlyNew ? [opleidingId, studentId, studentId, studentId] : [opleidingId, studentId, studentId];
     } else {
         query = `
             WITH bedrijf_reqs AS (
@@ -129,9 +138,15 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
             ) AS functie_match ON functie_match.bedrijf_id = b.gebruiker_id
             WHERE b.goedkeuring = 1 ${onlyNewCondition}
             ORDER BY functie_matches DESC, opleiding_matches DESC, match_percentage DESC, match_score DESC, b.naam ASC
-            LIMIT ? OFFSET ?
+            ${limitClause}
         `;
-        params = onlyNew ? [opleidingId, studentId, studentId, studentId, limit, offset] : [opleidingId, studentId, studentId, limit, offset];
+        params = onlyNew ? [opleidingId, studentId, studentId, studentId] : [opleidingId, studentId, studentId];
+    }
+    if (hasLimit) {
+        params.push(limit);
+        if (hasOffset) {
+            params.push(offset);
+        }
     }
     try {
         const [rows] = await pool.query(query, params);
@@ -180,6 +195,15 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = fal
     let onlyNewCondition = '';
     if (onlyNew) {
         onlyNewCondition = `AND NOT EXISTS (SELECT 1 FROM speeddate s WHERE s.id_bedrijf = ? AND s.id_student = s2.gebruiker_id)`;
+    }
+    const hasLimit = typeof limit === 'number' && !isNaN(limit);
+    const hasOffset = typeof offset === 'number' && !isNaN(offset);
+    let limitClause = '';
+    if (hasLimit) {
+        limitClause = 'LIMIT ?';
+        if (hasOffset) {
+            limitClause += ' OFFSET ?';
+        }
     }
     if (suggestions) {
         query = `
@@ -234,10 +258,9 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = fal
                 GROUP BY student_functie.id_gebruiker
             ) AS functie_match ON functie_match.student_id = s.gebruiker_id
             ORDER BY match_percentage DESC, match_score DESC, s.voornaam ASC
-            LIMIT ? OFFSET ?
+            ${limitClause}
         `;
-        // params: [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, (bedrijfId if onlyNew), bedrijfId, bedrijfId, limit, offset]
-        params = onlyNew ? [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId, bedrijfId, limit, offset] : [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId, limit, offset];
+        params = [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, ...(onlyNew ? [bedrijfId, bedrijfId, bedrijfId] : [bedrijfId, bedrijfId])];
     } else {
         query = `
             WITH bedrijf_reqs AS (
@@ -291,9 +314,15 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = fal
                 GROUP BY student_functie.id_gebruiker
             ) AS functie_match ON functie_match.student_id = s.gebruiker_id
             ORDER BY functie_matches DESC, opleiding_matches DESC, match_percentage DESC, match_score DESC, s.voornaam ASC
-            LIMIT ? OFFSET ?
+            ${limitClause}
         `;
-        params = onlyNew ? [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId, bedrijfId, limit, offset] : [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId, limit, offset];
+        params = [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, ...(onlyNew ? [bedrijfId, bedrijfId, bedrijfId] : [bedrijfId, bedrijfId])];
+    }
+    if (hasLimit) {
+        params.push(limit);
+        if (hasOffset) {
+            params.push(offset);
+        }
     }
     try {
         const [rows] = await pool.query(query, params);
