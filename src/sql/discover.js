@@ -10,7 +10,7 @@ const DB_NAME = process.env.DB_NAME || 'ehbmatchdev';
 
 const baseUrl = "https://gt0kk4fbet.ufs.sh/f/";
 
-async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = false) {
+async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = false, limit = 20, offset = 0) {
     const pool = getPool(DB_NAME);
     // Pre-fetch opleiding_id for the student to avoid subquery in every row
     const [[student]] = await pool.query('SELECT opleiding_id FROM student WHERE gebruiker_id = ?', [studentId]);
@@ -73,9 +73,10 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
             ) AS functie_match ON functie_match.bedrijf_id = b.gebruiker_id
             WHERE b.goedkeuring = 1 ${onlyNewCondition}
             ORDER BY match_percentage DESC, match_score DESC, b.naam ASC
+            LIMIT ? OFFSET ?
         `;
-        // params: [opleidingId, studentId, studentId, (studentId if onlyNew)]
-        params = onlyNew ? [opleidingId, studentId, studentId, studentId] : [opleidingId, studentId, studentId];
+        // params: [opleidingId, studentId, studentId, (studentId if onlyNew), limit, offset]
+        params = onlyNew ? [opleidingId, studentId, studentId, studentId, limit, offset] : [opleidingId, studentId, studentId, limit, offset];
     } else {
         query = `
             WITH bedrijf_reqs AS (
@@ -128,8 +129,9 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
             ) AS functie_match ON functie_match.bedrijf_id = b.gebruiker_id
             WHERE b.goedkeuring = 1 ${onlyNewCondition}
             ORDER BY functie_matches DESC, opleiding_matches DESC, match_percentage DESC, match_score DESC, b.naam ASC
+            LIMIT ? OFFSET ?
         `;
-        params = onlyNew ? [opleidingId, studentId, studentId, studentId] : [opleidingId, studentId, studentId];
+        params = onlyNew ? [opleidingId, studentId, studentId, studentId, limit, offset] : [opleidingId, studentId, studentId, limit, offset];
     }
     try {
         const [rows] = await pool.query(query, params);
@@ -164,7 +166,7 @@ async function getDiscoverBedrijven(studentId, suggestions = true, onlyNew = fal
  * @param {number} bedrijfId - The gebruiker_id of the bedrijf to compare to.
  * @param {boolean} suggestions - If true, use weighted total; if false, show all students with same opleiding first, then others.
  */
-async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = false) {
+async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = false, limit = 20, offset = 0) {
     const pool = getPool(DB_NAME);
     // Pre-fetch all opleiding_ids for the bedrijf to avoid subquery in every row
     const [bedrijfOplRows] = await pool.query('SELECT id_opleiding FROM bedrijf_opleiding WHERE id_bedrijf = ?', [bedrijfId]);
@@ -232,9 +234,10 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = fal
                 GROUP BY student_functie.id_gebruiker
             ) AS functie_match ON functie_match.student_id = s.gebruiker_id
             ORDER BY match_percentage DESC, match_score DESC, s.voornaam ASC
+            LIMIT ? OFFSET ?
         `;
-        // params: [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, (bedrijfId if onlyNew), bedrijfId, bedrijfId]
-        params = onlyNew ? [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId, bedrijfId] : [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId];
+        // params: [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, (bedrijfId if onlyNew), bedrijfId, bedrijfId, limit, offset]
+        params = onlyNew ? [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId, bedrijfId, limit, offset] : [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId, limit, offset];
     } else {
         query = `
             WITH bedrijf_reqs AS (
@@ -288,8 +291,9 @@ async function getDiscoverStudenten(bedrijfId, suggestions = true, onlyNew = fal
                 GROUP BY student_functie.id_gebruiker
             ) AS functie_match ON functie_match.student_id = s.gebruiker_id
             ORDER BY functie_matches DESC, opleiding_matches DESC, match_percentage DESC, match_score DESC, s.voornaam ASC
+            LIMIT ? OFFSET ?
         `;
-        params = onlyNew ? [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId, bedrijfId] : [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId];
+        params = onlyNew ? [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId, bedrijfId, limit, offset] : [opleiding_count, skill_count, functie_count, ...bedrijfOplIds, bedrijfId, bedrijfId, limit, offset];
     }
     try {
         const [rows] = await pool.query(query, params);
